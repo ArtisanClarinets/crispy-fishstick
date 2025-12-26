@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Inter } from "next/font/google";
+import { PageTransition } from "@/components/page-transition";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -59,7 +60,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          <main className="flex-1 pt-16">{children}</main>
+          <PageTransition>
+            <main className="flex-1 pt-16">{children}</main>
+          </PageTransition>
           <Footer />
         </ThemeProvider>
       </body>

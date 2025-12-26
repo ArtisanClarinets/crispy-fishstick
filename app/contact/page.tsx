@@ -38,7 +38,7 @@ export default function ContactPage() {
         <div className="mb-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Get in Touch</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Have a project in mind or just want to chat? We'd love to hear from
+            Have a project in mind or just want to chat? I&apos;d love to hear from
             you.
           </p>
         </div>
@@ -47,9 +47,9 @@ export default function ContactPage() {
           {/* Contact Info */}
           <div className="lg:col-span-1 space-y-8">
             <div>
-              <h2 className="text-2xl font-bold mb-6">Let's Connect</h2>
+              <h2 className="text-2xl font-bold mb-6">Let&apos;s Connect</h2>
               <p className="text-muted-foreground mb-8">
-                Fill out the form and we'll get back to you within 24 hours.
+                Fill out the form and I&apos;ll get back to you within 24 hours.
               </p>
             </div>
 
@@ -179,7 +179,7 @@ export default function ContactPage() {
 
                 {status === "success" && (
                   <p className="text-center text-green-600 dark:text-green-400">
-                    Thank you! We'll get back to you soon.
+                    Thank you! We&apos;ll get back to you soon.
                   </p>
                 )}
               </div>
