@@ -1,230 +1,194 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { siteConfig } from "@/lib/site";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, CheckCircle2, Layout, Database, Shield, Zap, Search } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-sm font-medium mb-8"
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>Welcome to Studio</span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
-            >
-              Premium Digital
-              <br />
-              <span className="text-muted-foreground">Experiences</span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12"
-            >
-              We craft exceptional digital products with meticulous attention to
-              detail, blending innovative design with cutting-edge technology.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
-              <Link
-                href="/work"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-colors font-medium"
-              >
-                View Our Work
-                <ArrowRight className="h-4 w-4" />
+      <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-4 text-center">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background opacity-50" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-4xl"
+        >
+          <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
+            Reliable Systems. <br className="hidden sm:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
+              Premium Interfaces.
+            </span>
+          </h1>
+          <p className="mt-6 text-lg text-muted-foreground sm:text-xl max-w-2xl mx-auto">
+            {siteConfig.description}
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" asChild className="text-lg h-12 px-8">
+              <Link href={siteConfig.cta.primary.href}>
+                {siteConfig.cta.primary.text}
               </Link>
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-border hover:bg-accent transition-colors font-medium"
-              >
-                Get in Touch
+            </Button>
+            <Button size="lg" variant="outline" asChild className="text-lg h-12 px-8">
+              <Link href={siteConfig.cta.secondary.href}>
+                {siteConfig.cta.secondary.text}
               </Link>
-            </motion.div>
+            </Button>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Social Proof */}
+      <section className="py-12 border-y border-border/40 bg-secondary/20">
+        <div className="container px-4 text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-8">
+            Trusted by founders and teams at
+          </p>
+          <div className="flex flex-wrap justify-center gap-8 opacity-70 grayscale transition-all hover:grayscale-0">
+             {/* Placeholders for logos */}
+            <div className="text-xl font-bold flex items-center gap-2"><div className="w-6 h-6 bg-primary rounded-full"></div>Acme Corp</div>
+            <div className="text-xl font-bold flex items-center gap-2"><div className="w-6 h-6 bg-primary rounded-full"></div>GlobalTech</div>
+            <div className="text-xl font-bold flex items-center gap-2"><div className="w-6 h-6 bg-primary rounded-full"></div>Nebula</div>
+            <div className="text-xl font-bold flex items-center gap-2"><div className="w-6 h-6 bg-primary rounded-full"></div>Vertex</div>
           </div>
         </div>
       </section>
 
-      {/* Featured Work Preview */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-secondary/50">
-        <div className="mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Featured Work
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Explore our latest projects and case studies showcasing our
-              expertise in design and development.
-            </p>
-          </motion.div>
+      {/* Featured Work */}
+      <section className="py-24 px-4">
+        <div className="container">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Selected Work</h2>
+              <p className="text-muted-foreground">Recent production-grade deployments.</p>
+            </div>
+            <Button variant="ghost" asChild className="group mt-4 md:mt-0">
+              <Link href="/work">
+                View all work <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {[
-              {
-                title: "Shopify Admin Sync",
-                description:
-                  "Seamless integration between Shopify GraphQL API and ERPNext",
-                category: "Integration",
-              },
-              {
-                title: "E-Commerce Platform",
-                description: "Modern storefront with advanced features",
-                category: "Web Development",
-              },
-              {
-                title: "Brand Identity",
-                description: "Complete brand redesign and guidelines",
-                category: "Design",
-              },
-            ].map((project, index) => (
-              <motion.div
-                key={project.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group relative bg-background rounded-2xl p-8 border border-border hover:border-foreground/20 transition-all"
-              >
-                <div className="mb-4">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {project.category}
-                  </span>
+          <div className="grid gap-8 md:grid-cols-3">
+            {siteConfig.featuredWork.map((project, index) => (
+              <Link key={project.slug} href={`/work/${project.slug}`} className="group block">
+                <div className="overflow-hidden rounded-xl border bg-card transition-all hover:shadow-lg hover:-translate-y-1">
+                  <div className="aspect-video bg-muted relative">
+                     {/* Placeholder for image */}
+                     <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/20 text-4xl font-bold">
+                        {project.title[0]}
+                     </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{project.title}</h3>
+                    <p className="text-muted-foreground text-sm line-clamp-2">{project.description}</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                <p className="text-muted-foreground mb-4">
-                  {project.description}
-                </p>
-                <Link
-                  href="/work"
-                  className="inline-flex items-center gap-2 text-sm font-medium group-hover:gap-3 transition-all"
-                >
-                  View Case Study
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </motion.div>
+              </Link>
             ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="text-center mt-12"
-          >
-            <Link
-              href="/work"
-              className="inline-flex items-center gap-2 text-sm font-medium hover:gap-3 transition-all"
-            >
-              View All Projects
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Services Overview */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              What We Do
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              From concept to launch, we provide comprehensive digital services
-              tailored to your needs.
-            </p>
-          </motion.div>
+      {/* Services */}
+      <section className="py-24 bg-secondary/10">
+         <div className="container px-4">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-16 text-center">Technical Services</h2>
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                {[
+                    { title: "Design Engineering", icon: <Layout className="w-6 h-6"/>, desc: "Bridging the gap between Figma and production code with pixel-perfect precision." },
+                    { title: "Frontend Systems", icon: <Zap className="w-6 h-6"/>, desc: "Scalable React architectures, component libraries, and performance optimization." },
+                    { title: "Backend Integrations", icon: <Database className="w-6 h-6"/>, desc: "Reliable synchronization engines, API design, and database modeling." },
+                    { title: "Audits & Rescue", icon: <Search className="w-6 h-6"/>, desc: "Performance, accessibility, and code quality audits for legacy codebases." }
+                ].map((service, i) => (
+                    <div key={i} className="flex flex-col gap-4 p-6 rounded-xl bg-background border transition-colors hover:border-primary/50">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                            {service.icon}
+                        </div>
+                        <h3 className="text-xl font-bold">{service.title}</h3>
+                        <p className="text-muted-foreground text-sm">{service.desc}</p>
+                    </div>
+                ))}
+            </div>
+         </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Design",
-                description:
-                  "User-centered design that delights and converts",
-              },
-              {
-                title: "Development",
-                description:
-                  "Modern, scalable solutions built with best practices",
-              },
-              {
-                title: "Integration",
-                description:
-                  "Seamless connections between your tools and platforms",
-              },
-            ].map((service, index) => (
-              <motion.div
-                key={service.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="text-center"
-              >
-                <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
-                <p className="text-muted-foreground">{service.description}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-center mt-12"
-          >
-            <Link
-              href="/services"
-              className="inline-flex items-center gap-2 text-sm font-medium hover:gap-3 transition-all"
-            >
-              Explore Our Services
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </motion.div>
+      {/* Rigor & Skills */}
+      <section className="py-24 container px-4">
+        <div className="grid gap-16 lg:grid-cols-2">
+            <div>
+                <h2 className="text-3xl font-bold tracking-tight mb-6">Engineering Rigor</h2>
+                <p className="text-lg text-muted-foreground mb-8">
+                    I don't just write code; I ship systems. Every deliverable meets a strict quality bar.
+                </p>
+                <div className="space-y-4">
+                    {[
+                        "100% Type Safety (Strict TypeScript)",
+                        "WCAG 2.1 AA Accessibility",
+                        "Automated CI/CD Pipelines",
+                        "Performance Budgets (Lighthouse 95+)",
+                        "Comprehensive Unit & E2E Testing"
+                    ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                            <CheckCircle2 className="w-5 h-5 text-primary" />
+                            <span className="font-medium">{item}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <div>
+                 <h3 className="text-xl font-bold mb-6">Technical Arsenal</h3>
+                 <div className="space-y-6">
+                    {siteConfig.skills.map((skill) => (
+                        <div key={skill.name}>
+                            <div className="flex justify-between mb-2 text-sm font-medium">
+                                <span>{skill.name}</span>
+                                <span className="text-muted-foreground">{skill.level}%</span>
+                            </div>
+                            <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    whileInView={{ width: `${skill.level}%` }}
+                                    transition={{ duration: 1, ease: "easeOut" }}
+                                    viewport={{ once: true }}
+                                    className="h-full bg-primary rounded-full"
+                                />
+                            </div>
+                        </div>
+                    ))}
+                 </div>
+            </div>
         </div>
+      </section>
+
+      {/* Principles */}
+      <section className="py-24 bg-primary text-primary-foreground">
+          <div className="container px-4">
+              <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">Core Principles</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                  {["Clarity", "Reliability", "Observability", "Safety", "Performance", "Accessibility"].map((p) => (
+                      <div key={p} className="aspect-square flex items-center justify-center rounded-xl bg-primary-foreground/10 border border-primary-foreground/20 backdrop-blur-sm hover:bg-primary-foreground/20 transition-colors">
+                          <span className="font-bold text-lg">{p}</span>
+                      </div>
+                  ))}
+              </div>
+          </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-32 container px-4 text-center">
+          <h2 className="text-4xl font-bold tracking-tight mb-6">Have a high-stakes product? <br/> Let's ship it right.</h2>
+          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+              Available for select contract engagements. Currently booking for Q4.
+          </p>
+          <Button size="lg" className="text-lg px-10 py-6" asChild>
+              <Link href="/contact">Start the Conversation</Link>
+          </Button>
       </section>
     </div>
   );
 }
-

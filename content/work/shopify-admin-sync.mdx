@@ -1,0 +1,65 @@
+---
+title: "Shopify Admin Sync — Enterprise Shopify → ERPNext synchronization engine"
+description: "A high-performance synchronization engine handling 40+ entity types with reliability, observability, and operational safety."
+date: "2023-10-15"
+image: "/images/shopify-sync-hero.jpg"
+tags: ["System Architecture", "GraphQL", "Python", "ERPNext", "Shopify Plus"]
+role: "Lead Engineer"
+timeline: "4 months"
+outcome: "100% data integrity across 500k+ SKUs"
+---
+
+## The Challenge
+
+Enterprise e-commerce operations often suffer from data fragmentation. Our client, a high-volume fashion retailer, needed to bridge the gap between their Shopify Plus storefront and their ERPNext backend. The existing solution was brittle, slow, and prone to silent failures, leading to inventory discrepancies and overselling.
+
+## The Solution
+
+We architected and built a bespoke synchronization engine designed for **reliability**, **observability**, and **operational safety**.
+
+### Key Capabilities
+
+- **Enterprise-grade Coverage**: Syncs 40+ entity types including Products, Variants, Customers, Orders, Fulfillments, Inventory, Payments, and Metafields.
+- **Dual Sync Modes**:
+    - **Incremental Delta Imports**: Real-time updates via webhooks and polling for recent changes.
+    - **Full Bulk Imports**: Nightly reconciliation jobs to ensure eventual consistency.
+- **Declarative Mapping**: Logic is defined in YAML configuration files, allowing non-engineers to adjust field mappings without deploying code. UI overrides provide a safety hatch for edge cases.
+
+## System Architecture
+
+The system uses a producer-consumer architecture with Redis queues to handle high throughput and ensure no data is lost during spikes.
+
+1.  **Ingestion**: Webhooks and cron jobs enqueue sync tasks.
+2.  **Processing**: Workers consume tasks, fetching data from Shopify's Admin GraphQL API using cost-based throttling.
+3.  **Transformation**: Data is normalized and mapped according to the declarative schema.
+4.  **Loading**: Transformed data is upserted into ERPNext using bulk operations where possible.
+
+### Production Safety
+
+Safety was a non-negotiable requirement.
+
+- **Rate Limiting**: Respects Shopify's leaky bucket algorithm dynamically.
+- **Concurrency Controls**: Semaphores prevent race conditions on the same entity.
+- **Safe Mode & Dry Run**: Operators can test changes in a read-only mode before applying them to production.
+
+## Observability
+
+"If you can't see it, you can't trust it." We built an enterprise observability suite:
+
+- **Audit Trails**: Every sync event is logged with full payloads.
+- **Real-time Monitoring**: Dashboard showing queue depth, throughput, and error rates.
+- **GraphQL Cost Monitoring**: Tracks query costs to optimize fetch strategies.
+
+## UI Master Plan
+
+We didn't just build a backend; we designed a "Control Tower" interface.
+
+- **Command-Center Clarity**: High-level health metrics at a glance.
+- **Actionable Control**: Pause, resume, and retry sync jobs with one click.
+- **Trust through Transparency**: Drill down into individual sync events to see exactly what changed and why.
+
+## Results
+
+- **Zero Overselling**: Inventory sync latency reduced from hours to seconds.
+- **Operational Confidence**: The team now trusts the data implicitly.
+- **Scalability**: Successfully handled Black Friday traffic with 10x normal load.
