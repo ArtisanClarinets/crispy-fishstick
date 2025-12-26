@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Layout, Database, Shield, Zap, Search } from "lucide-react";
+import { ArrowRight, CheckCircle2, Layout, Database, Zap, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/reveal";
@@ -78,7 +78,7 @@ export default function Home() {
           </Reveal>
 
           <div className="grid gap-8 md:grid-cols-3">
-            {siteConfig.featuredWork.map((project, index) => (
+            {siteConfig.featuredWork.map((project) => (
               <Reveal key={project.slug}>
               <Link href={`/work/${project.slug}`} className="group block h-full">
                 <div className="overflow-hidden rounded-xl border bg-card transition-all hover:shadow-lg hover:-translate-y-1 h-full flex flex-col">
@@ -112,8 +112,8 @@ export default function Home() {
                     { title: "Frontend Systems", icon: <Zap className="w-6 h-6"/>, desc: "Scalable React architectures, component libraries, and performance optimization." },
                     { title: "Backend Integrations", icon: <Database className="w-6 h-6"/>, desc: "Reliable synchronization engines, API design, and database modeling." },
                     { title: "Audits & Rescue", icon: <Search className="w-6 h-6"/>, desc: "Performance, accessibility, and code quality audits for legacy codebases." }
-                ].map((service, i) => (
-                    <Reveal key={i} className="h-full">
+                ].map((service) => (
+                    <Reveal key={service.title} className="h-full">
                       <div className="flex flex-col gap-4 p-6 rounded-xl bg-background border transition-colors hover:border-primary/50 h-full">
                           <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                               {service.icon}
@@ -142,8 +142,8 @@ export default function Home() {
                         "Automated CI/CD Pipelines",
                         "Performance Budgets (Lighthouse 95+)",
                         "Comprehensive Unit & E2E Testing"
-                    ].map((item, i) => (
-                        <div key={i} className="flex items-center gap-3">
+                    ].map((item) => (
+                        <div key={item} className="flex items-center gap-3">
                             <CheckCircle2 className="w-5 h-5 text-primary" />
                             <span className="font-medium">{item}</span>
                         </div>
@@ -182,7 +182,7 @@ export default function Home() {
               <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">Core Principles</h2>
               </Reveal>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                  {["Clarity", "Reliability", "Observability", "Safety", "Performance", "Accessibility"].map((p, i) => (
+                  {["Clarity", "Reliability", "Observability", "Safety", "Performance", "Accessibility"].map((p) => (
                       <Reveal key={p}>
                       <div className="aspect-square flex items-center justify-center rounded-xl bg-primary-foreground/10 border border-primary-foreground/20 backdrop-blur-sm hover:bg-primary-foreground/20 transition-colors h-full">
                           <span className="font-bold text-lg">{p}</span>
