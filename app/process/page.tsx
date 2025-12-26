@@ -3,7 +3,7 @@ import { CheckCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Process",
-  description: "Our proven process for delivering exceptional digital products.",
+  description: "My proven process for delivering exceptional digital products.",
 };
 
 const processSteps = [
@@ -11,7 +11,7 @@ const processSteps = [
     number: "01",
     title: "Discovery",
     description:
-      "We start by understanding your goals, challenges, and target audience. Through research and analysis, we define the project scope and success criteria.",
+      "I start by understanding your goals, challenges, and target audience. Through research and analysis, I define the project scope and success criteria.",
     deliverables: [
       "Project brief",
       "User research",
@@ -23,7 +23,7 @@ const processSteps = [
     number: "02",
     title: "Strategy & Planning",
     description:
-      "Based on our findings, we develop a comprehensive strategy and roadmap. We define the architecture, technology stack, and timeline.",
+      "Based on my findings, I develop a comprehensive strategy and roadmap. I define the architecture, technology stack, and timeline.",
     deliverables: [
       "Project roadmap",
       "Technical architecture",
@@ -35,7 +35,7 @@ const processSteps = [
     number: "03",
     title: "Design",
     description:
-      "We create wireframes, prototypes, and high-fidelity designs that bring the vision to life. Every element is crafted with purpose and attention to detail.",
+      "I create wireframes, prototypes, and high-fidelity designs that bring the vision to life. Every element is crafted with purpose and attention to detail.",
     deliverables: [
       "Wireframes",
       "Interactive prototypes",
@@ -47,7 +47,7 @@ const processSteps = [
     number: "04",
     title: "Development",
     description:
-      "Our team builds your product using modern technologies and best practices. We focus on performance, scalability, and maintainability.",
+      "I build your product using modern technologies and best practices. I focus on performance, scalability, and maintainability.",
     deliverables: [
       "Clean, documented code",
       "Responsive implementation",
@@ -59,7 +59,7 @@ const processSteps = [
     number: "05",
     title: "Testing & Refinement",
     description:
-      "Rigorous testing ensures everything works flawlessly across devices and browsers. We refine based on feedback and real-world usage.",
+      "Rigorous testing ensures everything works flawlessly across devices and browsers. I refine based on feedback and real-world usage.",
     deliverables: [
       "Comprehensive testing",
       "Performance optimization",
@@ -71,7 +71,7 @@ const processSteps = [
     number: "06",
     title: "Launch & Support",
     description:
-      "We handle the deployment and provide ongoing support to ensure success. Monitoring and optimization continue post-launch.",
+      "I handle the deployment and provide ongoing support to ensure success. Monitoring and optimization continue post-launch.",
     deliverables: [
       "Deployment",
       "Training & documentation",
@@ -96,7 +96,7 @@ export default function ProcessPage() {
 
         {/* Process Steps */}
         <div className="space-y-12">
-          {processSteps.map((step, index) => (
+          {processSteps.map((step) => (
             <div
               key={step.number}
               className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start"
@@ -144,7 +144,7 @@ export default function ProcessPage() {
             Ready to get started?
           </h2>
           <p className="text-muted-foreground mb-8">
-            Let's discuss your project and how our process can help achieve your
+            Let&apos;s discuss your project and how our process can help achieve your
             goals.
           </p>
           <a

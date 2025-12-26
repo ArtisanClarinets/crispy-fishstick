@@ -1,0 +1,43 @@
+---
+title: "GraphQL at Scale: cost-based throttling and resilient sync design"
+description: "Learnings from building high-volume synchronization engines using the Shopify Admin GraphQL API."
+date: "2024-11-20"
+tags: ["GraphQL", "Backend"]
+readTime: "8 min read"
+---
+
+Synchronizing data between an ERP and a commerce platform like Shopify is a classic distributed systems problem. It sounds simple—"copy data from A to B"—until you hit the edge cases.
+
+## The Cost of Querying
+
+Shopify's GraphQL API uses a calculated "cost" for rate limiting, rather than a simple request count. This changes how you design your sync engine.
+
+### 1. Complexity Budgeting
+You can't just request `edges { node { ... } }` for everything. You have to calculate the cost of your query *before* you run it, or at least respect the `requestedQueryCost` returned in the response.
+
+```graphql
+query {
+  products(first: 10) {
+    edges {
+      node {
+        id
+        title
+        # This is expensive!
+        variants(first: 100) {
+          edges { node { id } }
+        }
+      }
+    }
+  }
+}
+```
+
+### 2. The Leaky Bucket
+We implemented a client-side "leaky bucket" algorithm that tracks our available credit. If a job estimates its cost is higher than our available credit, it waits. It doesn't even try to send the request.
+
+### 3. Incremental vs. Bulk
+For day-to-day operations, we use webhooks to trigger incremental updates. But we also built a "Safety Valve": a bulk import mutation using Shopify's `stagedUploadsCreate` for when we need to reconcile thousands of records at once.
+
+## Conclusion
+
+Reliable sync isn't about code that works when everything is fine. It's about code that handles backpressure, respects limits, and recovers gracefully when the network fails.

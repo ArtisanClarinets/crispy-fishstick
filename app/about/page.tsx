@@ -1,4 +1,3 @@
-import { siteConfig } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 

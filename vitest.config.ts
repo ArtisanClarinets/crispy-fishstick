@@ -6,14 +6,12 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
-    setupFiles: ["./tests/setup.ts"],
     globals: true,
-    exclude: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/e2e/**",
-      "**/.next/**",
-    ],
+    setupFiles: ["./tests/setup.ts"],
+    exclude: ["node_modules", "e2e/**", ".next/**"],
+    alias: {
+      "@": path.resolve(__dirname, "./"),
+    },
   },
   resolve: {
     alias: {

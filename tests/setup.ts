@@ -1,12 +1,12 @@
 import "@testing-library/jest-dom";
 
 // Mock IntersectionObserver
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  takeRecords() {
-    return [];
-  }
-  unobserve() {}
-} as any;
+const IntersectionObserverMock = function () {
+  return {
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  };
+};
+
+vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);
