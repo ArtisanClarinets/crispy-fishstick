@@ -5,20 +5,22 @@ import { siteConfig } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Layout, Database, Shield, Zap, Search } from "lucide-react";
 import { motion } from "framer-motion";
+import { HeroBackground } from "@/components/hero-background";
+import { Reveal } from "@/components/reveal";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-4 text-center">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background opacity-50" />
+      <section className="relative flex min-h-[90svh] flex-col items-center justify-center overflow-hidden px-4 text-center pt-[env(safe-area-inset-top)]">
+        <HeroBackground />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-4xl"
+          className="max-w-5xl z-10"
         >
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
+          <h1 className="text-[clamp(2.5rem,8vw,6rem)] leading-[1.05] font-extrabold tracking-tight">
             Reliable Systems. <br className="hidden sm:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
               Premium Interfaces.
@@ -61,6 +63,7 @@ export default function Home() {
       {/* Featured Work */}
       <section className="py-24 px-4">
         <div className="container">
+          <Reveal>
           <div className="flex flex-col md:flex-row justify-between items-end mb-12">
             <div>
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Selected Work</h2>
@@ -72,23 +75,26 @@ export default function Home() {
               </Link>
             </Button>
           </div>
+          </Reveal>
 
           <div className="grid gap-8 md:grid-cols-3">
             {siteConfig.featuredWork.map((project, index) => (
-              <Link key={project.slug} href={`/work/${project.slug}`} className="group block">
-                <div className="overflow-hidden rounded-xl border bg-card transition-all hover:shadow-lg hover:-translate-y-1">
+              <Reveal key={project.slug}>
+              <Link href={`/work/${project.slug}`} className="group block h-full">
+                <div className="overflow-hidden rounded-xl border bg-card transition-all hover:shadow-lg hover:-translate-y-1 h-full flex flex-col">
                   <div className="aspect-video bg-muted relative">
                      {/* Placeholder for image */}
                      <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/20 text-4xl font-bold">
                         {project.title[0]}
                      </div>
                   </div>
-                  <div className="p-6">
+                  <div className="p-6 flex-1">
                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{project.title}</h3>
                     <p className="text-muted-foreground text-sm line-clamp-2">{project.description}</p>
                   </div>
                 </div>
               </Link>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -97,7 +103,9 @@ export default function Home() {
       {/* Services */}
       <section className="py-24 bg-secondary/10">
          <div className="container px-4">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-16 text-center">Technical Services</h2>
+            <Reveal>
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-16 text-center">Technical Services</h2>
+            </Reveal>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
                 {[
                     { title: "Design Engineering", icon: <Layout className="w-6 h-6"/>, desc: "Bridging the gap between Figma and production code with pixel-perfect precision." },
@@ -105,13 +113,15 @@ export default function Home() {
                     { title: "Backend Integrations", icon: <Database className="w-6 h-6"/>, desc: "Reliable synchronization engines, API design, and database modeling." },
                     { title: "Audits & Rescue", icon: <Search className="w-6 h-6"/>, desc: "Performance, accessibility, and code quality audits for legacy codebases." }
                 ].map((service, i) => (
-                    <div key={i} className="flex flex-col gap-4 p-6 rounded-xl bg-background border transition-colors hover:border-primary/50">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                            {service.icon}
-                        </div>
-                        <h3 className="text-xl font-bold">{service.title}</h3>
-                        <p className="text-muted-foreground text-sm">{service.desc}</p>
-                    </div>
+                    <Reveal key={i} className="h-full">
+                      <div className="flex flex-col gap-4 p-6 rounded-xl bg-background border transition-colors hover:border-primary/50 h-full">
+                          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                              {service.icon}
+                          </div>
+                          <h3 className="text-xl font-bold">{service.title}</h3>
+                          <p className="text-muted-foreground text-sm">{service.desc}</p>
+                      </div>
+                    </Reveal>
                 ))}
             </div>
          </div>
@@ -120,10 +130,10 @@ export default function Home() {
       {/* Rigor & Skills */}
       <section className="py-24 container px-4">
         <div className="grid gap-16 lg:grid-cols-2">
-            <div>
+            <Reveal>
                 <h2 className="text-3xl font-bold tracking-tight mb-6">Engineering Rigor</h2>
                 <p className="text-lg text-muted-foreground mb-8">
-                    I don't just write code; I ship systems. Every deliverable meets a strict quality bar.
+                    I don&apos;t just write code; I ship systems. Every deliverable meets a strict quality bar.
                 </p>
                 <div className="space-y-4">
                     {[
@@ -139,8 +149,8 @@ export default function Home() {
                         </div>
                     ))}
                 </div>
-            </div>
-            <div>
+            </Reveal>
+            <Reveal>
                  <h3 className="text-xl font-bold mb-6">Technical Arsenal</h3>
                  <div className="space-y-6">
                     {siteConfig.skills.map((skill) => (
@@ -161,19 +171,23 @@ export default function Home() {
                         </div>
                     ))}
                  </div>
-            </div>
+            </Reveal>
         </div>
       </section>
 
       {/* Principles */}
       <section className="py-24 bg-primary text-primary-foreground">
           <div className="container px-4">
+              <Reveal>
               <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">Core Principles</h2>
+              </Reveal>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                  {["Clarity", "Reliability", "Observability", "Safety", "Performance", "Accessibility"].map((p) => (
-                      <div key={p} className="aspect-square flex items-center justify-center rounded-xl bg-primary-foreground/10 border border-primary-foreground/20 backdrop-blur-sm hover:bg-primary-foreground/20 transition-colors">
+                  {["Clarity", "Reliability", "Observability", "Safety", "Performance", "Accessibility"].map((p, i) => (
+                      <Reveal key={p}>
+                      <div className="aspect-square flex items-center justify-center rounded-xl bg-primary-foreground/10 border border-primary-foreground/20 backdrop-blur-sm hover:bg-primary-foreground/20 transition-colors h-full">
                           <span className="font-bold text-lg">{p}</span>
                       </div>
+                      </Reveal>
                   ))}
               </div>
           </div>
@@ -181,13 +195,15 @@ export default function Home() {
 
       {/* CTA */}
       <section className="py-32 container px-4 text-center">
-          <h2 className="text-4xl font-bold tracking-tight mb-6">Have a high-stakes product? <br/> Let's ship it right.</h2>
+          <Reveal>
+          <h2 className="text-4xl font-bold tracking-tight mb-6">Have a high-stakes product? <br/> Let&apos;s ship it right.</h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
               Available for select contract engagements. Currently booking for Q4.
           </p>
           <Button size="lg" className="text-lg px-10 py-6" asChild>
               <Link href="/contact">Start the Conversation</Link>
           </Button>
+          </Reveal>
       </section>
     </div>
   );

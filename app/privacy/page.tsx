@@ -110,7 +110,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mb-4">Children's Privacy</h2>
+            <h2 className="text-2xl font-bold mb-4">Children&apos;s Privacy</h2>
             <p className="text-muted-foreground">
               Our website is not intended for children under 13 years of age. We
               do not knowingly collect personal information from children under
@@ -125,7 +125,7 @@ export default function PrivacyPage() {
             <p className="text-muted-foreground">
               We may update our Privacy Policy from time to time. We will notify
               you of any changes by posting the new Privacy Policy on this page
-              and updating the "Last updated" date.
+              and updating the &quot;Last updated&quot; date.
             </p>
           </section>
 

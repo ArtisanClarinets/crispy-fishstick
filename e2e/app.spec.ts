@@ -8,10 +8,11 @@ test.describe("Homepage", () => {
 
   test("should have navigation links", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("link", { name: "Work" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Services" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "About" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Contact" })).toBeVisible();
+    // Use .first() because links appear in both nav and footer
+    await expect(page.getByRole("link", { name: "Work" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Services" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "About" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Contact" }).first()).toBeVisible();
   });
 
   test("should navigate to work page", async ({ page }) => {
@@ -29,7 +30,7 @@ test.describe("Homepage", () => {
   test("should have accessible hero section", async ({ page }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { level: 1, name: /Premium Digital/ })
+      page.getByRole("heading", { level: 1, name: /Reliable Systems/ })
     ).toBeVisible();
   });
 });
@@ -44,7 +45,8 @@ test.describe("Work Page", () => {
 
   test("should navigate to case study detail", async ({ page }) => {
     await page.goto("/work");
-    await page.getByRole("link", { name: /View Case Study/ }).first().click();
+    // The card itself is the link, or it has a title link
+    await page.getByRole("link", { name: "Shopify Admin Sync" }).first().click();
     await expect(page).toHaveURL(/\/work\//);
   });
 });

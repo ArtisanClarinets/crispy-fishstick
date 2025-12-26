@@ -7,7 +7,7 @@ const root = process.cwd();
 export async function getMdxFiles(dir: string) {
   try {
     return fs.readdirSync(path.join(root, "content", dir));
-  } catch (e) {
+  } catch {
     return [];
   }
 }
@@ -25,6 +25,7 @@ export async function getMdxContent(dir: string, slug: string) {
     timeline?: string;
     outcome?: string;
     image?: string;
+    readTime?: string;
   }>({
     source,
     options: { parseFrontmatter: true },

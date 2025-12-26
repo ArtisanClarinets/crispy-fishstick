@@ -93,16 +93,16 @@ export default function ServicesPage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Services</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Services</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From concept to launch and beyond, we provide comprehensive digital
+            From concept to launch and beyond, I provide comprehensive digital
             services tailored to your needs.
           </p>
         </div>
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => {
+          {services.map((service) => {
             const Icon = service.icon;
             return (
               <div
@@ -143,7 +143,7 @@ export default function ServicesPage() {
               Ready to start your project?
             </h2>
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Let's discuss how we can help bring your vision to life with our
+              Let&apos;s discuss how we can help bring your vision to life with our
               expertise and dedication.
             </p>
             <a
