@@ -1,12 +1,15 @@
+
 import "@testing-library/jest-dom";
 
-// Mock IntersectionObserver
-const IntersectionObserverMock = function () {
-  return {
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
+// Mock IntersectionObserver for Playwright
+if (typeof window !== "undefined") {
+  const IntersectionObserverMock = function () {
+    return {
+      observe: () => null,
+      unobserve: () => null,
+      disconnect: () => null,
+    };
   };
-};
 
-vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);
+  (window as any).IntersectionObserver = IntersectionObserverMock;
+}
