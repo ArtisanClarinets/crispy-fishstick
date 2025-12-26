@@ -1,132 +1,107 @@
 import type { Metadata } from "next";
-import { Code, Palette, Zap, Layers, Database, Sparkles } from "lucide-react";
+import { Code, Palette, Zap, Layers, BarChart, ShieldCheck, Database, Search } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Services",
-  description: "Comprehensive digital services tailored to your needs.",
+  description: "Specialized engineering and design services for high-stakes digital products.",
 };
 
 const services = [
   {
-    icon: Palette,
-    title: "Design",
-    description:
-      "User-centered design that creates meaningful experiences and drives engagement.",
-    features: [
-      "UI/UX Design",
-      "Brand Identity",
-      "Design Systems",
-      "Prototyping",
-      "User Research",
-    ],
-  },
-  {
     icon: Code,
-    title: "Development",
+    title: "Design Engineering",
     description:
-      "Modern, scalable web applications built with cutting-edge technologies.",
+      "Bridging the gap between Figma and production code. I build pixel-perfect UI systems that scale.",
     features: [
-      "Web Applications",
-      "E-Commerce",
-      "Progressive Web Apps",
-      "API Development",
-      "Performance Optimization",
-    ],
-  },
-  {
-    icon: Zap,
-    title: "Integration",
-    description:
-      "Seamless connections between your tools and platforms for efficient workflows.",
-    features: [
-      "API Integration",
-      "Data Synchronization",
-      "Workflow Automation",
-      "Third-party Services",
-      "Custom Connectors",
+      "Component Libraries",
+      "Design Systems",
+      "Motion & Interaction",
+      "Storybook Architecture",
+      "Token-based Theming",
     ],
   },
   {
     icon: Layers,
-    title: "Strategy",
+    title: "Frontend Systems",
     description:
-      "Data-driven digital strategies that align with your business goals.",
+      "Scalable React architectures for complex applications. Optimized for performance and maintainability.",
     features: [
-      "Digital Strategy",
-      "Technical Consulting",
-      "Architecture Planning",
-      "Technology Selection",
-      "Roadmap Development",
+      "Next.js Architecture",
+      "State Management",
+      "Performance Optimization",
+      "Type-Safe APIs",
+      "Legacy Migration",
     ],
   },
   {
     icon: Database,
-    title: "Data & Analytics",
+    title: "Commerce Integrations",
     description:
-      "Insights and intelligence to make informed decisions and drive growth.",
+      "Reliable synchronization engines and custom storefronts for high-volume commerce.",
     features: [
-      "Analytics Implementation",
-      "Data Visualization",
-      "Reporting Dashboards",
-      "Performance Monitoring",
-      "Business Intelligence",
+      "Shopify Headless",
+      "ERP Synchronization",
+      "Inventory Management",
+      "Payment Gateways",
+      "Custom Checkouts",
     ],
   },
   {
-    icon: Sparkles,
-    title: "Optimization",
+    icon: ShieldCheck,
+    title: "Audits & Rescue",
     description:
-      "Continuous improvement of performance, SEO, and user experience.",
+      "Deep-dive technical audits to identify bottlenecks, accessibility issues, and code debt.",
     features: [
-      "Performance Tuning",
-      "SEO Optimization",
-      "Conversion Rate Optimization",
-      "Accessibility Compliance",
-      "Code Audits",
+      "Performance Audits",
+      "Accessibility (WCAG)",
+      "Code Quality Review",
+      "Security Assessment",
+      "SEO Technical Audit",
     ],
   },
 ];
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-24 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Services</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From concept to launch and beyond, I provide comprehensive digital
-            services tailored to your needs.
+        <div className="mb-20">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+            Technical Services
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl">
+            I don't just write code; I engineer systems. My services are designed for founders and companies who need production-grade quality from day one.
           </p>
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
           {services.map((service) => {
             const Icon = service.icon;
             return (
               <div
                 key={service.title}
-                className="bg-background rounded-2xl p-8 border border-border hover:border-foreground/20 transition-all"
+                className="group bg-card rounded-3xl p-8 sm:p-10 border border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg"
               >
-                <div className="mb-4">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary">
-                    <Icon className="h-6 w-6" />
+                <div className="mb-6">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-secondary group-hover:bg-foreground/5 transition-colors">
+                    <Icon className="h-7 w-7 text-foreground" />
                   </div>
                 </div>
 
-                <h2 className="text-2xl font-bold mb-3">{service.title}</h2>
-                <p className="text-muted-foreground mb-6">
+                <h2 className="text-2xl font-bold mb-4">{service.title}</h2>
+                <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
                   {service.description}
                 </p>
 
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {service.features.map((feature) => (
                     <li
                       key={feature}
-                      className="text-sm flex items-center gap-2"
+                      className="text-sm font-medium flex items-center gap-3 text-foreground/80"
                     >
-                      <span className="w-1 h-1 rounded-full bg-foreground"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/60"></span>
                       {feature}
                     </li>
                   ))}
@@ -137,22 +112,22 @@ export default function ServicesPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-20 text-center">
-          <div className="bg-secondary/50 rounded-2xl p-12 border border-border">
-            <h2 className="text-3xl font-bold mb-4">
-              Ready to start your project?
-            </h2>
-            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Let&apos;s discuss how we can help bring your vision to life with our
-              expertise and dedication.
-            </p>
-            <a
-              href="/contact"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-colors font-medium"
-            >
-              Get in Touch
-            </a>
-          </div>
+        <div className="border-t border-border pt-24">
+            <div className="max-w-3xl">
+                <h2 className="text-3xl font-bold mb-6">
+                  Have a specific challenge?
+                </h2>
+                <p className="text-lg text-muted-foreground mb-8">
+                  I often take on custom engineering challenges that don't fit neatly into a bucket.
+                  If you need a reliable partner to solve a hard problem, let's talk.
+                </p>
+                <a
+                  href="/contact"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all font-medium text-lg"
+                >
+                  Book a Consultation
+                </a>
+            </div>
         </div>
       </div>
     </div>
