@@ -6,14 +6,31 @@ const root = process.cwd();
 
 export async function getMdxFiles(dir: string) {
   try {
-    return fs.readdirSync(path.join(root, "content", dir));
+    const contentDir = path.join(root, "content");
+    const joinedPath = path.join(contentDir, dir);
+    const targetPath = path.normalize(joinedPath);
+
+    // Ensure the resolved path stays within the intended content directory
+    if (!targetPath.startsWith(contentDir)) {
+      throw new Error("Invalid directory path");
+    }
+
+    return fs.readdirSync(targetPath);
   } catch {
     return [];
   }
 }
 
 export async function getMdxContent(dir: string, slug: string) {
-  const filePath = path.join(root, "content", dir, `${slug}.mdx`);
+  const contentDir = path.join(root, "content");
+  const joinedPath = path.join(contentDir, dir, `${slug}.mdx`);
+  const filePath = path.normalize(joinedPath);
+
+  // Ensure the resulting path is within the intended content directory
+  if (!filePath.startsWith(contentDir)) {
+    throw new Error("Invalid path specified!");
+  }
+
   const source = fs.readFileSync(filePath, "utf8");
 
   const { content, frontmatter } = await compileMDX<{

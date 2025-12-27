@@ -71,7 +71,7 @@ export default function ServicesPage() {
             Technical Services
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            I don't just write code; I engineer systems. My services are designed for founders and companies who need production-grade quality from day one.
+            I don&apos;t just write code; I engineer systems. My services are designed for founders and companies who need production-grade quality from day one.
           </p>
         </div>
 
@@ -118,8 +118,8 @@ export default function ServicesPage() {
                   Have a specific challenge?
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8">
-                  I often take on custom engineering challenges that don't fit neatly into a bucket.
-                  If you need a reliable partner to solve a hard problem, let's talk.
+                  I often take on custom engineering challenges that don&apos;t fit neatly into a bucket.
+                  If you need a reliable partner to solve a hard problem, let&apos;s talk.
                 </p>
                 <a
                   href="/contact"
