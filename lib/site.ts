@@ -1,14 +1,14 @@
 export const siteConfig = {
-  name: "Dylan Thompson",
-  company: "Thompson Studio",
+  name: "YOUR_NAME_HERE",
+  company: "YOUR_COMPANY_NAME_HERE",
   tagline: "High-Performance Systems & Premium Interfaces",
   description:
     "A specialized solo studio for founders who need production-grade engineering and Apple-caliber design.",
-  email: "hello@example.com",
+  email: "YOUR_EMAIL_HERE",
   links: {
-    github: "https://github.com/example",
-    linkedin: "https://linkedin.com/in/example",
-    twitter: "https://twitter.com/example",
+    github: "YOUR_GITHUB_URL_HERE",
+    linkedin: "YOUR_LINKEDIN_URL_HERE",
+    twitter: "YOUR_TWITTER_URL_HERE",
   },
   cta: {
     primary: {
