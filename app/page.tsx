@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/reveal";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, getWorkPlaceholder } from "@/lib/site";
 import { Card } from "@/components/ui/card";
 
 // Premium Stack Chips
@@ -130,7 +130,7 @@ export default function Home() {
                 <Link href={`/work/${project.slug}`} className="group block h-full">
                   <div className="relative overflow-hidden rounded-2xl bg-secondary aspect-[4/3] mb-6 border border-border/50">
                      {/* Abstract Gradient Cover */}
-                     <div className={`absolute inset-0 bg-gradient-to-br ${siteConfig.workPlaceholders[project.slug as keyof typeof siteConfig.workPlaceholders]?.gradient || 'from-gray-800 to-black'} opacity-80 transition-transform duration-700 group-hover:scale-105`} />
+                     <div className={`absolute inset-0 bg-gradient-to-br ${getWorkPlaceholder(project.slug).gradient} opacity-80 transition-transform duration-700 group-hover:scale-105`} />
 
                      <div className="absolute inset-0 p-8 flex flex-col justify-between">
                         <div className="self-end p-2 bg-background/10 backdrop-blur-md rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">

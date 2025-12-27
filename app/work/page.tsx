@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, getWorkPlaceholder } from "@/lib/site";
 import { Reveal } from "@/components/reveal";
 import { ArrowRight } from "lucide-react";
 import { Metadata } from "next";
@@ -29,7 +29,7 @@ export default function WorkPage() {
             <Link href={`/work/${project.slug}`} className="group grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               {/* Image Column */}
               <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-secondary border border-border/50">
-                 <div className={`absolute inset-0 bg-gradient-to-br ${siteConfig.workPlaceholders[project.slug as keyof typeof siteConfig.workPlaceholders]?.gradient || 'from-gray-800 to-black'} opacity-80 transition-transform duration-700 group-hover:scale-105`} />
+                 <div className={`absolute inset-0 bg-gradient-to-br ${getWorkPlaceholder(project.slug).gradient} opacity-80 transition-transform duration-700 group-hover:scale-105`} />
                  <div className="absolute inset-0 flex items-center justify-center">
                     <span className="sr-only">{project.title}</span>
                  </div>

@@ -58,3 +58,8 @@ export const siteConfig = {
 };
 
 export type SiteConfig = typeof siteConfig;
+
+export function getWorkPlaceholder(slug: string) {
+  const placeholders = siteConfig.workPlaceholders as Record<string, { gradient: string; accent: string } | undefined>;
+  return placeholders[slug] || { gradient: "from-gray-800 to-black", accent: "text-primary" };
+}

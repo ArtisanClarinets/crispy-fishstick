@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, User, BarChart, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, getWorkPlaceholder } from "@/lib/site";
 import { Reveal } from "@/components/reveal";
 
 // Import MDX Components to pass directly
@@ -49,7 +49,7 @@ export default async function WorkDetail({ params }: { params: { slug: string } 
   const { title, description, date, role, timeline, outcome, tags } = post.frontmatter;
 
   // Placeholder gradient lookup
-  const placeholderStyle = siteConfig.workPlaceholders[slug as keyof typeof siteConfig.workPlaceholders] || { gradient: "from-gray-800 to-black", accent: "text-primary" };
+  const placeholderStyle = getWorkPlaceholder(slug);
 
   return (
     <article className="min-h-screen pb-24">
