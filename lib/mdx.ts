@@ -33,6 +33,15 @@ export async function getMdxContent(dir: string, slug: string) {
 
   const source = fs.readFileSync(filePath, "utf8");
 
+  // We only parse frontmatter here, but return raw source for the component to handle
+  // OR we can compile it here.
+  // Given we are using next-mdx-remote/rsc in the page, let's keep it simple:
+  // Return the raw source and frontmatter.
+
+  // We use compileMDX just to extract frontmatter easily, but we can also just use it for everything.
+  // If we return 'content' (React Element) from here, we can't serialize it easily if this was an API,
+  // but since we are in RSC -> RSC, we CAN return the element!
+
   const { content, frontmatter } = await compileMDX<{
     title: string;
     description: string;
@@ -46,11 +55,13 @@ export async function getMdxContent(dir: string, slug: string) {
   }>({
     source,
     options: { parseFrontmatter: true },
+    // We can pass components here if we want them available during compilation
+    // components: { ... }
   });
 
   return {
     slug,
-    content,
+    content, // This is a React Element
     frontmatter,
   };
 }
