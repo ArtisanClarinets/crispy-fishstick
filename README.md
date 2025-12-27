@@ -1,71 +1,142 @@
-# Studio Portfolio
+# Thompson Studio - Premium Engineering Portfolio
 
-A premium, Apple-caliber portfolio website built with Next.js 14, React 18, Tailwind CSS, and TypeScript. Designed for high-end freelance engineering studios.
+> "High-trust systems. Premium UX. Production-grade engineering."
 
-## Features
+A flagship portfolio website designed to communicate rigor, craftsmanship, and enterprise-grade capability. Built with a modern, stable stack focusing on performance, accessibility, and visual polish.
 
--   **Tech Stack:** Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Framer Motion.
--   **Design System:** Token-driven Tailwind setup with shadcn/ui components.
--   **Performance:** Optimized for Core Web Vitals (Lighthouse 95+ targets).
--   **Content:** MDX-driven case studies and insights.
--   **Accessibility:** Fully accessible (WCAG AA compliant).
--   **Testing:** End-to-end testing with Playwright, unit testing with Vitest.
+## ⚡ Tech Stack
 
-## Getting Started
+This project is built on a **proven, stable foundation** to ensure reliability and ease of maintenance:
 
-1.  **Install dependencies:**
+-   **Framework:** [Next.js 14 (App Router)](https://nextjs.org/) - The React Framework for the Web.
+-   **Language:** [TypeScript](https://www.typescriptlang.org/) - Strict mode for type safety.
+-   **Styling:** [Tailwind CSS v3](https://tailwindcss.com/) - Utility-first CSS with a custom design token system.
+-   **UI Library:** [shadcn/ui](https://ui.shadcn.com/) - Reusable components built with Radix UI and Tailwind.
+-   **Animation:** [Framer Motion](https://www.framer.com/motion/) - Production-ready animation library.
+-   **Content:** [MDX](https://mdxjs.com/) - Markdown for the component era, powering Case Studies and Insights.
+-   **Testing:**
+    -   **Unit:** [Vitest](https://vitest.dev/) + React Testing Library.
+    -   **E2E:** [Playwright](https://playwright.dev/).
 
-    ```bash
-    npm install
-    ```
+## 🚀 Getting Started
 
-2.  **Run the development server:**
+We prioritize a seamless "one-command" setup experience.
 
-    ```bash
-    npm run dev
-    ```
+### Prerequisites
 
-    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+-   Node.js 18+
+-   npm
 
-3.  **Build for production:**
+### Installation
 
-    ```bash
-    npm run build
-    npm start
-    ```
+Clone the repository and install dependencies. This will also automatically install the necessary Playwright browsers.
 
-## Adding Content
+```bash
+npm install
+```
 
-### Case Studies
-Add new case studies in `content/work/`. Use the existing `.mdx` files as templates. Ensure you include the frontmatter:
+### Development
 
+Start the local development server:
+
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000).
+
+### Production Build
+
+To simulate a production environment locally:
+
+```bash
+npm run build
+npm start
+```
+
+## 🧪 Quality Gates & Testing
+
+This project employs a rigorous testing strategy to ensure production readiness.
+
+### End-to-End (E2E) Testing
+We use Playwright to verify critical user flows (Navigation, Contact Form, Case Study rendering).
+
+```bash
+# Run all E2E tests (headless)
+npm run test:e2e
+
+# Run with UI mode for debugging
+npm run test:e2e:ui
+```
+
+### Unit Testing
+Vitest is used for testing isolated UI logic and utilities.
+
+```bash
+npm test
+```
+
+### Static Analysis
+Ensure code quality before committing:
+
+```bash
+# Linting (ESLint)
+npm run lint
+
+# Type Checking
+npx tsc --noEmit
+```
+
+## 📂 Project Structure
+
+```
+├── app/                  # Next.js App Router pages and layouts
+├── components/           # React components
+│   ├── ui/               # Base UI components (Buttons, Inputs, etc.)
+│   └── ...               # Feature-specific components
+├── content/              # MDX Content Source
+│   ├── work/             # Case Studies
+│   └── insights/         # Blog Posts
+├── lib/                  # Utilities and Configuration
+│   ├── site.ts           # Global site config (Links, SEO, etc.)
+│   └── mdx.ts            # MDX processing logic
+├── public/               # Static assets
+└── e2e/                  # Playwright E2E tests
+```
+
+## 📝 Managing Content
+
+### Case Studies (`content/work/*.mdx`)
+Add new case studies to the `content/work` directory.
+**Frontmatter Requirements:**
 ```yaml
 ---
-title: "Project Name"
-excerpt: "Short description"
-date: "2024-01-01"
-client: "Client Name"
-role: "Engineering Lead"
-tags: ["Next.js", "TypeScript"]
-coverImage: "/images/project-cover.jpg"
+title: "Shopify Admin Sync"
+description: "Enterprise sync engine handling 1M+ SKUs."
+date: "2023-11-15"
+tags: ["Backend", "GraphQL", "System Design"]
+role: "Lead Engineer"
+timeline: "4 months"
+outcome: "99.99% sync reliability"
+image: "/images/placeholder-work-1.jpg"
 ---
 ```
 
-### Insights (Blog)
-Add new posts in `content/insights/`.
+### Insights (`content/insights/*.mdx`)
+Add thought leadership articles to `content/insights`.
 
-## Configuration
+## 🎨 Design System
 
-Edit `lib/site.ts` to update global site information (Company Name, Links, etc.).
+The design system is token-driven via CSS variables in `app/globals.css`. It supports:
+-   **Light/Dark Mode:** Automatic switching with perfect contrast ratios.
+-   **Reduced Motion:** Respects user system preferences.
+-   **Typography:** Apple-system font stack for native feel.
 
-## Quality Gates
+## 🛡️ Security
 
-This project enforces strict quality standards:
+-   **Input Validation:** All MDX paths are sanitized to prevent traversal attacks.
+-   **Strict TypeScript:** No `any` types allowed.
 
--   **Linting:** `npm run lint`
--   **Type Checking:** Built into build process.
--   **E2E Tests:** `npm run test:e2e`
+---
 
-## License
-
-Private / Proprietary.
+© 2024 Thompson Studio. All rights reserved.
