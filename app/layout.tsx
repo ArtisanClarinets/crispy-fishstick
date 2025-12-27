@@ -5,39 +5,44 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Inter } from "next/font/google";
 import { PageTransition } from "@/components/page-transition";
+import { cn } from "@/lib/utils";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: {
-    default: "Studio - Premium Digital Experiences",
-    template: "%s | Studio",
+    default: "Thompson Systems | High-Trust Engineering",
+    template: "%s | Thompson Systems",
   },
   description:
-    "Creating premium digital experiences with attention to detail and craftsmanship. Specializing in modern web development and design.",
+    "A specialized engineering studio for founders who demand production-grade quality, rigorous systems, and Apple-caliber interfaces.",
   keywords: [
-    "web development",
-    "design",
-    "digital studio",
-    "portfolio",
+    "Software Engineering",
+    "Systems Architecture",
     "Next.js",
     "React",
+    "TypeScript",
+    "High-Performance",
+    "Design Engineering",
   ],
-  authors: [{ name: "Studio" }],
+  authors: [{ name: "Dylan Thompson" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://studio.example.com",
-    title: "Studio - Premium Digital Experiences",
+    url: "https://thompsonsystems.com",
+    title: "Thompson Systems",
     description:
-      "Creating premium digital experiences with attention to detail and craftsmanship.",
-    siteName: "Studio",
+      "Engineering for High-Trust Products. Production-grade quality from day one.",
+    siteName: "Thompson Systems",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Studio - Premium Digital Experiences",
-    description:
-      "Creating premium digital experiences with attention to detail and craftsmanship.",
+    title: "Thompson Systems",
+    creator: "@dylanthompson-demo",
   },
   robots: {
     index: true,
@@ -51,17 +56,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col`}>
+    <html lang="en" suppressHydrationWarning className="scroll-smooth">
+      <body className={cn(
+        inter.variable,
+        "font-sans antialiased min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary"
+      )}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark" // Premium defaults to dark usually
           enableSystem
           disableTransitionOnChange
         >
           <Header />
           <PageTransition>
-            <main className="flex-1 pt-16">{children}</main>
+            {/* Added a subtle global grain/noise if needed later via CSS */}
+            <main className="flex-1 pt-20">{children}</main>
           </PageTransition>
           <Footer />
         </ThemeProvider>
