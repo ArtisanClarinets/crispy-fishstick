@@ -1,48 +1,37 @@
 import type { MDXComponents } from "mdx/types";
+import Link from "next/link";
+import { Callout } from "@/components/mdx/callout";
+import { MetricGrid, MetricItem } from "@/components/mdx/metric";
+import { Figure } from "@/components/mdx/figure";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    h1: ({ children }) => (
-      <h1 className="text-4xl font-bold mt-8 mb-4">{children}</h1>
-    ),
-    h2: ({ children }) => (
-      <h2 className="text-3xl font-bold mt-8 mb-4">{children}</h2>
-    ),
-    h3: ({ children }) => (
-      <h3 className="text-2xl font-semibold mt-6 mb-3">{children}</h3>
-    ),
-    h4: ({ children }) => (
-      <h4 className="text-xl font-semibold mt-4 mb-2">{children}</h4>
-    ),
-    p: ({ children }) => <p className="mb-4 leading-7">{children}</p>,
-    ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-2">{children}</ul>,
-    ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-2">{children}</ol>,
-    li: ({ children }) => <li className="leading-7">{children}</li>,
+    h1: ({ children }) => <h1 className="text-3xl font-bold tracking-tight mt-12 mb-6">{children}</h1>,
+    h2: ({ children }) => <h2 className="text-2xl font-bold tracking-tight mt-10 mb-4">{children}</h2>,
+    h3: ({ children }) => <h3 className="text-xl font-semibold tracking-tight mt-8 mb-4">{children}</h3>,
+    p: ({ children }) => <p className="leading-7 [&:not(:first-child)]:mt-6 text-muted-foreground">{children}</p>,
     a: ({ href, children }) => (
-      <a
-        href={href}
-        className="text-foreground underline hover:text-muted-foreground transition-colors"
-        target={href?.startsWith("http") ? "_blank" : undefined}
-        rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
-      >
+      <Link href={href as string} className="font-medium text-primary underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-all">
         {children}
-      </a>
+      </Link>
     ),
-    code: ({ children }) => (
-      <code className="bg-secondary px-1.5 py-0.5 rounded text-sm font-mono">
-        {children}
-      </code>
-    ),
-    pre: ({ children }) => (
-      <pre className="bg-secondary p-4 rounded-lg overflow-x-auto mb-4">
-        {children}
-      </pre>
-    ),
+    ul: ({ children }) => <ul className="my-6 ml-6 list-disc [&>li]:mt-2 text-muted-foreground">{children}</ul>,
+    ol: ({ children }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2 text-muted-foreground">{children}</ol>,
+    li: ({ children }) => <li>{children}</li>,
     blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-border pl-4 italic my-4">
+      <blockquote className="mt-6 border-l-2 border-primary pl-6 italic text-foreground text-lg">
         {children}
       </blockquote>
     ),
+    code: ({ children }) => (
+      <code className="relative rounded bg-secondary px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold text-foreground">
+        {children}
+      </code>
+    ),
+    Callout,
+    MetricGrid,
+    MetricItem,
+    Figure,
     ...components,
   };
 }

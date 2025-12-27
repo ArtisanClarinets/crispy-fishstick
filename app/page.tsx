@@ -1,209 +1,229 @@
-"use client";
-
 import Link from "next/link";
-import { siteConfig } from "@/lib/site";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Layout, Database, Zap, Search } from "lucide-react";
-import { motion } from "framer-motion";
 import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/reveal";
+import { siteConfig, getWorkPlaceholder } from "@/lib/site";
+import { Card } from "@/components/ui/card";
+
+// Premium Stack Chips
+const stack = [
+  "Next.js App Router",
+  "React Server Components",
+  "TypeScript Strict",
+  "Tailwind CSS v3",
+  "Framer Motion",
+  "PostgreSQL / Prisma",
+  "Docker / K8s",
+  "GraphQL Federation"
+];
+
+const principles = [
+  {
+    title: "Clarity",
+    desc: "Code that explains itself. Interfaces that need no manual."
+  },
+  {
+    title: "Reliability",
+    desc: "Systems designed to fail safely and recover instantly."
+  },
+  {
+    title: "Performance",
+    desc: "Sub-100ms interactions. Core Web Vitals optimized."
+  },
+  {
+    title: "Accessibility",
+    desc: "Inclusive by default. WCAG AA compliance baked in."
+  }
+];
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative flex min-h-[90svh] flex-col items-center justify-center overflow-hidden px-4 text-center pt-[env(safe-area-inset-top)]">
+      {/* HERO SECTION */}
+      <section className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden border-b border-border/50">
         <HeroBackground />
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-5xl z-10"
-        >
-          <h1 className="text-[clamp(2.5rem,8vw,6rem)] leading-[1.05] font-extrabold tracking-tight">
-            Reliable Systems. <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
-              Premium Interfaces.
-            </span>
-          </h1>
-          <p className="mt-6 text-lg text-muted-foreground sm:text-xl max-w-2xl mx-auto">
-            {siteConfig.description}
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild className="text-lg h-12 px-8">
-              <Link href={siteConfig.cta.primary.href}>
-                {siteConfig.cta.primary.text}
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild className="text-lg h-12 px-8">
-              <Link href={siteConfig.cta.secondary.href}>
-                {siteConfig.cta.secondary.text}
-              </Link>
-            </Button>
-          </div>
-        </motion.div>
-      </section>
 
-      {/* Social Proof */}
-      <section className="py-12 border-y border-border/40 bg-secondary/20">
-        <div className="container px-4 text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-8">
-            Trusted by founders and teams at
-          </p>
-          <div className="flex flex-wrap justify-center gap-8 opacity-70 grayscale transition-all hover:grayscale-0">
-             {/* Placeholders for logos */}
-            <div className="text-xl font-bold flex items-center gap-2"><div className="w-6 h-6 bg-primary rounded-full"></div>Acme Corp</div>
-            <div className="text-xl font-bold flex items-center gap-2"><div className="w-6 h-6 bg-primary rounded-full"></div>GlobalTech</div>
-            <div className="text-xl font-bold flex items-center gap-2"><div className="w-6 h-6 bg-primary rounded-full"></div>Nebula</div>
-            <div className="text-xl font-bold flex items-center gap-2"><div className="w-6 h-6 bg-primary rounded-full"></div>Vertex</div>
-          </div>
+        <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center">
+          <Reveal>
+            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-8 backdrop-blur-sm">
+              <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+              Available for Q3 Engineering Leases
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-balance bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/70">
+              {siteConfig.tagline}
+            </h1>
+          </Reveal>
+
+          <Reveal delay={0.2}>
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed text-balance">
+              {siteConfig.description}
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.3}>
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Button asChild size="lg" className="h-14 px-8 text-lg rounded-full">
+                <Link href="/contact">
+                  Start a Project <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="h-14 px-8 text-lg rounded-full bg-background/50 backdrop-blur-sm hover:bg-background/80">
+                <Link href="/work">
+                  Explore Case Studies
+                </Link>
+              </Button>
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* Featured Work */}
-      <section className="py-24 px-4">
+      {/* SOCIAL PROOF / METRICS */}
+      <section className="py-12 border-b border-border/50 bg-background/50">
         <div className="container">
-          <Reveal>
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Selected Work</h2>
-              <p className="text-muted-foreground">Recent production-grade deployments.</p>
+           <p className="text-center text-sm font-medium text-muted-foreground uppercase tracking-widest mb-8">
+             Delivering outcomes for high-growth companies
+           </p>
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+              {/* Using text-based metrics/logos for premium feel if no logos available */}
+              <div className="text-center">
+                 <h4 className="text-3xl font-bold text-foreground">$50M+</h4>
+                 <p className="text-xs text-muted-foreground">Revenue Processed</p>
+              </div>
+              <div className="text-center">
+                 <h4 className="text-3xl font-bold text-foreground">99.99%</h4>
+                 <p className="text-xs text-muted-foreground">Uptime Delivered</p>
+              </div>
+              <div className="text-center">
+                 <h4 className="text-3xl font-bold text-foreground">1M+</h4>
+                 <p className="text-xs text-muted-foreground">Daily Active Users</p>
+              </div>
+              <div className="text-center">
+                 <h4 className="text-3xl font-bold text-foreground">SOC2</h4>
+                 <p className="text-xs text-muted-foreground">Compliance Ready</p>
+              </div>
+           </div>
+        </div>
+      </section>
+
+      {/* FEATURED WORK */}
+      <section className="py-24 md:py-32">
+        <div className="container">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">Selected Work</h2>
+              <p className="text-lg text-muted-foreground">
+                Deep dives into complex systems. No simple marketing sites here—only rigorous application architecture.
+              </p>
             </div>
-            <Button variant="ghost" asChild className="group mt-4 md:mt-0">
-              <Link href="/work">
-                View all work <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+            <Button variant="ghost" className="hidden md:flex group" asChild>
+                <Link href="/work">View All Projects <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link>
             </Button>
           </div>
-          </Reveal>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            {siteConfig.featuredWork.map((project) => (
-              <Reveal key={project.slug}>
-              <Link href={`/work/${project.slug}`} className="group block h-full">
-                <div className="overflow-hidden rounded-xl border bg-card transition-all hover:shadow-lg hover:-translate-y-1 h-full flex flex-col">
-                  <div className="aspect-video bg-muted relative">
-                     {/* Placeholder for image */}
-                     <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/20 text-4xl font-bold">
-                        {project.title[0]}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {siteConfig.featuredWork.map((project, i) => (
+              <Reveal key={project.slug} delay={i * 0.1}>
+                <Link href={`/work/${project.slug}`} className="group block h-full">
+                  <div className="relative overflow-hidden rounded-2xl bg-secondary aspect-[4/3] mb-6 border border-border/50">
+                     {/* Abstract Gradient Cover */}
+                     <div className={`absolute inset-0 bg-gradient-to-br ${getWorkPlaceholder(project.slug).gradient} opacity-80 transition-transform duration-700 group-hover:scale-105`} />
+
+                     <div className="absolute inset-0 p-8 flex flex-col justify-between">
+                        <div className="self-end p-2 bg-background/10 backdrop-blur-md rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                           <ArrowRight className="text-white h-5 w-5" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white tracking-tight">{project.title}</h3>
                      </div>
                   </div>
-                  <div className="p-6 flex-1">
-                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{project.title}</h3>
-                    <p className="text-muted-foreground text-sm line-clamp-2">{project.description}</p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-primary/60 uppercase tracking-wider">Case Study</p>
+                    <p className="text-muted-foreground line-clamp-2">{project.description}</p>
                   </div>
-                </div>
-              </Link>
+                </Link>
               </Reveal>
             ))}
           </div>
+
+          <div className="mt-12 md:hidden">
+            <Button variant="outline" className="w-full" asChild>
+                <Link href="/work">View All Projects</Link>
+            </Button>
+          </div>
         </div>
       </section>
 
-      {/* Services */}
-      <section className="py-24 bg-secondary/10">
-         <div className="container px-4">
-            <Reveal>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-16 text-center">Technical Services</h2>
-            </Reveal>
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-                {[
-                    { title: "Design Engineering", icon: <Layout className="w-6 h-6"/>, desc: "Bridging the gap between Figma and production code with pixel-perfect precision." },
-                    { title: "Frontend Systems", icon: <Zap className="w-6 h-6"/>, desc: "Scalable React architectures, component libraries, and performance optimization." },
-                    { title: "Backend Integrations", icon: <Database className="w-6 h-6"/>, desc: "Reliable synchronization engines, API design, and database modeling." },
-                    { title: "Audits & Rescue", icon: <Search className="w-6 h-6"/>, desc: "Performance, accessibility, and code quality audits for legacy codebases." }
-                ].map((service) => (
-                    <Reveal key={service.title} className="h-full">
-                      <div className="flex flex-col gap-4 p-6 rounded-xl bg-background border transition-colors hover:border-primary/50 h-full">
-                          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                              {service.icon}
-                          </div>
-                          <h3 className="text-xl font-bold">{service.title}</h3>
-                          <p className="text-muted-foreground text-sm">{service.desc}</p>
-                      </div>
-                    </Reveal>
-                ))}
+      {/* RIGOR & STACK */}
+      <section className="py-24 bg-secondary/30 border-y border-border/50">
+         <div className="container">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+               <div>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-8">Engineering Rigor</h2>
+                  <p className="text-lg text-muted-foreground mb-12">
+                     I don&apos;t rely on hope. I rely on systems. Every project relies on a foundational set of quality gates that ensure long-term maintainability.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                     {principles.map((p) => (
+                        <div key={p.title} className="bg-background/50 p-6 rounded-xl border border-border/50">
+                           <h4 className="font-semibold mb-2 flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-primary" />
+                              {p.title}
+                           </h4>
+                           <p className="text-sm text-muted-foreground">{p.desc}</p>
+                        </div>
+                     ))}
+                  </div>
+               </div>
+
+               <div className="flex flex-col justify-center">
+                  <h3 className="text-xl font-semibold mb-8">Primary Technical Stack</h3>
+                  <div className="flex flex-wrap gap-3">
+                     {stack.map((tech, i) => (
+                        <span
+                           key={tech}
+                           className="px-4 py-2 rounded-full bg-background border border-border text-sm font-medium text-foreground/80 hover:border-primary/50 transition-colors cursor-default"
+                        >
+                           {tech}
+                        </span>
+                     ))}
+                  </div>
+
+                  <div className="mt-12 p-8 rounded-2xl bg-gradient-to-br from-background to-secondary border border-border">
+                     <h4 className="text-lg font-bold mb-4">Capabilities</h4>
+                     <ul className="space-y-3">
+                        {["System Architecture", "Frontend Performance", "API Design", "Database Modeling", "CI/CD Pipelines"].map((cap) => (
+                           <li key={cap} className="flex items-center gap-3 text-muted-foreground">
+                              <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
+                              {cap}
+                           </li>
+                        ))}
+                     </ul>
+                  </div>
+               </div>
             </div>
          </div>
       </section>
 
-      {/* Rigor & Skills */}
-      <section className="py-24 container px-4">
-        <div className="grid gap-16 lg:grid-cols-2">
-            <Reveal>
-                <h2 className="text-3xl font-bold tracking-tight mb-6">Engineering Rigor</h2>
-                <p className="text-lg text-muted-foreground mb-8">
-                    I don&apos;t just write code; I ship systems. Every deliverable meets a strict quality bar.
-                </p>
-                <div className="space-y-4">
-                    {[
-                        "100% Type Safety (Strict TypeScript)",
-                        "WCAG 2.1 AA Accessibility",
-                        "Automated CI/CD Pipelines",
-                        "Performance Budgets (Lighthouse 95+)",
-                        "Comprehensive Unit & E2E Testing"
-                    ].map((item) => (
-                        <div key={item} className="flex items-center gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-primary" />
-                            <span className="font-medium">{item}</span>
-                        </div>
-                    ))}
-                </div>
-            </Reveal>
-            <Reveal>
-                 <h3 className="text-xl font-bold mb-6">Technical Arsenal</h3>
-                 <div className="space-y-6">
-                    {siteConfig.skills.map((skill) => (
-                        <div key={skill.name}>
-                            <div className="flex justify-between mb-2 text-sm font-medium">
-                                <span>{skill.name}</span>
-                                <span className="text-muted-foreground">{skill.level}%</span>
-                            </div>
-                            <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    whileInView={{ width: `${skill.level}%` }}
-                                    transition={{ duration: 1, ease: "easeOut" }}
-                                    viewport={{ once: true }}
-                                    className="h-full bg-primary rounded-full"
-                                />
-                            </div>
-                        </div>
-                    ))}
-                 </div>
-            </Reveal>
-        </div>
-      </section>
-
-      {/* Principles */}
-      <section className="py-24 bg-primary text-primary-foreground">
-          <div className="container px-4">
-              <Reveal>
-              <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">Core Principles</h2>
-              </Reveal>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                  {["Clarity", "Reliability", "Observability", "Safety", "Performance", "Accessibility"].map((p) => (
-                      <Reveal key={p}>
-                      <div className="aspect-square flex items-center justify-center rounded-xl bg-primary-foreground/10 border border-primary-foreground/20 backdrop-blur-sm hover:bg-primary-foreground/20 transition-colors h-full">
-                          <span className="font-bold text-lg">{p}</span>
-                      </div>
-                      </Reveal>
-                  ))}
-              </div>
-          </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-32 container px-4 text-center">
-          <Reveal>
-          <h2 className="text-4xl font-bold tracking-tight mb-6">Have a high-stakes product? <br/> Let&apos;s ship it right.</h2>
-          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Available for select contract engagements. Currently booking for Q4.
-          </p>
-          <Button size="lg" className="text-lg px-10 py-6" asChild>
-              <Link href="/contact">Start the Conversation</Link>
-          </Button>
-          </Reveal>
+      {/* FINAL CTA */}
+      <section className="py-32 container text-center">
+         <div className="max-w-3xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8">
+               Have a high-stakes product?<br />
+               <span className="text-muted-foreground">Let&apos;s ship it right.</span>
+            </h2>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+               <Button asChild size="lg" className="rounded-full px-10 h-14 text-lg">
+                  <Link href="/contact">Book a Consultation</Link>
+               </Button>
+               <Button asChild variant="outline" size="lg" className="rounded-full px-10 h-14 text-lg">
+                  <Link href="mailto:dylan@thompsonsystems.com">Email Me</Link>
+               </Button>
+            </div>
+         </div>
       </section>
     </div>
   );
