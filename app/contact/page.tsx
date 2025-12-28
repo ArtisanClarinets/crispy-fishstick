@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,6 +20,7 @@ export default function ContactPage() {
     message: "",
     email: "",
     website: "",
+    honeypot: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -32,6 +33,11 @@ export default function ContactPage() {
     if (step < 3) {
         setStep(step + 1);
         return;
+    }
+
+    if (formData.honeypot) {
+      setIsSuccess(true);
+      return;
     }
 
     setIsSubmitting(true);
@@ -106,6 +112,17 @@ export default function ContactPage() {
           </CardHeader>
           <CardContent className="pt-8">
             <form onSubmit={handleSubmit}>
+              <div className="hidden">
+                <Label htmlFor="honeypot">Leave this field empty</Label>
+                <Input
+                  id="honeypot"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={formData.honeypot}
+                  onChange={handleChange}
+                />
+              </div>
               <AnimatePresence mode="wait">
                  {step === 1 && (
                     <motion.div

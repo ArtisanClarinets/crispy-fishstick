@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { SystemLayer } from "@/components/system-layer";
 import { ConsoleHud } from "@/components/console-hud";
 import { RouteTransitionLayer } from "@/components/route-transition-layer";
+import { AppMotionConfig } from "@/components/motion-config";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -70,23 +71,25 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Background system layer (always present) */}
-          <SystemLayer />
+          <AppMotionConfig>
+            {/* Background system layer (always present) */}
+            <SystemLayer />
 
-          {/* Console HUD (system overlay) */}
-          <ConsoleHud />
+            {/* Console HUD (system overlay) */}
+            <ConsoleHud />
 
-          {/* Route Transition Overlay */}
-          <RouteTransitionLayer />
+            {/* Route Transition Overlay */}
+            <RouteTransitionLayer />
 
-          {/* Foreground app chrome */}
-          <div className="relative z-10 min-h-dvh flex flex-col">
-            <Header />
-            <PageTransition>
-              <main className="flex-1 pt-20">{children}</main>
-            </PageTransition>
-            <Footer />
-          </div>
+            {/* Foreground app chrome */}
+            <div className="relative z-10 min-h-dvh flex flex-col">
+              <Header />
+              <PageTransition>
+                <main className="flex-1 pt-20">{children}</main>
+              </PageTransition>
+              <Footer />
+            </div>
+          </AppMotionConfig>
         </ThemeProvider>
       </body>
     </html>

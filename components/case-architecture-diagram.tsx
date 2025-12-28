@@ -9,12 +9,6 @@ interface CaseArchitectureDiagramProps {
 
 export function CaseArchitectureDiagram({ mode }: CaseArchitectureDiagramProps) {
   // Simplified SVG diagram with nodes that light up based on mode
-  const getNodeColor = (targetMode: string) => {
-    if (mode === "incident") return targetMode === "db" ? "text-destructive" : "text-muted-foreground";
-    if (mode === "scale") return "text-primary";
-    return "text-muted-foreground"; // Normal
-  };
-
   const getStrokeWidth = (targetMode: string) => {
     if (mode === "scale") return 2;
     if (mode === "incident" && targetMode === "db") return 2;
