@@ -8,6 +8,7 @@ import { PageTransition } from "@/components/page-transition";
 import { cn } from "@/lib/utils";
 import { SystemLayer } from "@/components/system-layer";
 import { ConsoleHud } from "@/components/console-hud";
+import { RouteTransitionLayer } from "@/components/route-transition-layer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -74,6 +75,9 @@ export default function RootLayout({
 
           {/* Console HUD (system overlay) */}
           <ConsoleHud />
+
+          {/* Route Transition Overlay */}
+          <RouteTransitionLayer />
 
           {/* Foreground app chrome */}
           <div className="relative z-10 min-h-dvh flex flex-col">

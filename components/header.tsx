@@ -30,6 +30,7 @@ export function Header() {
 
   const navLinks = [
     { href: "/work", label: "Work" },
+    { href: "/lab/revenue-leak", label: "Lab" },
     { href: "/process", label: "Process" },
     { href: "/trust", label: "Trust Center" },
   ];

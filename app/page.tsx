@@ -7,6 +7,7 @@ import { siteConfig, getWorkPlaceholder } from "@/lib/site";
 import { Card } from "@/components/ui/card";
 import { BuildPlanModule } from "@/components/build-plan-module";
 import { AuditModal } from "@/components/audit-modal";
+import { CalibrationHeadline } from "@/components/calibration-headline";
 
 // Premium Stack Chips
 const stack = [
@@ -61,9 +62,10 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-balance bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/70">
-                {siteConfig.tagline}
-              </h1>
+              <CalibrationHeadline
+                text={siteConfig.tagline}
+                className="mb-10"
+              />
             </Reveal>
 
             <Reveal delay={0.2}>
