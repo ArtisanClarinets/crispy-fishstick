@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import { motion } from "framer-motion";
+import { CoverArt } from "@/components/cover-art";
 
 interface WorkDetailHeroProps {
   slug: string;
@@ -28,19 +28,9 @@ export function WorkDetailHero({
       {/* Shared Element Background */}
       <motion.div
         layoutId={`cover-${slug}`}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 bg-secondary"
       >
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={title}
-            fill
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className={`absolute inset-0 bg-gradient-to-br ${placeholderGradient} opacity-80`} />
-        )}
+        <CoverArt slug={slug} variant="hero" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
       </motion.div>
 
