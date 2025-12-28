@@ -82,7 +82,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen py-24 container px-4 flex flex-col items-center justify-center">
+    <div className="min-h-screen py-24 container px-4 flex flex-col items-center justify-center" data-system-tone="contact">
       <div className="max-w-2xl w-full">
          <div className="mb-12 text-center">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Let&apos;s talk engineering.</h1>

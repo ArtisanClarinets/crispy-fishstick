@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen py-24 container px-4 md:px-6 max-w-4xl mx-auto">
+    <div className="min-h-screen py-24 container px-4 md:px-6 max-w-4xl mx-auto" data-system-tone="about">
       <Reveal>
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-8">
            Not a generic agency. <br/>

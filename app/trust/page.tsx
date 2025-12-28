@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function TrustCenterPage() {
   return (
-    <div className="container max-w-4xl py-24 space-y-24">
+    <div className="container max-w-4xl py-24 space-y-24" data-system-tone="default">
       {/* Header */}
       <section className="space-y-6 text-center">
         <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-4">

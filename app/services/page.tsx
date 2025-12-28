@@ -63,7 +63,7 @@ const services = [
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen py-24 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8" data-system-tone="default">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-20">

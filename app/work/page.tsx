@@ -9,7 +9,7 @@ import { CoverArt } from "@/components/cover-art";
 
 export default function WorkPage() {
   return (
-    <div className="min-h-screen py-24 container px-4 md:px-6">
+    <div className="min-h-screen py-24 container px-4 md:px-6" data-system-tone="work">
       <div className="max-w-2xl mb-16 md:mb-24">
         <Reveal>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">Selected Work</h1>

@@ -47,6 +47,7 @@ export default function Home() {
       <section
         className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden border-b border-border/50 py-20"
         data-hud-section="Hero"
+        data-system-tone="home"
       >
         <HeroBackground />
 
@@ -131,6 +132,7 @@ export default function Home() {
       <section
         className="py-24 md:py-32"
         data-hud-section="Work"
+        data-system-tone="work"
       >
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
@@ -233,6 +235,7 @@ export default function Home() {
       <section
         className="py-32 container text-center"
         data-hud-section="CTA"
+        data-system-tone="contact"
       >
          <div className="max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8">
