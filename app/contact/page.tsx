@@ -46,8 +46,7 @@ export default function ContactPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to submit");
+        throw new Error("Failed to submit");
       }
 
       setIsSuccess(true);
