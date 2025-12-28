@@ -14,7 +14,6 @@
     "postinstall": "npx playwright install"
   },
   "dependencies": {
-    "@google/gemini-cli": "^0.22.4",
     "@mdx-js/loader": "^3.0.1",
     "@mdx-js/react": "^3.0.1",
     "@next/mdx": "14.2.35",
