@@ -7,25 +7,48 @@ import { cn } from "@/lib/utils";
 interface CoverArtProps {
   slug: string;
   className?: string;
-  detail?: boolean; // If true, maybe show more detail?
+  variant?: "card" | "hero";
 }
 
-export function CoverArt({ slug, className, detail = false }: CoverArtProps) {
-  // Memoize spec so we don't re-run PRNG on every render (though it's fast)
+export function CoverArt({ slug, className, variant = "card" }: CoverArtProps) {
   const spec = useMemo(() => getCoverSpec(slug), [slug]);
 
-  // CSS variables for dynamic coloring
   const style = {
     "--cover-hue": spec.palette.hue,
     "--cover-sec": spec.palette.secHue,
   } as React.CSSProperties;
+
+  // Generate topo paths from params
+  const topoPaths = useMemo(() => {
+    return spec.topo.map((layer) => {
+      // Create a sine wave path
+      let d = `M 0 ${layer.y}`;
+      for (let x = 0; x <= 800; x += 10) {
+        const y = layer.y + Math.sin(x * layer.freq + layer.phase) * layer.amplitude;
+        d += ` L ${x} ${y}`;
+      }
+      return d;
+    });
+  }, [spec.topo]);
+
+  // Generate circuit paths from points
+  const circuitPaths = useMemo(() => {
+    return spec.circuits.routes.map((route) => {
+      if (route.points.length === 0) return "";
+      let d = `M ${route.points[0].x} ${route.points[0].y}`;
+      for (let i = 1; i < route.points.length; i++) {
+        d += ` L ${route.points[i].x} ${route.points[i].y}`;
+      }
+      return d;
+    });
+  }, [spec.circuits.routes]);
 
   return (
     <div
       className={cn("relative w-full h-full bg-background overflow-hidden select-none", className)}
       style={style}
     >
-      {/* Background Gradient */}
+      {/* 1. Background Field (Subtle Gradient/Vignette) */}
       <div
         className="absolute inset-0 opacity-20"
         style={{
@@ -35,7 +58,7 @@ export function CoverArt({ slug, className, detail = false }: CoverArtProps) {
 
       <svg
         viewBox="0 0 800 600"
-        className="w-full h-full opacity-60"
+        className="w-full h-full"
         preserveAspectRatio="xMidYMid slice"
       >
         <defs>
@@ -64,10 +87,10 @@ export function CoverArt({ slug, className, detail = false }: CoverArtProps) {
           </radialGradient>
         </defs>
 
-        {/* 1. Hatch Fill */}
-        <rect width="100%" height="100%" fill={`url(#hatch-${slug})`} />
+        {/* 2. Blueprint Hatch */}
+        <rect width="100%" height="100%" fill={`url(#hatch-${slug})`} opacity="0.3" />
 
-        {/* 2. Heat Blobs */}
+        {/* 3. Heat Blobs */}
         {spec.blobs.map((blob, i) => (
           <circle
             key={`blob-${i}`}
@@ -75,38 +98,36 @@ export function CoverArt({ slug, className, detail = false }: CoverArtProps) {
             cy={blob.cy}
             r={blob.r}
             fill={`url(#glow-${slug})`}
-            style={{ opacity: blob.opacity, mixBlendMode: "screen" }}
+            style={{ opacity: blob.intensity, mixBlendMode: "screen" }}
           />
         ))}
 
-        {/* 3. Topo Lines */}
+        {/* 4. Topographic Lines */}
         {spec.topo.map((layer, i) => (
-          <g key={`topo-${i}`} style={{ opacity: layer.opacity }}>
-            {layer.paths.map((d, j) => (
-              <path
-                key={`path-${j}`}
-                d={d}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1"
-                className="text-primary/40"
-              />
-            ))}
-          </g>
+          <path
+            key={`topo-${i}`}
+            d={topoPaths[i]}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            className="text-primary"
+            style={{ opacity: layer.strokeOpacity }}
+          />
         ))}
 
-        {/* 4. Circuit Traces */}
-        <g className="text-primary/70">
+        {/* 5. Circuit Traces + Node Dots */}
+        <g className="text-primary">
           {spec.circuits.routes.map((route, i) => (
             <path
               key={`route-${i}`}
-              d={route.d}
+              d={circuitPaths[i]}
               fill="none"
               stroke="currentColor"
               strokeWidth={route.width}
               strokeDasharray={route.dash}
               strokeLinecap="round"
               strokeLinejoin="round"
+              className="opacity-70"
             />
           ))}
           {spec.circuits.nodes.map((node, i) => (
@@ -116,21 +137,14 @@ export function CoverArt({ slug, className, detail = false }: CoverArtProps) {
               cy={node.cy}
               r={node.r}
               fill="currentColor"
-              className="text-primary"
+              className="opacity-90"
             />
           ))}
         </g>
-
-        {/* Optional Technical Overlay Text (just decorative) */}
-        {detail && (
-          <text x="40" y="560" className="text-[10px] font-mono fill-muted-foreground uppercase tracking-widest opacity-50">
-             REF: {slug.toUpperCase()} // HUE: {spec.palette.hue} // GEN: V1
-          </text>
-        )}
       </svg>
 
-      {/* Vignette Overlay for depth */}
-      <div className="absolute inset-0 bg-[radial-gradient(transparent_50%,rgba(0,0,0,0.5)_100%)] pointer-events-none" />
+      {/* 6. Edge Polish (Subtle Inner Stroke; Rounding handled by wrapper) */}
+      <div className="absolute inset-0 border border-white/5 pointer-events-none mix-blend-overlay" />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { Inter } from "next/font/google";
 import { PageTransition } from "@/components/page-transition";
 import { cn } from "@/lib/utils";
 import { SystemLayer } from "@/components/system-layer";
+import { ConsoleHud } from "@/components/console-hud";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -70,6 +71,9 @@ export default function RootLayout({
         >
           {/* Background system layer (always present) */}
           <SystemLayer />
+
+          {/* Console HUD (system overlay) */}
+          <ConsoleHud />
 
           {/* Foreground app chrome */}
           <div className="relative z-10 min-h-dvh flex flex-col">
