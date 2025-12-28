@@ -1,10 +1,12 @@
 import { getMdxContent, getMdxFiles } from "@/lib/mdx";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Calendar, User, BarChart, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { siteConfig, getWorkPlaceholder } from "@/lib/site";
 import { Reveal } from "@/components/reveal";
+import { motion } from "framer-motion";
 
 // Import MDX Components to pass directly
 import { Callout } from "@/components/mdx/callout";
@@ -37,6 +39,20 @@ const components = {
   Figure,
 };
 
+// Client component wrapper for animations if needed, but for now we can use motion in the server component file
+// provided "use client" directive is present or we use a client wrapper.
+// Since this file is a Server Component (async default export), we should extract the animated hero to a client component
+// OR we can make this page a client component if necessary, but that breaks generateStaticParams/async data fetching pattern.
+//
+// CORRECTION: Framer Motion components can be used in Server Components IF they are imported from a "use client" file
+// OR if the file itself is "use client".
+// However, `getMdxContent` is async/server-side.
+//
+// Solution: We will keep this file as Server Component and move the Hero visualization to a new Client Component
+// OR simpler: we'll make a small client component for the Hero Image part to handle `layoutId`.
+
+import { WorkDetailHero } from "@/components/work-detail-hero";
+
 export default async function WorkDetail({ params }: { params: { slug: string } }) {
   const { slug } = params;
   let post;
@@ -51,37 +67,21 @@ export default async function WorkDetail({ params }: { params: { slug: string } 
   // Placeholder gradient lookup
   const placeholderStyle = getWorkPlaceholder(slug);
 
+  // Find project image from siteConfig
+  const projectConfig = siteConfig.featuredWork.find(p => p.slug === slug);
+  const imageUrl = projectConfig?.image;
+
   return (
     <article className="min-h-screen pb-24">
-      {/* HERO HEADER */}
-      <div className={`relative w-full h-[60vh] md:h-[70vh] flex flex-col justify-end pb-12 md:pb-24 overflow-hidden`}>
-         <div className={`absolute inset-0 bg-gradient-to-br ${placeholderStyle.gradient} opacity-30`} />
-         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-
-         <div className="container relative z-10">
-            <Link href="/work" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8 transition-colors">
-               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Work
-            </Link>
-
-            <Reveal>
-               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-balance">{title}</h1>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl leading-relaxed">{description}</p>
-            </Reveal>
-
-             <Reveal delay={0.2}>
-               <div className="flex flex-wrap gap-2 mt-8">
-                  {tags?.map((tag) => (
-                     <span key={tag} className="px-3 py-1 rounded-full bg-secondary/50 border border-border/50 text-sm font-medium backdrop-blur-sm">
-                        {tag}
-                     </span>
-                  ))}
-               </div>
-            </Reveal>
-         </div>
-      </div>
+      {/* HERO HEADER - Use Client Component for Shared Element Transition */}
+      <WorkDetailHero
+        slug={slug}
+        title={title}
+        description={description}
+        tags={tags}
+        imageUrl={imageUrl}
+        placeholderGradient={placeholderStyle.gradient}
+      />
 
       <div className="container grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8">
          {/* SIDEBAR METADATA - STICKY */}
@@ -123,10 +123,6 @@ export default async function WorkDetail({ params }: { params: { slug: string } 
 
          {/* MAIN CONTENT */}
          <div className="lg:col-span-8 prose prose-neutral dark:prose-invert prose-lg max-w-none">
-            {/*
-              With next-mdx-remote v5/RSC, `post.content` is already a compiled React Element.
-              We just render it. We don't need <MDXRemote /> here if `lib/mdx.ts` uses `compileMDX`.
-            */}
             {post.content}
 
             <div className="mt-24 pt-12 border-t border-border flex justify-between items-center not-prose">

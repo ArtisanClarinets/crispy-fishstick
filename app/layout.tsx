@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer";
 import { Inter } from "next/font/google";
 import { PageTransition } from "@/components/page-transition";
 import { cn } from "@/lib/utils";
+import { SystemLayer } from "@/components/system-layer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -59,20 +60,25 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className={cn(
         inter.variable,
-        "font-sans antialiased min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary"
+        "font-sans antialiased min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary"
       )}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark" // Premium defaults to dark usually
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <PageTransition>
-            {/* Added a subtle global grain/noise if needed later via CSS */}
-            <main className="flex-1 pt-20">{children}</main>
-          </PageTransition>
-          <Footer />
+          {/* Background system layer (always present) */}
+          <SystemLayer />
+
+          {/* Foreground app chrome */}
+          <div className="relative z-10 min-h-dvh flex flex-col">
+            <Header />
+            <PageTransition>
+              <main className="flex-1 pt-20">{children}</main>
+            </PageTransition>
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>
