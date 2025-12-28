@@ -5,6 +5,8 @@ import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/reveal";
 import { siteConfig, getWorkPlaceholder } from "@/lib/site";
 import { Card } from "@/components/ui/card";
+import { BuildPlanModule } from "@/components/build-plan-module";
+import { AuditModal } from "@/components/audit-modal";
 
 // Premium Stack Chips
 const stack = [
@@ -41,43 +43,51 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* HERO SECTION */}
-      <section className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden border-b border-border/50">
+      <section className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden border-b border-border/50 py-20">
         <HeroBackground />
 
-        <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center">
-          <Reveal>
-            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-8 backdrop-blur-sm">
-              <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
-              Available for Q3 Engineering Leases
-            </div>
-          </Reveal>
+        <div className="container relative z-10 px-4 md:px-6 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
-          <Reveal delay={0.1}>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-balance bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/70">
-              {siteConfig.tagline}
-            </h1>
-          </Reveal>
+          {/* LEFT: Text Content */}
+          <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
+            <Reveal>
+              <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-8 backdrop-blur-sm">
+                <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+                Transparent. Predictable. Done.
+              </div>
+            </Reveal>
 
-          <Reveal delay={0.2}>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed text-balance">
-              {siteConfig.description}
-            </p>
-          </Reveal>
+            <Reveal delay={0.1}>
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-balance bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/70">
+                {siteConfig.tagline}
+              </h1>
+            </Reveal>
 
-          <Reveal delay={0.3}>
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Button asChild size="lg" className="h-14 px-8 text-lg rounded-full">
-                <Link href="/contact">
-                  Start a Project <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="h-14 px-8 text-lg rounded-full bg-background/50 backdrop-blur-sm hover:bg-background/80">
-                <Link href="/work">
-                  Explore Case Studies
-                </Link>
-              </Button>
-            </div>
-          </Reveal>
+            <Reveal delay={0.2}>
+              <p className="text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed text-balance">
+                No vague estimates. No vendor lock-in. Just a clear, engineered path to a premium product.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.3}>
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center">
+                <AuditModal />
+                <Button asChild variant="ghost" size="lg" className="h-14 px-8 text-lg rounded-full hover:bg-background/80">
+                  <Link href="/work">
+                    See real outcomes <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
+            </Reveal>
+          </div>
+
+          {/* RIGHT: Build Plan Module */}
+          <div className="flex-1 w-full max-w-2xl">
+            <Reveal delay={0.4}>
+              <BuildPlanModule />
+            </Reveal>
+          </div>
+
         </div>
       </section>
 

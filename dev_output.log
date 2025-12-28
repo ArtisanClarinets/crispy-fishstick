@@ -1,0 +1,25 @@
+
+> crispy-fishstick@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.15
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+   automatically enabled Fast Refresh for 1 custom loader
+ ✓ Ready in 1820ms
+ ○ Compiling / ...
+ ✓ Compiled / in 9.5s (1463 modules)
+ GET / 200 in 10724ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 9.3s (1443 modules)
+ GET /noise.png 404 in 8307ms
+ GET /noise.png 404 in 37ms
+ ✓ Compiled /trust in 495ms (1453 modules)
+ GET / 200 in 112ms
+ GET /noise.png 404 in 44ms
