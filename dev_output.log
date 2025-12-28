@@ -23,3 +23,39 @@ https://nextjs.org/telemetry
  ✓ Compiled /trust in 495ms (1453 modules)
  GET / 200 in 112ms
  GET /noise.png 404 in 44ms
+ ✓ Compiled in 5.4s (710 modules)
+ ✓ Compiled in 1453ms (710 modules)
+ ✓ Compiled in 485ms (710 modules)
+ ✓ Compiled in 4s (710 modules)
+ ✓ Compiled in 850ms (711 modules)
+ ✓ Compiled in 405ms (711 modules)
+ ✓ Compiled in 374ms (711 modules)
+ ✓ Compiled in 325ms (711 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 1301ms (1445 modules)
+ GET / 200 in 1947ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 549ms (1448 modules)
+ GET /_next/static/css/app/layout.css?v=1766918598712 404 in 829ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 805ms
+ GET /_next/static/chunks/main-app.js?v=1766918598712 404 in 811ms
+ GET /_next/static/chunks/app/page.js 404 in 804ms
+ GET /_next/static/media/e4af272ccee01ff0-s.p.woff2 404 in 906ms
+ ○ Compiling /work ...
+ ✓ Compiled /work in 1777ms (1489 modules)
+ GET /work 200 in 2085ms
+ GET /_next/static/css/app/layout.css?v=1766918604139 404 in 122ms
+ GET /_next/static/media/e4af272ccee01ff0-s.p.woff2 404 in 248ms
+ GET /_next/static/chunks/main-app.js?v=1766918604139 404 in 213ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 173ms
+ GET / 200 in 228ms
+ GET /_next/static/css/app/layout.css?v=1766918660912 404 in 73ms
+ GET /_next/static/media/e4af272ccee01ff0-s.p.woff2 404 in 170ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 115ms
+ GET /_next/static/chunks/main-app.js?v=1766918660912 404 in 119ms
+ GET /_next/static/chunks/app/page.js 404 in 101ms
+ GET /work 200 in 44ms
+ GET /_next/static/css/app/layout.css?v=1766918663420 404 in 63ms
+ GET /_next/static/media/e4af272ccee01ff0-s.p.woff2 404 in 1261ms
+ GET /_next/static/chunks/main-app.js?v=1766918663420 404 in 1271ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 1271ms
