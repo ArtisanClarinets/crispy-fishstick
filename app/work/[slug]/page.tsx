@@ -72,7 +72,7 @@ export default async function WorkDetail({ params }: { params: { slug: string } 
   const imageUrl = projectConfig?.image;
 
   return (
-    <article className="min-h-screen pb-24">
+    <article className="min-h-screen pb-24" data-system-tone="work">
       {/* HERO HEADER - Use Client Component for Shared Element Transition */}
       <WorkDetailHero
         slug={slug}
