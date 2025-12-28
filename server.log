@@ -2,41 +2,26 @@
 > crispy-fishstick@0.1.0 dev
 > next dev
 
-  ▲ Next.js 14.2.15
+  ▲ Next.js 14.2.35
   - Local:        http://localhost:3000
 
  ✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
    automatically enabled Fast Refresh for 1 custom loader
- ✓ Ready in 1842ms
+ ✓ Ready in 1744ms
  ○ Compiling /contact ...
- ✓ Compiled /contact in 7.9s (1330 modules)
- GET /contact 200 in 9393ms
- ✓ Compiled in 1478ms (648 modules)
- GET /contact? 200 in 334ms
- GET /contact 200 in 52ms
+ ✓ Compiled /contact in 9.5s (1339 modules)
+ ✓ Compiled in 794ms (651 modules)
+ GET /contact 200 in 10310ms
+ GET /contact? 200 in 116ms
+ GET /contact 200 in 50ms
  ○ Compiling /api/contact ...
- ✓ Compiled /api/contact in 796ms (711 modules)
+ ✓ Compiled /api/contact in 766ms (717 modules)
 Contact form submitted: {
   name: 'Test User',
   role: 'Tester',
-  budget: '$25k - $50k',
-  message: 'This is a test message to verify API integration.',
+  budget: '$10k - $25k',
+  message: 'This is a test message from playwright.',
   email: 'test@example.com',
-  website: 'https://example.com'
+  website: ''
 }
- POST /api/contact 200 in 1914ms
- GET /contact 200 in 246ms
-Contact form submitted: {
-  name: 'Test User',
-  role: 'Tester',
-  budget: '$25k - $50k',
-  message: 'This is a test message to verify API integration.',
-  email: 'test@example.com',
-  website: 'https://example.com'
-}
- POST /api/contact 200 in 1014ms
+ POST /api/contact 200 in 1882ms

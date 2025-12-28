@@ -1,44 +1,40 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-const contactFormSchema = z.object({
+const contactSchema = z.object({
   name: z.string().min(1, "Name is required"),
   role: z.string().optional(),
-  budget: z.string().min(1, "Budget is required"),
+  budget: z.string().optional(),
   message: z.string().min(1, "Message is required"),
   email: z.string().email("Invalid email address"),
-  website: z.string().url().optional().or(z.literal("")),
+  website: z.union([z.literal(''), z.string().url()]).optional(),
 });
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
+    const body = await request.json();
+    const result = contactSchema.safeParse(body);
 
-    // Validate the request body
-    const validatedData = contactFormSchema.parse(body);
-
-    // In a real application, you would send this to an email service or CRM
-    // For now, we'll log it to simulate the process
-    console.log("Contact form submitted:", validatedData);
-
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    return NextResponse.json(
-      { message: "Message received successfully" },
-      { status: 200 }
-    );
-  } catch (error) {
-    if (error instanceof z.ZodError) {
+    if (!result.success) {
       return NextResponse.json(
-        { message: "Invalid form data", errors: error.errors },
+        { error: "Invalid input", details: result.error.errors },
         { status: 400 }
       );
     }
 
+    const data = result.data;
+
+    // In a real application, you would send this to an email service or database
+    console.log("Contact form submitted:", data);
+
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    return NextResponse.json({ success: true, message: "Message received" });
+  } catch (error) {
     console.error("Error processing contact form:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
