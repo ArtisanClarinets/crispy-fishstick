@@ -33,7 +33,7 @@ export default function WorkPage() {
                       layoutId={`cover-${project.slug}`}
                       className="relative aspect-[16/10] w-full overflow-hidden bg-secondary"
                     >
-                      <CoverArt slug={project.slug} />
+                      <CoverArt slug={project.slug} variant="card" />
 
                       {/* Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

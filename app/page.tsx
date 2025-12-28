@@ -43,7 +43,10 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* HERO SECTION */}
-      <section className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden border-b border-border/50 py-20">
+      <section
+        className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden border-b border-border/50 py-20"
+        data-hud-section="Hero"
+      >
         <HeroBackground />
 
         <div className="container relative z-10 px-4 md:px-6 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
@@ -92,7 +95,10 @@ export default function Home() {
       </section>
 
       {/* SOCIAL PROOF / METRICS */}
-      <section className="py-12 border-b border-border/50 bg-background/50">
+      <section
+        className="py-12 border-b border-border/50 bg-background/50"
+        data-hud-section="Proof"
+      >
         <div className="container">
            <p className="text-center text-sm font-medium text-muted-foreground uppercase tracking-widest mb-8">
              Delivering outcomes for high-growth companies
@@ -120,7 +126,10 @@ export default function Home() {
       </section>
 
       {/* FEATURED WORK */}
-      <section className="py-24 md:py-32">
+      <section
+        className="py-24 md:py-32"
+        data-hud-section="Work"
+      >
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div className="max-w-2xl">
@@ -219,7 +228,10 @@ export default function Home() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="py-32 container text-center">
+      <section
+        className="py-32 container text-center"
+        data-hud-section="CTA"
+      >
          <div className="max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8">
                Have a high-stakes product?<br />

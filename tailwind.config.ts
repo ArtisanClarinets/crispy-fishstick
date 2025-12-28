@@ -95,6 +95,10 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in-up": "fade-in-up 0.5s ease-out forwards",
       },
+      transitionTimingFunction: {
+        "precision": "cubic-bezier(0.25, 1, 0.5, 1)",
+        "premium": "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
     },
   },
   plugins: [tailwindcssAnimate, tailwindcssTypography],
