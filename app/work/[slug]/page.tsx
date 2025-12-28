@@ -1,55 +1,8 @@
 import { getMdxContent, getMdxFiles } from "@/lib/mdx";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, Calendar, User, BarChart, ArrowUpRight } from "lucide-react";
+import { Calendar, User, BarChart, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { siteConfig, getWorkPlaceholder } from "@/lib/site";
-import { Reveal } from "@/components/reveal";
-import { motion } from "framer-motion";
-
-// Import MDX Components to pass directly
-import { Callout } from "@/components/mdx/callout";
-import { MetricGrid, MetricItem } from "@/components/mdx/metric";
-import { Figure } from "@/components/mdx/figure";
-
-// Define global components for MDX
-const components = {
-  h1: (props: any) => <h1 className="text-3xl font-bold tracking-tight mt-12 mb-6" {...props} />,
-  h2: (props: any) => <h2 className="text-2xl font-bold tracking-tight mt-10 mb-4" {...props} />,
-  h3: (props: any) => <h3 className="text-xl font-semibold tracking-tight mt-8 mb-4" {...props} />,
-  p: (props: any) => <p className="leading-7 [&:not(:first-child)]:mt-6 text-muted-foreground" {...props} />,
-  a: ({ href, children }: any) => (
-    <Link href={href as string} className="font-medium text-primary underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-all">
-      {children}
-    </Link>
-  ),
-  ul: (props: any) => <ul className="my-6 ml-6 list-disc [&>li]:mt-2 text-muted-foreground" {...props} />,
-  ol: (props: any) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2 text-muted-foreground" {...props} />,
-  li: (props: any) => <li {...props} />,
-  blockquote: (props: any) => (
-    <blockquote className="mt-6 border-l-2 border-primary pl-6 italic text-foreground text-lg" {...props} />
-  ),
-  code: (props: any) => (
-    <code className="relative rounded bg-secondary px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold text-foreground" {...props} />
-  ),
-  Callout,
-  MetricGrid,
-  MetricItem,
-  Figure,
-};
-
-// Client component wrapper for animations if needed, but for now we can use motion in the server component file
-// provided "use client" directive is present or we use a client wrapper.
-// Since this file is a Server Component (async default export), we should extract the animated hero to a client component
-// OR we can make this page a client component if necessary, but that breaks generateStaticParams/async data fetching pattern.
-//
-// CORRECTION: Framer Motion components can be used in Server Components IF they are imported from a "use client" file
-// OR if the file itself is "use client".
-// However, `getMdxContent` is async/server-side.
-//
-// Solution: We will keep this file as Server Component and move the Hero visualization to a new Client Component
-// OR simpler: we'll make a small client component for the Hero Image part to handle `layoutId`.
 
 import { WorkDetailHero } from "@/components/work-detail-hero";
 
@@ -62,14 +15,7 @@ export default async function WorkDetail({ params }: { params: { slug: string } 
     notFound();
   }
 
-  const { title, description, date, role, timeline, outcome, tags } = post.frontmatter;
-
-  // Placeholder gradient lookup
-  const placeholderStyle = getWorkPlaceholder(slug);
-
-  // Find project image from siteConfig
-  const projectConfig = siteConfig.featuredWork.find(p => p.slug === slug);
-  const imageUrl = projectConfig?.image;
+  const { title, description, role, timeline, outcome, tags } = post.frontmatter;
 
   return (
     <article className="min-h-screen pb-24">
@@ -79,8 +25,6 @@ export default async function WorkDetail({ params }: { params: { slug: string } 
         title={title}
         description={description}
         tags={tags}
-        imageUrl={imageUrl}
-        placeholderGradient={placeholderStyle.gradient}
       />
 
       <div className="container grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8">
