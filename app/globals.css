@@ -132,7 +132,8 @@
 
   /* Card: Lift + Specular Sweep */
   .card-precision {
-    @apply relative transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)];
+    @apply relative transition-all duration-300;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
   .card-precision:hover {
     transform: translateY(-4px);
