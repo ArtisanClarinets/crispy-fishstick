@@ -91,6 +91,86 @@
   }
 }
 
+@layer components {
+  /* ---------------------------
+     Micro-Interactions
+  ---------------------------- */
+
+  /* Button: Pressure + Highlight Shift */
+  .btn-precision {
+    @apply relative overflow-hidden transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)];
+  }
+  .btn-precision:hover {
+    transform: translateY(-2px);
+  }
+  .btn-precision:active {
+    transform: translateY(0) scale(0.98);
+  }
+  .btn-precision::after {
+    content: "";
+    @apply absolute top-0 left-0 right-0 h-px opacity-0 transition-all duration-500 ease-out;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transform: translateX(-100%);
+  }
+  .btn-precision:hover::after {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+
+  /* Input: Focus Beam */
+  .input-precision {
+    @apply transition-all duration-200 bg-origin-border;
+    background-clip: padding-box, border-box;
+  }
+  .input-precision:focus {
+    @apply border-transparent;
+    background-image: linear-gradient(var(--background), var(--background)),
+                      linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+    background-size: 200% 100%;
+    animation: beam-sweep 0.8s ease-out forwards;
+  }
+
+  /* Card: Lift + Specular Sweep */
+  .card-precision {
+    @apply relative transition-all duration-300;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card-precision:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+  }
+  .card-precision::before {
+    content: "";
+    @apply absolute inset-0 opacity-0 pointer-events-none z-10 transition-all duration-300;
+    background: linear-gradient(
+      115deg,
+      transparent 30%,
+      rgba(255,255,255,0.05) 45%,
+      rgba(255,255,255,0.1) 50%,
+      rgba(255,255,255,0.05) 55%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+  }
+  .card-precision:hover::before {
+    opacity: 1;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateX(100%);
+  }
+
+  /* Link: Progress Underline */
+  .link-precision {
+    @apply relative no-underline;
+  }
+  .link-precision::after {
+    content: "";
+    @apply absolute left-0 bottom-[-2px] w-full h-px bg-current opacity-60 origin-left scale-x-0 transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)];
+  }
+  .link-precision:hover::after {
+    @apply scale-x-100;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -201,10 +281,18 @@
   100% { transform: translateX(120%) skewX(-12deg); opacity: 0; }
 }
 
+@keyframes beam-sweep {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .system-layer[data-sweep="1"]::after {
     animation: none;
     opacity: 0;
+  }
+  .card-precision:hover, .btn-precision:hover {
+    transform: none;
   }
 }

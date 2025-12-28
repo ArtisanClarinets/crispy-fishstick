@@ -13,8 +13,20 @@ export default function ContactPage() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    role: "",
+    budget: "$10k - $25k",
+    message: "",
+    email: "",
+    website: "",
+  });
 
-  // Mock form handling
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step < 3) {
@@ -23,10 +35,28 @@ export default function ContactPage() {
     }
 
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSuccess(true);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to submit");
+      }
+
+      setIsSuccess(true);
+    } catch (error) {
+      console.error("Submission error:", error);
+      // Optionally handle error UI here
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSuccess) {
@@ -88,11 +118,25 @@ export default function ContactPage() {
                     >
                        <div className="space-y-2">
                           <Label htmlFor="name">What&apos;s your name?</Label>
-                          <Input id="name" required placeholder="Jane Doe" className="h-14 text-lg" autoFocus />
+                          <Input
+                            id="name"
+                            required
+                            placeholder="Jane Doe"
+                            className="h-14 text-lg"
+                            autoFocus
+                            value={formData.name}
+                            onChange={handleChange}
+                          />
                        </div>
                        <div className="space-y-2">
                           <Label htmlFor="role">What is your role?</Label>
-                          <Input id="role" placeholder="Founder, CTO, Product Lead..." className="h-14 text-lg" />
+                          <Input
+                            id="role"
+                            placeholder="Founder, CTO, Product Lead..."
+                            className="h-14 text-lg"
+                            value={formData.role}
+                            onChange={handleChange}
+                          />
                        </div>
                     </motion.div>
                  )}
@@ -107,7 +151,12 @@ export default function ContactPage() {
                     >
                        <div className="space-y-2">
                           <Label htmlFor="budget">Estimated Budget Range</Label>
-                          <select className="flex h-14 w-full rounded-md border border-input bg-background px-3 py-2 text-lg ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                          <select
+                            id="budget"
+                            className="flex h-14 w-full rounded-md border border-input bg-background px-3 py-2 text-lg ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            value={formData.budget}
+                            onChange={handleChange}
+                          >
                              <option>$10k - $25k</option>
                              <option>$25k - $50k</option>
                              <option>$50k - $100k</option>
@@ -116,7 +165,14 @@ export default function ContactPage() {
                        </div>
                        <div className="space-y-2">
                           <Label htmlFor="message">Tell me a bit about the project</Label>
-                          <Textarea id="message" required placeholder="We're looking to rebuild our core platform..." className="min-h-[150px] text-lg p-4" />
+                          <Textarea
+                            id="message"
+                            required
+                            placeholder="We're looking to rebuild our core platform..."
+                            className="min-h-[150px] text-lg p-4"
+                            value={formData.message}
+                            onChange={handleChange}
+                          />
                        </div>
                     </motion.div>
                  )}
@@ -131,11 +187,27 @@ export default function ContactPage() {
                     >
                        <div className="space-y-2">
                           <Label htmlFor="email">Work Email</Label>
-                          <Input id="email" type="email" required placeholder="jane@company.com" className="h-14 text-lg" autoFocus />
+                          <Input
+                            id="email"
+                            type="email"
+                            required
+                            placeholder="jane@company.com"
+                            className="h-14 text-lg"
+                            autoFocus
+                            value={formData.email}
+                            onChange={handleChange}
+                          />
                        </div>
                        <div className="space-y-2">
                           <Label htmlFor="website">Company Website (Optional)</Label>
-                          <Input id="website" type="url" placeholder="https://" className="h-14 text-lg" />
+                          <Input
+                            id="website"
+                            type="url"
+                            placeholder="https://"
+                            className="h-14 text-lg"
+                            value={formData.website}
+                            onChange={handleChange}
+                          />
                        </div>
                     </motion.div>
                  )}

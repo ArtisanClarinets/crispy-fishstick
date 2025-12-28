@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { siteConfig, getWorkPlaceholder } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
 import { Reveal } from "@/components/reveal";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { CoverArt } from "@/components/cover-art";
 
 export default function WorkPage() {
   return (
@@ -28,26 +28,15 @@ export default function WorkPage() {
             {/* Image Column - Wrapped in Reveal but LayoutId on motion.div */}
             <Reveal delay={i * 0.1} className="w-full">
                <Link href={`/work/${project.slug}`} className="block w-full">
-                  <div className="rounded-2xl border border-white/10 bg-card/50 backdrop-blur-sm overflow-hidden">
+                  <div className="rounded-2xl border border-white/10 bg-card/50 backdrop-blur-sm overflow-hidden card-precision">
                     <motion.div
                       layoutId={`cover-${project.slug}`}
-                      className="relative aspect-[16/10] w-full overflow-hidden"
+                      className="relative aspect-[16/10] w-full overflow-hidden bg-secondary"
                     >
-                      {/* Using Image if available, otherwise fallback to gradient div */}
-                      {project.image ? (
-                        <Image
-                          src={project.image}
-                          alt={project.title}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                          priority={i < 2}
-                        />
-                      ) : (
-                         <div className={`absolute inset-0 bg-gradient-to-br ${getWorkPlaceholder(project.slug).gradient} opacity-80 transition-transform duration-700 group-hover:scale-105`} />
-                      )}
+                      <CoverArt slug={project.slug} />
 
                       {/* Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </motion.div>
                   </div>
                </Link>
