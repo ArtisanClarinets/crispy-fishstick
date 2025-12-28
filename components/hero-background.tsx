@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import React, { MouseEvent, useMemo, useState } from "react";
+import React, { MouseEvent, useEffect, useMemo, useState } from "react";
 
 type Trace = { id: string; label: string; d: string };
 
@@ -34,6 +34,12 @@ export function HeroBackground() {
   const [active, setActive] = useState<string | null>(null);
 
   const tooltip = useMotionTemplate`translate(${mouseX}px, ${mouseY}px)`;
+
+  const [animating, setAnimating] = useState(false);
+
+  useEffect(() => {
+    setAnimating(true);
+  }, []);
 
   function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -132,11 +138,16 @@ export function HeroBackground() {
                   strokeWidth={isActive ? 2.2 : 1.7}
                   strokeLinecap="round"
                   strokeDasharray="18 14"
-                  initial={{ strokeDashoffset: 0, opacity: 0.65 }}
-                  animate={{
-                    strokeDashoffset: [-64, 0],
-                    opacity: isActive ? 1 : 0.72,
-                  }}
+                  style={{ opacity: isActive ? 1 : 0.72 }}
+                  initial={false}
+                  animate={
+                    animating
+                      ? {
+                          strokeDashoffset: [-64, 0],
+                          opacity: isActive ? 1 : 0.72,
+                        }
+                      : undefined
+                  }
                   transition={{
                     duration: timing.dur,
                     delay: timing.delay,
