@@ -6,9 +6,9 @@ export const siteConfig = {
     "A specialized engineering studio for founders who demand production-grade quality, rigorous systems, and Apple-caliber interfaces.",
   email: "dylan@thompsonsystems.com",
   links: {
-    github: "https://github.com/dylanthompson-demo",
-    linkedin: "https://linkedin.com/in/dylanthompson-demo",
-    twitter: "https://twitter.com/dylanthompson-demo",
+    github: null,
+    linkedin: null,
+    twitter: null,
   },
   cta: {
     primary: {
@@ -27,6 +27,8 @@ export const siteConfig = {
       slug: "shopify-admin-sync",
       outcome: "100% data integrity across 500k+ SKUs",
       constraints: "Black Friday traffic spikes, strict ERPNext schema enforcement.",
+      role: "Lead Engineer",
+      coverImage: null,
     },
     {
       title: "Fintech Dashboard",
@@ -34,6 +36,8 @@ export const siteConfig = {
       slug: "fintech-dashboard",
       outcome: "Sub-200ms analytics refresh under 30M events/day.",
       constraints: "Regulatory audit trails and SOC2 logging requirements.",
+      role: "Product Engineer",
+      coverImage: null,
     },
     {
       title: "HealthTech Patient Portal",
@@ -41,15 +45,17 @@ export const siteConfig = {
       slug: "healthtech-platform",
       outcome: "42% reduction in intake time across 12 clinics.",
       constraints: "HIPAA safeguards with legacy EMR integrations.",
+      role: "Lead Engineer",
+      coverImage: null,
     },
   ],
   stackPrimary: [
     "Next.js App Router",
-    "TypeScript Strict",
+    "React 18",
+    "TypeScript (strict)",
+    "Tailwind CSS",
     "Framer Motion",
-    "PostgreSQL / Prisma",
-    "Frappe ERPNext Integrations",
-    "GraphQL Federation",
+    "MDX Content Pipeline",
   ],
   stackSecondary: [
     "Event-driven systems",

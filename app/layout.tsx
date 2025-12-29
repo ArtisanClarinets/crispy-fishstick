@@ -15,7 +15,7 @@ import { AppMotionConfig } from "@/components/motion-config";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  display: 'swap',
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -47,7 +47,6 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Thompson Systems",
-    creator: "@dylanthompson-demo",
   },
   robots: {
     index: true,

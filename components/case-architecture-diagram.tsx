@@ -8,72 +8,96 @@ interface CaseArchitectureDiagramProps {
 }
 
 export function CaseArchitectureDiagram({ mode }: CaseArchitectureDiagramProps) {
-  // Simplified SVG diagram with nodes that light up based on mode
   const gridId = `grid-${mode}`;
-  const getStrokeWidth = (targetMode: string) => {
-    if (mode === "scale") return 2;
-    if (mode === "incident" && targetMode === "db") return 2;
-    return 1;
-  };
+  const accentClass =
+    mode === "incident"
+      ? "text-destructive"
+      : mode === "scale"
+        ? "text-primary"
+        : "text-foreground";
+
+  const railGlowClass =
+    mode === "incident" ? "text-destructive/60" : "text-primary/60";
 
   return (
-    <svg viewBox="0 0 400 200" className="w-full h-full text-sm font-mono select-none">
-       {/* Background Grid */}
-       <pattern id={gridId} width="20" height="20" patternUnits="userSpaceOnUse">
-         <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-border opacity-20"/>
-       </pattern>
-       <rect width="400" height="200" fill={`url(#${gridId})`} />
+    <svg viewBox="0 0 520 300" className="w-full h-full text-sm font-mono select-none">
+      {/* Background Grid */}
+      <pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse">
+        <path d="M 24 0 L 0 0 0 24" fill="none" stroke="currentColor" strokeWidth="0.6" className="text-border/40" />
+      </pattern>
+      <rect width="520" height="300" fill={`url(#${gridId})`} />
 
-       {/* Edges */}
-       <motion.path
-         d="M 60 100 L 140 100"
-         fill="none"
-         stroke="currentColor"
-         className={mode === "scale" ? "text-primary" : "text-border"}
-         animate={{ strokeDasharray: mode === "scale" ? "4 2" : "0 0" }} // dashed moving line simulation if possible, or just style
-         strokeWidth={getStrokeWidth('web')}
-       />
-       <motion.path
-         d="M 200 100 L 280 100"
-         fill="none"
-         stroke="currentColor"
-         className={mode === "incident" ? "text-destructive" : "text-border"}
-         strokeWidth={getStrokeWidth('db')}
-       />
+      {/* Layered surfaces */}
+      <rect x="40" y="50" width="440" height="190" rx="20" fill="currentColor" className="text-secondary/30" />
+      <rect x="70" y="70" width="380" height="150" rx="18" fill="currentColor" className="text-secondary/50" />
+      <rect x="100" y="90" width="320" height="110" rx="16" fill="currentColor" className="text-secondary" />
 
-       {/* Node: Client */}
-       <g transform="translate(30, 100)">
-          <circle r="20" fill="none" stroke="currentColor" className="text-foreground" />
-          <text textAnchor="middle" y="4" className="fill-foreground text-[10px]">USR</text>
-       </g>
+      {/* Rails */}
+      <motion.path
+        d="M 130 145 L 220 145 L 300 145 L 390 145"
+        fill="none"
+        stroke="currentColor"
+        className={accentClass}
+        strokeWidth={2}
+        strokeLinecap="round"
+        animate={{ opacity: 0.9 }}
+      />
+      <motion.path
+        d="M 130 165 L 220 165 L 300 165 L 390 165"
+        fill="none"
+        stroke="currentColor"
+        className={mode === "incident" ? "text-destructive/40" : "text-primary/30"}
+        strokeWidth={1.4}
+        strokeLinecap="round"
+      />
+      {mode !== "normal" && (
+        <motion.path
+          d="M 130 145 L 220 145 L 300 145 L 390 145"
+          fill="none"
+          stroke="currentColor"
+          className={railGlowClass}
+          strokeWidth={4}
+          strokeLinecap="round"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.6 }}
+        />
+      )}
 
-       {/* Node: Web */}
-       <g transform="translate(170, 100)">
-          <rect x="-30" y="-20" width="60" height="40" rx="4" fill="currentColor" className="text-secondary" stroke="currentColor" strokeWidth="1" />
-          <text textAnchor="middle" y="4" className="fill-foreground text-[10px]">API GW</text>
+      {/* Nodes */}
+      <g className="text-foreground">
+        <circle cx="130" cy="155" r="14" fill="currentColor" className="text-background" stroke="currentColor" strokeWidth="1" />
+        <text x="130" y="158" textAnchor="middle" className="fill-foreground text-[9px]">EDGE</text>
 
-          {/* Scale indicators */}
-          {mode === "scale" && (
-            <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-               <rect x="-35" y="-25" width="70" height="50" rx="6" fill="none" stroke="currentColor" className="text-primary" strokeDasharray="4 2" />
-               <text x="0" y="-35" textAnchor="middle" className="fill-primary text-[8px]">AUTOSCALE</text>
-            </motion.g>
-          )}
-       </g>
+        <rect x="206" y="136" width="28" height="38" rx="6" fill="currentColor" className="text-background" stroke="currentColor" strokeWidth="1" />
+        <text x="220" y="158" textAnchor="middle" className="fill-foreground text-[9px]">QUEUE</text>
 
-       {/* Node: DB */}
-       <g transform="translate(310, 100)">
-          <path d="M -20 -15 C -20 -25 20 -25 20 -15 L 20 15 C 20 25 -20 25 -20 15 Z" fill="currentColor" className={mode === "incident" ? "text-destructive/20" : "text-secondary"} stroke="currentColor" strokeWidth="1" />
-          <text textAnchor="middle" y="4" className={`text-[10px] ${mode === "incident" ? "fill-destructive font-bold" : "fill-foreground"}`}>DB PRIMARY</text>
+        <rect x="286" y="136" width="28" height="38" rx="6" fill="currentColor" className="text-background" stroke="currentColor" strokeWidth="1" />
+        <text x="300" y="158" textAnchor="middle" className="fill-foreground text-[9px]">CORE</text>
 
-           {/* Incident indicators */}
-          {mode === "incident" && (
-            <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-               <text x="0" y="35" textAnchor="middle" className="fill-destructive text-[8px] animate-pulse">FAILOVER...</text>
-            </motion.g>
-          )}
-       </g>
+        <circle cx="390" cy="155" r="14" fill="currentColor" className="text-background" stroke="currentColor" strokeWidth="1" />
+        <text x="390" y="158" textAnchor="middle" className="fill-foreground text-[9px]">DATA</text>
+      </g>
 
+      {/* Mode badge */}
+      <g transform="translate(330, 60)">
+        <rect width="120" height="28" rx="14" fill="currentColor" className={mode === "incident" ? "text-destructive/15" : "text-primary/10"} />
+        <text x="60" y="18" textAnchor="middle" className={`text-[9px] tracking-[0.2em] ${accentClass}`}>
+          MODE: {mode.toUpperCase()}
+        </text>
+      </g>
+
+      {/* Legend */}
+      <g transform="translate(60, 232)" className="text-[9px]">
+        <text x="0" y="0" className="fill-muted-foreground" letterSpacing="2">LEGEND</text>
+        <g transform="translate(0, 12)">
+          <circle cx="6" cy="6" r="3" fill="currentColor" className="text-primary/70" />
+          <text x="16" y="9" className="fill-muted-foreground">Flow rail</text>
+        </g>
+        <g transform="translate(90, 12)">
+          <rect x="0" y="3" width="8" height="6" rx="2" fill="currentColor" className="text-secondary" />
+          <text x="14" y="9" className="fill-muted-foreground">Surface</text>
+        </g>
+      </g>
     </svg>
   );
 }

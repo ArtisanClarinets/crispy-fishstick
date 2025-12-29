@@ -4,6 +4,14 @@ import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import {
+  PROOF_HEADERS,
+  type BuildProof,
+  type HeaderStatus,
+  getAuditStatus,
+  loadProofSnapshot,
+  saveProofSnapshot,
+} from "@/lib/proof";
 
 export function ConsoleHud() {
   const [visible, setVisible] = useState(false);
@@ -11,7 +19,9 @@ export function ConsoleHud() {
   const [time, setTime] = useState<string>("00:00:00");
   const [syncing, setSyncing] = useState(false);
   const [ttfb, setTtfb] = useState<number | null>(null);
-  const [cspReady, setCspReady] = useState(false);
+  const [headers, setHeaders] = useState<HeaderStatus[]>([]);
+  const [buildProof, setBuildProof] = useState<BuildProof | null>(null);
+  const [auditLabel, setAuditLabel] = useState("CHECKING");
   const pathname = usePathname();
   const startTime = useRef<number>(Date.now());
   const prefersReducedMotion = useReducedMotion();
@@ -76,23 +86,57 @@ export function ConsoleHud() {
     return () => clearInterval(interval);
   }, []);
 
-  // Proof checks
   useEffect(() => {
     const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
     if (navEntry) {
       setTtfb(Math.round(navEntry.responseStart));
     }
 
-    const checkCsp = async () => {
+    const snapshot = loadProofSnapshot();
+    if (snapshot) {
+      setHeaders(snapshot.headers);
+      setBuildProof(snapshot.buildProof);
+      const audit = getAuditStatus(snapshot.headers, snapshot.buildProof);
+      setAuditLabel(audit.auditOk ? "VERIFIED" : "UNVERIFIED / DEGRADED");
+    }
+
+    const checkProof = async () => {
       try {
-        const res = await fetch("/api/proof/headers", { cache: "no-store" });
-        setCspReady(res.ok);
+        const [headersRes, buildRes] = await Promise.all([
+          fetch("/api/proof/headers", { cache: "no-store" }),
+          fetch("/proof/build.json", { cache: "no-store" }),
+        ]);
+
+        const headerResults: HeaderStatus[] = headersRes.ok
+          ? PROOF_HEADERS.map((header) => {
+              const value = headersRes.headers.get(header.key);
+              return {
+                name: header.name,
+                key: header.key,
+                value,
+                ok: Boolean(value),
+              };
+            })
+          : [];
+
+        const buildData = (buildRes.ok ? ((await buildRes.json()) as BuildProof) : null) ?? null;
+
+        setHeaders(headerResults);
+        setBuildProof(buildData);
+        const audit = getAuditStatus(headerResults, buildData);
+        setAuditLabel(audit.auditOk ? "VERIFIED" : "UNVERIFIED / DEGRADED");
+
+        saveProofSnapshot({
+          headers: headerResults,
+          buildProof: buildData,
+          lastAuditAt: new Date().toISOString(),
+        });
       } catch {
-        setCspReady(false);
+        setAuditLabel("UNVERIFIED / DEGRADED");
       }
     };
 
-    void checkCsp();
+    void checkProof();
   }, []);
 
   // Sync Blip on navigation
@@ -102,6 +146,8 @@ export function ConsoleHud() {
     const t = setTimeout(() => setSyncing(false), 350);
     return () => clearTimeout(t);
   }, [pathname, prefersReducedMotion]);
+
+  const audit = getAuditStatus(headers, buildProof);
 
   return (
     <div
@@ -119,28 +165,31 @@ export function ConsoleHud() {
           >
             {/* Top Right Pill */}
             <div className="absolute top-6 right-6 flex items-center gap-2 bg-background/80 backdrop-blur border border-border/40 px-3 py-1 rounded-full shadow-sm">
-               <span className={cn("w-1.5 h-1.5 rounded-full bg-green-500", syncing && "animate-pulse")} />
-               <span className="text-foreground/80">OPERATIONAL</span>
+              <span className={cn("w-1.5 h-1.5 rounded-full", audit.auditOk ? "bg-green-500" : "bg-amber-500", syncing && "animate-pulse")} />
+              <span className="text-foreground/80">{audit.auditOk ? "VERIFIED" : "DEGRADED"}</span>
             </div>
 
             {/* Left Gutter */}
             <div className="absolute top-1/2 left-6 -translate-y-1/2 flex flex-col gap-1 opacity-60">
-               <div>SEC: {section.toUpperCase()}</div>
-               <div>TIM: {time}</div>
-               <div>PTH: {pathname === "/" ? "/ROOT" : pathname.toUpperCase()}</div>
+              <div>SEC: {section.toUpperCase()}</div>
+              <div>TIM: {time}</div>
+              <div>PTH: {pathname === "/" ? "/ROOT" : pathname.toUpperCase()}</div>
             </div>
 
             {/* Bottom Bar */}
             <div
               className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-4 py-1.5 rounded-full bg-background/50 backdrop-blur border border-white/5 shadow-sm whitespace-nowrap"
             >
-               <span>BUILD: VERIFIED</span>
-               <span className="text-border">|</span>
-               <span>{cspReady ? "CSP: VERIFIED" : "CSP: CHECKING"}</span>
-               <span className="text-border">|</span>
-               <span className={cn("hud-sync transition-colors duration-300", syncing ? "text-primary" : "")}>
-                 {ttfb === null ? "TTFB: --" : `TTFB: ${ttfb}ms`}
-               </span>
+              <span>BUILD: {audit.buildOk ? "VERIFIED" : "UNVERIFIED"}</span>
+              <span className="text-border">|</span>
+              <span>HEADERS: {audit.headersOk ? "VERIFIED" : "DEGRADED"}</span>
+              <span className="text-border">|</span>
+              <span>{auditLabel}</span>
+              <span className="text-border">|</span>
+              <span className={cn("hud-sync transition-colors duration-300", syncing ? "text-primary" : "")}
+              >
+                {ttfb === null ? "TTFB: --" : `TTFB: ${ttfb}ms`}
+              </span>
             </div>
           </motion.div>
         )}

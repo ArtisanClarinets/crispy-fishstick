@@ -17,17 +17,26 @@ const depsSha256 = crypto
   .update(pkgLock)
   .digest("hex");
 
+const gatesConfigured = [
+  "TypeScript strict",
+  "ESLint enforced",
+  "Vitest unit suite",
+  "Playwright e2e suite",
+  "Security headers active",
+];
+
+const gatesRan = gatesConfigured.map((name) => ({
+  name,
+  ran: false,
+}));
+
 const payload = {
   commit: commit.slice(0, 12),
   builtAt,
   depsSha256,
-  checks: [
-    "TypeScript strict",
-    "ESLint enforced",
-    "Vitest unit suite",
-    "Playwright e2e suite",
-    "Security headers active",
-  ],
+  generated: true,
+  gatesConfigured,
+  gatesRan,
 };
 
 fs.mkdirSync("public/proof", { recursive: true });

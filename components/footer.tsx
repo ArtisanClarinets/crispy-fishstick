@@ -41,33 +41,39 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground/80">Connect</h4>
             <div className="flex gap-4">
-              <a
-                href={siteConfig.links.github}
-                target="_blank"
-                rel="noreferrer"
-                className="p-2 rounded-full bg-secondary hover:bg-foreground hover:text-background transition-all duration-300"
-                aria-label="GitHub"
-              >
-                <Github className="h-4 w-4" />
-              </a>
-              <a
-                href={siteConfig.links.linkedin}
-                target="_blank"
-                rel="noreferrer"
-                className="p-2 rounded-full bg-secondary hover:bg-foreground hover:text-background transition-all duration-300"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="h-4 w-4" />
-              </a>
-              <a
-                href={siteConfig.links.twitter}
-                target="_blank"
-                rel="noreferrer"
-                className="p-2 rounded-full bg-secondary hover:bg-foreground hover:text-background transition-all duration-300"
-                aria-label="Twitter"
-              >
-                <Twitter className="h-4 w-4" />
-              </a>
+              {siteConfig.links.github ? (
+                <a
+                  href={siteConfig.links.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2 rounded-full bg-secondary hover:bg-foreground hover:text-background transition-all duration-300"
+                  aria-label="GitHub"
+                >
+                  <Github className="h-4 w-4" />
+                </a>
+              ) : null}
+              {siteConfig.links.linkedin ? (
+                <a
+                  href={siteConfig.links.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2 rounded-full bg-secondary hover:bg-foreground hover:text-background transition-all duration-300"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="h-4 w-4" />
+                </a>
+              ) : null}
+              {siteConfig.links.twitter ? (
+                <a
+                  href={siteConfig.links.twitter}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2 rounded-full bg-secondary hover:bg-foreground hover:text-background transition-all duration-300"
+                  aria-label="Twitter"
+                >
+                  <Twitter className="h-4 w-4" />
+                </a>
+              ) : null}
             </div>
             <p className="text-sm text-muted-foreground">
               {siteConfig.email}
@@ -84,8 +90,8 @@ export function Footer() {
             <VTLink href="/terms" className="hover:text-foreground transition-colors">Terms of Service</VTLink>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-             <span className="w-2 h-2 rounded-full bg-primary/60"></span>
-             <span>Proof Panel: Live Audit</span>
+            <span className="w-2 h-2 rounded-full bg-primary/60"></span>
+            <span>Proof Panel: Live Audit</span>
           </div>
         </div>
       </div>
