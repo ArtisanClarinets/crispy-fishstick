@@ -32,7 +32,11 @@ export default function WorkPage() {
                   layoutId={`cover-${project.slug}`}
                   className="relative aspect-[16/10] w-full overflow-hidden bg-secondary"
                 >
-                  <CoverArt slug={project.slug} className="transition-transform duration-700 group-hover:scale-105" />
+                  <CoverArt
+                    slug={project.slug}
+                    imageSrc={project.coverImage}
+                    className="transition-transform duration-700 group-hover:scale-105"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </motion.div>
               </div>
@@ -64,6 +68,9 @@ export default function WorkPage() {
                 </p>
                 <p>
                   <span className="text-foreground font-semibold">Constraints:</span> {project.constraints}
+                </p>
+                <p>
+                  <span className="text-foreground font-semibold">Role:</span> {project.role}
                 </p>
               </div>
 

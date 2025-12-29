@@ -69,6 +69,7 @@ export default function Home() {
 
       {/* SELF-AUDIT PROOF PANEL */}
       <section
+        id="proof"
         className="py-16 border-b border-border/50 bg-background/50"
         data-hud-section="Proof"
       >

@@ -1,10 +1,44 @@
-import { Shield, CheckCircle, AlertTriangle, Lock, FileText } from "lucide-react"
-import { Metadata } from "next"
+import { Shield, CheckCircle, AlertTriangle, Lock, FileText } from "lucide-react";
+import { Metadata } from "next";
+import { VTLink } from "@/components/vt-link";
 
 export const metadata: Metadata = {
   title: "Trust Center | Thompson Systems",
-  description: "How we protect your IP, ensure predictability, and define success. No black boxes.",
-}
+  description: "How I protect your IP, ensure predictability, and define success. No black boxes.",
+};
+
+const definitionOfDone = [
+  {
+    title: "Performance Baseline",
+    detail: "Recorded Lighthouse report delivered with trace + budgets.",
+    proof: "Proof Panel runtime scan + exported Lighthouse artifacts.",
+  },
+  {
+    title: "Accessibility Review",
+    detail: "WCAG AA checklist with screen reader passes and keyboard map.",
+    proof: "Annotated audit PDF + remediation checklist.",
+  },
+  {
+    title: "Analytics Verification",
+    detail: "Event map validated against live payloads.",
+    proof: "Proof Panel headers + analytics payload log.",
+  },
+  {
+    title: "SEO Foundation",
+    detail: "Metadata, sitemap, and structured data verified.",
+    proof: "Snapshot of tags + sitemap artifact.",
+  },
+  {
+    title: "Handoff Package",
+    detail: "Runbook, infrastructure notes, and ownership transfer.",
+    proof: "Signed handoff checklist.",
+  },
+  {
+    title: "Security Headers",
+    detail: "CSP, HSTS, referrer, and content-type protections confirmed.",
+    proof: "Proof Panel header inspection.",
+  },
+];
 
 export default function TrustCenterPage() {
   return (
@@ -32,16 +66,16 @@ export default function TrustCenterPage() {
         </h2>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="p-6 rounded-2xl bg-secondary/30 border border-border/50">
-             <h3 className="font-semibold text-lg mb-2">Total IP Ownership</h3>
-             <p className="text-muted-foreground">
-               You keep your domain, accounts, assets, and code. I build in your repositories (or transfer them immediately). You are never locked out of your own business.
-             </p>
+            <h3 className="font-semibold text-lg mb-2">Total IP Ownership</h3>
+            <p className="text-muted-foreground">
+              You keep your domain, accounts, assets, and code. I build in your repositories (or transfer them immediately). You are never locked out of your own business.
+            </p>
           </div>
           <div className="p-6 rounded-2xl bg-secondary/30 border border-border/50">
-             <h3 className="font-semibold text-lg mb-2">Zero Vendor Lock-in</h3>
-             <p className="text-muted-foreground">
-               I use standard, widely-supported technologies (React, Next.js, Postgres). Any competent engineer can pick up where I leave off. No proprietary &quot;black box&quot; CMS.
-             </p>
+            <h3 className="font-semibold text-lg mb-2">Zero Vendor Lock-in</h3>
+            <p className="text-muted-foreground">
+              I use standard, widely-supported technologies (React, Next.js, Frappe). Any competent engineer can pick up where I leave off. No proprietary &quot;black box&quot; CMS.
+            </p>
           </div>
         </div>
       </section>
@@ -53,33 +87,33 @@ export default function TrustCenterPage() {
           How Projects Stay Predictable
         </h2>
         <div className="space-y-4">
-           <div className="flex gap-4 items-start">
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
-                 <span className="font-bold text-primary">1</span>
-              </div>
-              <div>
-                 <h4 className="font-semibold text-lg">Clear Phases & Deliverables</h4>
-                 <p className="text-muted-foreground">Every project follows the Build Plan. You know exactly what is being delivered at each stage, from design mockups to the final line of code.</p>
-              </div>
-           </div>
-           <div className="flex gap-4 items-start">
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
-                 <span className="font-bold text-primary">2</span>
-              </div>
-              <div>
-                 <h4 className="font-semibold text-lg">Written Scope & Change Control</h4>
-                 <p className="text-muted-foreground">We agree on a scope in writing. If you want to add more, we pause, estimate the new work, and you approve it before I start. No surprise bills.</p>
-              </div>
-           </div>
-           <div className="flex gap-4 items-start">
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
-                 <span className="font-bold text-primary">3</span>
-              </div>
-              <div>
-                 <h4 className="font-semibold text-lg">Weekly Updates</h4>
-                 <p className="text-muted-foreground">You get a plain-English status update every week. What I did, what&apos;s next, and any blockers.</p>
-              </div>
-           </div>
+          <div className="flex gap-4 items-start">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+              <span className="font-bold text-primary">1</span>
+            </div>
+            <div>
+              <h4 className="font-semibold text-lg">Clear Phases & Deliverables</h4>
+              <p className="text-muted-foreground">Every project follows the Build Plan. You know exactly what is being delivered at each stage, from design mockups to the final line of code.</p>
+            </div>
+          </div>
+          <div className="flex gap-4 items-start">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+              <span className="font-bold text-primary">2</span>
+            </div>
+            <div>
+              <h4 className="font-semibold text-lg">Written Scope & Change Control</h4>
+              <p className="text-muted-foreground">We agree on a scope in writing. If you want to add more, we pause, estimate the new work, and you approve it before I start. No surprise bills.</p>
+            </div>
+          </div>
+          <div className="flex gap-4 items-start">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+              <span className="font-bold text-primary">3</span>
+            </div>
+            <div>
+              <h4 className="font-semibold text-lg">Weekly Evidence Drops</h4>
+              <p className="text-muted-foreground">You get a plain-English status update every week with a link to the current audit results, artifacts, and the next milestone.</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -87,22 +121,23 @@ export default function TrustCenterPage() {
       <section className="space-y-8">
         <h2 className="text-3xl font-bold flex items-center gap-3">
           <CheckCircle className="w-8 h-8 text-primary" />
-          What &apos;Done&apos; Means
+          Definition of Done (What You Receive)
         </h2>
+        <p className="text-muted-foreground">
+          Every item below maps to a measurable artifact. Nothing is marked &quot;done&quot; without the proof.
+          See the live evidence in the <VTLink href="/#proof" className="underline">Proof Panel</VTLink> and delivered reports.
+        </p>
         <div className="grid gap-4 sm:grid-cols-2">
-           {[
-             "Performance Baseline (90+ Lighthouse)",
-             "Mobile Responsiveness Checked",
-             "Accessibility (WCAG AA) Audit",
-             "Analytics Installed & Verified",
-             "SEO Basics (Meta tags, Sitemap)",
-             "Handoff Documentation Provided"
-           ].map((item) => (
-             <div key={item} className="flex items-center gap-3 p-4 border border-border/50 rounded-lg">
+          {definitionOfDone.map((item) => (
+            <div key={item.title} className="flex flex-col gap-2 p-4 border border-border/50 rounded-lg bg-background/60">
+              <div className="flex items-center gap-3">
                 <CheckCircle className="w-5 h-5 text-green-500" />
-                <span>{item}</span>
-             </div>
-           ))}
+                <span className="font-semibold">{item.title}</span>
+              </div>
+              <p className="text-sm text-muted-foreground">{item.detail}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Proof: {item.proof}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -116,20 +151,20 @@ export default function TrustCenterPage() {
           Whether you hire me or someone else, please be careful if you see these signs:
         </p>
         <ul className="space-y-4">
-           <li className="flex gap-3">
-              <span className="text-red-500 font-bold">•</span>
-              <span className="text-foreground/80"><strong>No Admin Access:</strong> If a vendor won&apos;t give you full admin access to your own site or hosting, run. They are holding you hostage.</span>
-           </li>
-           <li className="flex gap-3">
-              <span className="text-red-500 font-bold">•</span>
-              <span className="text-foreground/80"><strong>Vague Pricing:</strong> &quot;It depends&quot; is fine for an estimate, but you need a fixed project fee or a clear hourly rate with a cap.</span>
-           </li>
-           <li className="flex gap-3">
-              <span className="text-red-500 font-bold">•</span>
-              <span className="text-foreground/80"><strong>No Deliverables List:</strong> If they can&apos;t list exactly what you are paying for (e.g., &quot;Home page, About page, Contact form&quot;), you will likely be disappointed.</span>
-           </li>
+          <li className="flex gap-3">
+            <span className="text-red-500 font-bold">•</span>
+            <span className="text-foreground/80"><strong>No Admin Access:</strong> If a vendor won&apos;t give you full admin access to your own site or hosting, run. They are holding you hostage.</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="text-red-500 font-bold">•</span>
+            <span className="text-foreground/80"><strong>Vague Pricing:</strong> &quot;It depends&quot; is fine for an estimate, but you need a fixed project fee or a clear hourly rate with a cap.</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="text-red-500 font-bold">•</span>
+            <span className="text-foreground/80"><strong>No Deliverables List:</strong> If they can&apos;t list exactly what you are paying for (e.g., &quot;Home page, About page, Contact form&quot;), you will likely be disappointed.</span>
+          </li>
         </ul>
       </section>
     </div>
-  )
+  );
 }

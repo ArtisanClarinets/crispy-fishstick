@@ -3,11 +3,14 @@ import Link from "next/link";
 import { Callout } from "@/components/mdx/callout";
 import { MetricGrid, MetricItem } from "@/components/mdx/metric";
 import { Figure } from "@/components/mdx/figure";
+import { ShopifySyncDiagram } from "@/components/mdx/ShopifySyncDiagram";
+import { RedactionNote } from "@/components/mdx/RedactionNote";
+import { SystemSpec } from "@/components/mdx/SystemSpec";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    h1: ({ children }) => <h1 className="text-3xl font-bold tracking-tight mt-12 mb-6">{children}</h1>,
-    h2: ({ children }) => <h2 className="text-2xl font-bold tracking-tight mt-10 mb-4">{children}</h2>,
+    h1: ({ children }) => <h1 className="text-3xl md:text-4xl font-bold tracking-tight mt-12 mb-6 text-gradient">{children}</h1>,
+    h2: ({ children }) => <h2 className="text-2xl md:text-3xl font-bold tracking-tight mt-10 mb-4">{children}</h2>,
     h3: ({ children }) => <h3 className="text-xl font-semibold tracking-tight mt-8 mb-4">{children}</h3>,
     p: ({ children }) => <p className="leading-7 [&:not(:first-child)]:mt-6 text-muted-foreground">{children}</p>,
     a: ({ href, children }) => (
@@ -32,6 +35,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     MetricGrid,
     MetricItem,
     Figure,
+    ShopifySyncDiagram,
+    RedactionNote,
+    SystemSpec,
     ...components,
   };
 }

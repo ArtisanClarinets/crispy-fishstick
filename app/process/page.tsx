@@ -4,7 +4,7 @@ import { VTLink } from "@/components/vt-link";
 
 export const metadata: Metadata = {
   title: "Process",
-  description: "My proven process for delivering exceptional digital products.",
+  description: "My process for delivering high-trust digital products with measurable proof.",
 };
 
 const processSteps = [
@@ -12,73 +12,79 @@ const processSteps = [
     number: "01",
     title: "Discovery",
     description:
-      "I start by understanding your goals, challenges, and target audience. Through research and analysis, I define the project scope and success criteria.",
+      "I start by mapping your goals, constraints, and current risks. This becomes the source of truth for scope and success criteria.",
     deliverables: [
-      "Project brief",
-      "User research",
-      "Competitive analysis",
-      "Technical requirements",
+      "Project brief + success metrics",
+      "Risk register",
+      "Scope boundaries",
+      "Decision log",
     ],
+    proof: "Signed brief + scope baseline",
   },
   {
     number: "02",
     title: "Strategy & Planning",
     description:
-      "Based on my findings, I develop a comprehensive strategy and roadmap. I define the architecture, technology stack, and timeline.",
+      "I translate requirements into a build plan with measurable checkpoints and proof artifacts.",
     deliverables: [
-      "Project roadmap",
-      "Technical architecture",
-      "Content strategy",
-      "Resource planning",
+      "Architecture sketch",
+      "Build plan with gates",
+      "Milestone calendar",
+      "Evidence checklist",
     ],
+    proof: "Build Plan module + gate checklist",
   },
   {
     number: "03",
     title: "Design",
     description:
-      "I create wireframes, prototypes, and high-fidelity designs that bring the vision to life. Every element is crafted with purpose and attention to detail.",
+      "I design the system and interface together so visuals and engineering match from day one.",
     deliverables: [
-      "Wireframes",
-      "Interactive prototypes",
-      "Visual designs",
-      "Design system",
+      "Component spec",
+      "Interaction inventory",
+      "Design tokens",
+      "Accessibility pre-check",
     ],
+    proof: "Component spec PDF + token export",
   },
   {
     number: "04",
     title: "Development",
     description:
-      "I build your product using modern technologies and best practices. I focus on performance, scalability, and maintainability.",
+      "I build in small, auditable increments with runtime checks and measurable budgets.",
     deliverables: [
-      "Clean, documented code",
-      "Responsive implementation",
-      "API integration",
-      "Quality assurance",
+      "Typed codebase",
+      "Performance budgets",
+      "Instrumentation hooks",
+      "Security header config",
     ],
+    proof: "Proof Panel runtime scan",
   },
   {
     number: "05",
     title: "Testing & Refinement",
     description:
-      "Rigorous testing ensures everything works flawlessly across devices and browsers. I refine based on feedback and real-world usage.",
+      "I validate the build against the evidence checklist and record the results.",
     deliverables: [
-      "Comprehensive testing",
-      "Performance optimization",
-      "Bug fixes",
-      "User acceptance testing",
+      "Audit report",
+      "Bug/edge-case ledger",
+      "Accessibility QA",
+      "Release checklist",
     ],
+    proof: "Audit report + rerun log",
   },
   {
     number: "06",
     title: "Launch & Support",
     description:
-      "I handle the deployment and provide ongoing support to ensure success. Monitoring and optimization continue post-launch.",
+      "I ship with a handoff plan, monitoring, and a documented exit route.",
     deliverables: [
-      "Deployment",
-      "Training & documentation",
-      "Monitoring setup",
-      "Ongoing support",
+      "Launch runbook",
+      "Rollback plan",
+      "Ownership transfer",
+      "Post-launch review",
     ],
+    proof: "Signed launch checklist + handoff docs",
   },
 ];
 
@@ -88,10 +94,9 @@ export default function ProcessPage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Process</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">My Process</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A proven methodology that ensures successful outcomes for every
-            project, from initial concept to final delivery.
+            A transparent, evidence-first workflow. Every phase ships with artifacts that prove what was done.
           </p>
         </div>
 
@@ -111,7 +116,7 @@ export default function ProcessPage() {
 
               {/* Content */}
               <div className="md:col-span-10">
-                <div className="bg-background rounded-2xl p-8 border border-border">
+                <div className="glass-card surface-rim rounded-2xl p-8">
                   <h2 className="text-2xl font-bold mb-3">{step.title}</h2>
                   <p className="text-muted-foreground mb-6">
                     {step.description}
@@ -132,6 +137,9 @@ export default function ProcessPage() {
                         </li>
                       ))}
                     </ul>
+                    <p className="text-xs text-muted-foreground uppercase tracking-[0.2em] mt-4">
+                      Proof: {step.proof}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -145,8 +153,7 @@ export default function ProcessPage() {
             Ready to get started?
           </h2>
           <p className="text-muted-foreground mb-8">
-            Let&apos;s discuss your project and how our process can help achieve your
-            goals.
+            Let&apos;s define your scope and build the proof trail from day one.
           </p>
           <VTLink
             href="/contact"
