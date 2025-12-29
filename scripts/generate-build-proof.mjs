@@ -1,10 +1,17 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
+import { execSync } from "node:child_process";
 
-const commit =
-  process.env.VERCEL_GIT_COMMIT_SHA ||
-  process.env.GITHUB_SHA ||
-  "unknown";
+let commit = "unknown";
+
+try {
+  commit =
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.GITHUB_SHA ||
+    execSync("git rev-parse HEAD").toString().trim();
+} catch (e) {
+  console.warn("Could not determine git commit hash");
+}
 
 const builtAt = new Date().toISOString();
 
@@ -41,4 +48,4 @@ const payload = {
 
 fs.mkdirSync("public/proof", { recursive: true });
 fs.writeFileSync("public/proof/build.json", JSON.stringify(payload, null, 2));
-console.log("Wrote public/proof/build.json");
+console.log("Wrote public/proof/build.json with commit:", payload.commit);

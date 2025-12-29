@@ -246,24 +246,6 @@ export function ProofPanel() {
                 ))}
               </ul>
             </div>
-            {buildProof.gatesRan && buildProof.gatesRan.length > 0 ? (
-              <div>
-                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">Execution Evidence</div>
-                <ul className="space-y-2">
-                  {buildProof.gatesRan.map((gate) => (
-                    <li key={gate.name} className="flex items-center gap-2">
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${gate.ran ? "bg-emerald-500" : "bg-muted"}`}
-                      />
-                      <span>{gate.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {gate.ran ? (gate.passed ? "Passed" : "Ran") : "Not run"}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
           </div>
         </div>
       </div>
