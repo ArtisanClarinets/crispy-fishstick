@@ -10,7 +10,7 @@ export default function PrivacyPage() {
   const lastUpdated = "2024-11-15";
 
   return (
-    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8" data-system-tone="default">
       <div className="mx-auto max-w-4xl">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Privacy Policy</h1>
         <p className="text-muted-foreground mb-8">

@@ -9,36 +9,33 @@ export interface CoverSpec {
   palette: {
     hue: number;
     secHue: number;
+    accentHue: number;
   };
-  hatch: {
-    spacing: number;
-    angle: number;
-  };
-  blobs: Array<{
+  mood: "signal" | "calm" | "nocturne";
+  meshStops: Array<{
+    x: number;
+    y: number;
+    hue: number;
+    alpha: number;
+    radius: number;
+  }>;
+  ribbons: Array<{
+    start: { x: number; y: number };
+    control1: { x: number; y: number };
+    control2: { x: number; y: number };
+    end: { x: number; y: number };
+    width: number;
+    opacity: number;
+  }>;
+  rings: Array<{
     cx: number;
     cy: number;
     r: number;
-    intensity: number;
+    strokeWidth: number;
+    opacity: number;
   }>;
-  topo: Array<{
-    y: number;
-    freq: number;
-    phase: number;
-    amplitude: number;
-    strokeOpacity: number;
-  }>;
-  circuits: {
-    routes: Array<{
-      points: Array<{ x: number; y: number }>;
-      width: number;
-      dash: string;
-    }>;
-    nodes: Array<{
-      cx: number;
-      cy: number;
-      r: number;
-    }>;
-  };
+  grainSeed: number;
+  accentIntensity: number;
 }
 
 const SPEC_CACHE = new Map<string, CoverSpec>();
@@ -51,30 +48,11 @@ function snap(value: number, grid: number) {
   return Math.round(value / grid) * grid;
 }
 
-function orthogonalRoute(rng: () => number) {
-  const grid = 20;
-  const start = {
-    x: snap(range(rng, 60, 740), grid),
-    y: snap(range(rng, 60, 540), grid),
-  };
-  const mid = {
-    x: snap(range(rng, 120, 680), grid),
-    y: snap(range(rng, 120, 480), grid),
-  };
-  const end = {
-    x: snap(range(rng, 60, 740), grid),
-    y: snap(range(rng, 60, 540), grid),
-  };
-
-  return {
-    points: [
-      start,
-      { x: mid.x, y: start.y },
-      mid,
-      { x: mid.x, y: end.y },
-      end,
-    ],
-  };
+function pickMood(rng: () => number): CoverSpec["mood"] {
+  const roll = rng();
+  if (roll > 0.66) return "nocturne";
+  if (roll > 0.33) return "signal";
+  return "calm";
 }
 
 export function getCoverSpec(slug: string): CoverSpec {
@@ -87,66 +65,54 @@ export function getCoverSpec(slug: string): CoverSpec {
   const rng = mulberry32(seed);
 
   // Color palette
-  const hue = Math.round(range(rng, 0, 360));
-  const secHue = Math.round((hue + range(rng, 120, 240)) % 360);
+  const hue = Math.round(range(rng, 180, 340));
+  const secHue = Math.round((hue + range(rng, 30, 90)) % 360);
+  const accentHue = Math.round((hue + range(rng, 120, 200)) % 360);
 
-  // Hatch pattern
-  const hatchSpacing = range(rng, 8, 16);
-  const hatchAngle = range(rng, 0, 90);
+  const mood = pickMood(rng);
 
-  // Heat blobs
-  const blobCount = Math.floor(range(rng, 3, 7));
-  const blobs = Array.from({ length: blobCount }, () => ({
-    cx: range(rng, 100, 700),
-    cy: range(rng, 100, 500),
-    r: range(rng, 50, 200),
-    intensity: range(rng, 0.3, 0.8),
+  // Mesh gradient stops
+  const meshStops = Array.from({ length: 4 }, () => ({
+    x: snap(range(rng, 10, 90), 5),
+    y: snap(range(rng, 8, 88), 4),
+    hue: rng() > 0.6 ? secHue : hue,
+    alpha: range(rng, 0.12, 0.32),
+    radius: range(rng, 35, 60),
   }));
 
-  // Topographic layers (sine waves)
-  const topoLayers = Math.floor(range(rng, 2, 4));
-  const topo = Array.from({ length: topoLayers }, () => ({
-    y: range(rng, 100, 500),
-    freq: range(rng, 0.01, 0.05),
-    phase: range(rng, 0, Math.PI * 2),
-    amplitude: range(rng, 20, 80),
-    strokeOpacity: range(rng, 0.4, 0.8),
+  // Ribbon arcs
+  const ribbonCount = Math.floor(range(rng, 2, 4));
+  const ribbons = Array.from({ length: ribbonCount }, () => ({
+    start: { x: range(rng, 40, 140), y: range(rng, 60, 160) },
+    control1: { x: range(rng, 160, 320), y: range(rng, 20, 220) },
+    control2: { x: range(rng, 360, 520), y: range(rng, 260, 520) },
+    end: { x: range(rng, 620, 760), y: range(rng, 320, 520) },
+    width: range(rng, 1.4, 2.6),
+    opacity: range(rng, 0.25, 0.6),
   }));
 
-  // Circuit traces
-  const nodeCount = Math.floor(range(rng, 4, 8));
-  const nodes = Array.from({ length: nodeCount }, () => ({
-    cx: range(rng, 50, 750),
-    cy: range(rng, 50, 550),
-    r: range(rng, 2, 6),
+  // Rings
+  const ringCount = Math.floor(range(rng, 2, 4));
+  const rings = Array.from({ length: ringCount }, () => ({
+    cx: range(rng, 120, 680),
+    cy: range(rng, 120, 460),
+    r: range(rng, 60, 180),
+    strokeWidth: range(rng, 0.6, 1.6),
+    opacity: range(rng, 0.2, 0.5),
   }));
-
-  const routeCount = Math.floor(range(rng, 3, 6));
-  const routes = Array.from({ length: routeCount }, () => {
-    const path = orthogonalRoute(rng);
-
-    return {
-      points: path.points,
-      width: range(rng, 0.5, 2),
-      dash: rng() > 0.5 ? "5,5" : "none",
-    };
-  });
 
   const spec = {
     palette: {
       hue,
       secHue,
+      accentHue,
     },
-    hatch: {
-      spacing: hatchSpacing,
-      angle: hatchAngle,
-    },
-    blobs,
-    topo,
-    circuits: {
-      routes,
-      nodes,
-    },
+    mood,
+    meshStops,
+    ribbons,
+    rings,
+    grainSeed: seed,
+    accentIntensity: range(rng, 0.35, 0.8),
   };
 
   SPEC_CACHE.set(slug, spec);

@@ -14,7 +14,7 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  display: 'swap',
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -47,7 +47,6 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Thompson Systems",
-    creator: "@dylanthompson-demo",
   },
   robots: {
     index: true,
@@ -74,7 +73,8 @@ export default function RootLayout({
       )}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          // Follow the user's device preference by default
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
           // nonce={nonce} // Disabled nonce to avoid hydration mismatch, relying on unsafe-inline for now

@@ -8,5 +8,27 @@
     "Vitest unit suite",
     "Playwright e2e suite",
     "Security headers active"
+  ],
+  "gatesRan": [
+    {
+      "name": "TypeScript strict",
+      "ran": false
+    },
+    {
+      "name": "ESLint enforced",
+      "ran": false
+    },
+    {
+      "name": "Vitest unit suite",
+      "ran": false
+    },
+    {
+      "name": "Playwright e2e suite",
+      "ran": false
+    },
+    {
+      "name": "Security headers active",
+      "ran": false
+    }
   ]
 }

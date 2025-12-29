@@ -7,6 +7,6 @@ export async function GET() {
     { ok: true, ts: new Date().toISOString() },
     { status: 200 }
   );
-  res.headers.set("Cache-Control", "no-store");
+  res.headers.set("Cache-Control", "no-store, max-age=0");
   return res;
 }

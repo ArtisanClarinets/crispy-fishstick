@@ -12,59 +12,59 @@ const services = [
     icon: Code,
     title: "Design Engineering",
     description:
-      "Bridging the gap between Figma and production code. I build pixel-perfect UI systems that scale.",
+      "Production-ready UI systems built from a documented component spec, not a pitch deck.",
     features: [
-      "Component Libraries",
-      "Design Systems",
-      "Motion & Interaction",
-      "Storybook Architecture",
-      "Token-based Theming",
+      "Component specification & naming map",
+      "Token inventory + usage rules",
+      "Interaction matrix (states + motion)",
+      "Accessibility checklist with findings",
+      "Implementation diff log",
     ],
   },
   {
     icon: Layers,
     title: "Frontend Systems",
     description:
-      "Scalable React architectures for complex applications. Optimized for performance and maintainability.",
+      "A scalable front-end architecture with measurable budgets and proof artifacts.",
     features: [
-      "Next.js Architecture",
-      "State Management",
-      "Performance Optimization",
-      "Type-Safe APIs",
-      "Legacy Migration",
+      "Performance budget doc (per route)",
+      "Data flow diagrams + state boundaries",
+      "Typed API contracts",
+      "Caching strategy memo",
+      "Implementation runbook",
     ],
   },
   {
     icon: Database,
     title: "Commerce Integrations",
     description:
-      "Reliable synchronization engines and custom storefronts for high-volume commerce.",
+      "High-volume synchronization engines with replayable audit logs.",
     features: [
-      "Shopify Headless",
-      "ERP Synchronization",
-      "Inventory Management",
-      "Payment Gateways",
-      "Custom Checkouts",
+      "Sync ledger schema + replay plan",
+      "Mapping rules (CSV/YAML)",
+      "Queue/backpressure settings",
+      "Error taxonomy with remediation",
+      "Observed throughput report",
     ],
   },
   {
     icon: ShieldCheck,
     title: "Audits & Rescue",
     description:
-      "Deep-dive technical audits to identify bottlenecks, accessibility issues, and code debt.",
+      "A forensic audit that shows exactly what is broken and how it was verified.",
     features: [
-      "Performance Audits",
-      "Accessibility (WCAG)",
-      "Code Quality Review",
-      "Security Assessment",
-      "SEO Technical Audit",
+      "Header inspection log",
+      "Runtime request inventory",
+      "Accessibility findings with fixes",
+      "Security risk matrix",
+      "Priority remediation backlog",
     ],
   },
 ];
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen py-24 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8" data-system-tone="default">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-20">
@@ -72,7 +72,7 @@ export default function ServicesPage() {
             Technical Services
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            I don&apos;t just write code; I engineer systems. My services are designed for founders and companies who need production-grade quality from day one.
+            I don&apos;t just write code; I engineer systems. Every engagement ships with evidence: audit logs, specs, and measurable outputs.
           </p>
         </div>
 
@@ -83,7 +83,7 @@ export default function ServicesPage() {
             return (
               <div
                 key={service.title}
-                className="group bg-card rounded-3xl p-8 sm:p-10 border border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg"
+                className="group glass-card surface-rim rounded-3xl p-8 sm:p-10 hover:border-foreground/20 transition-all duration-300 hover:shadow-lg"
               >
                 <div className="mb-6">
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-secondary group-hover:bg-foreground/5 transition-colors">
@@ -114,21 +114,21 @@ export default function ServicesPage() {
 
         {/* CTA Section */}
         <div className="border-t border-border pt-24">
-            <div className="max-w-3xl">
-                <h2 className="text-3xl font-bold mb-6">
-                  Have a specific challenge?
-                </h2>
-                <p className="text-lg text-muted-foreground mb-8">
-                  I often take on custom engineering challenges that don&apos;t fit neatly into a bucket.
-                  If you need a reliable partner to solve a hard problem, let&apos;s talk.
-                </p>
-                <VTLink
-                  href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all font-medium text-lg"
-                >
-                  Book a Consultation
-                </VTLink>
-            </div>
+          <div className="max-w-3xl">
+            <h2 className="text-3xl font-bold mb-6">
+              Have a specific challenge?
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              I take on custom engineering work that doesn&apos;t fit neatly into a bucket.
+              If you need a reliable partner to solve a hard problem, let&apos;s talk.
+            </p>
+            <VTLink
+              href="/contact"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all font-medium text-lg"
+            >
+              Book a Consultation
+            </VTLink>
+          </div>
         </div>
       </div>
     </div>

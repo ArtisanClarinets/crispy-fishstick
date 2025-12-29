@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 
 export default function RevenueLeakPage() {
   return (
-    <div className="min-h-screen container py-24 px-4 md:px-6">
+    <div className="min-h-screen container py-24 px-4 md:px-6" data-system-tone="insights">
        <div className="max-w-4xl mx-auto mb-12">
           <Button variant="ghost" className="mb-8" asChild>
              <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Return to Home</Link>

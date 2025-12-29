@@ -31,55 +31,7 @@ The system uses a producer-consumer architecture with Redis queues to handle hig
 
 <CaseModePanel preset="shopify-admin-sync" />
 
-<div className="my-12 p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-<svg viewBox="0 0 800 320" className="w-full h-auto font-sans text-xs">
-  <defs>
-    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" className="text-zinc-400" />
-    </marker>
-  </defs>
-
-  {/* Shopify */}
-  <rect x="50" y="110" width="120" height="100" rx="8" fill="transparent" stroke="currentColor" className="text-green-500" strokeWidth="2" />
-  <text x="110" y="165" textAnchor="middle" fill="currentColor" className="text-foreground font-semibold text-sm">Shopify Plus</text>
-  <text x="110" y="185" textAnchor="middle" fill="currentColor" className="text-muted-foreground text-[10px]">GraphQL Admin API</text>
-
-  {/* Arrow 1 */}
-  <line x1="170" y1="160" x2="240" y2="160" stroke="currentColor" className="text-zinc-400" strokeWidth="2" markerEnd="url(#arrowhead)" />
-  <text x="205" y="150" textAnchor="middle" fill="currentColor" className="text-zinc-500 text-[10px]">Webhooks</text>
-
-  {/* Ingestion / Queue */}
-  <rect x="250" y="110" width="120" height="100" rx="8" fill="transparent" stroke="currentColor" className="text-blue-500" strokeWidth="2" />
-  <text x="310" y="155" textAnchor="middle" fill="currentColor" className="text-foreground font-semibold text-sm">Ingestion</text>
-  <text x="310" y="175" textAnchor="middle" fill="currentColor" className="text-muted-foreground text-[10px]">Redis Queue</text>
-  <text x="310" y="190" textAnchor="middle" fill="currentColor" className="text-muted-foreground text-[10px]">(BullMQ)</text>
-
-  {/* Arrow 2 */}
-  <line x1="370" y1="160" x2="440" y2="160" stroke="currentColor" className="text-zinc-400" strokeWidth="2" markerEnd="url(#arrowhead)" />
-  <text x="405" y="150" textAnchor="middle" fill="currentColor" className="text-zinc-500 text-[10px]">Process Jobs</text>
-
-  {/* Sync Engine */}
-  <rect x="450" y="60" width="140" height="200" rx="8" fill="transparent" stroke="currentColor" className="text-violet-500" strokeWidth="2" />
-  <text x="520" y="90" textAnchor="middle" fill="currentColor" className="text-foreground font-semibold text-sm">Sync Engine</text>
-  <line x1="470" y1="120" x2="610" y2="120" stroke="currentColor" className="text-zinc-200 dark:text-zinc-800" strokeWidth="1" />
-
-  <text x="520" y="150" textAnchor="middle" fill="currentColor" className="text-foreground text-xs">Transformer</text>
-  <text x="520" y="170" textAnchor="middle" fill="currentColor" className="text-muted-foreground text-[10px]">YAML Mapping</text>
-
-  <rect x="470" y="190" width="100" height="40" rx="4" fill="transparent" stroke="currentColor" className="text-zinc-300 dark:text-zinc-700" strokeWidth="1" transform="translate(20,0)"/>
-  <text x="520" y="215" textAnchor="middle" fill="currentColor" className="text-muted-foreground text-[10px]">Safety Gates</text>
-
-  {/* Arrow 3 */}
-  <line x1="590" y1="160" x2="660" y2="160" stroke="currentColor" className="text-zinc-400" strokeWidth="2" markerEnd="url(#arrowhead)" />
-  <text x="625" y="150" textAnchor="middle" fill="currentColor" className="text-zinc-500 text-[10px]">JSON API</text>
-
-  {/* ERPNext */}
-  <rect x="670" y="110" width="120" height="100" rx="8" fill="transparent" stroke="currentColor" className="text-orange-500" strokeWidth="2" />
-  <text x="730" y="165" textAnchor="middle" fill="currentColor" className="text-foreground font-semibold text-sm">ERPNext</text>
-  <text x="730" y="185" textAnchor="middle" fill="currentColor" className="text-muted-foreground text-[10px]">Frappe Framework</text>
-
-</svg>
-</div>
+<ShopifySyncDiagram />
 
 ### Performance & Accessibility Outcomes
 
@@ -103,6 +55,16 @@ We made several distinct engineering decisions to prioritize safety over raw spe
 - **Concurrency Controls**: Semaphores prevent race conditions when the same entity is updated twice rapidly.
 - **Safe Mode & Dry Run**: Operators can test mapping changes against production data in a read-only mode.
 
+<SystemSpec
+  title="Operational Safeguards"
+  items={[
+    "Queue backpressure with replay ledger validation.",
+    "Safety gates for schema drift and inventory integrity.",
+    "Manual override workflow with audit trails.",
+  ]}
+  footnote="Full incident response runbooks are available under NDA."
+/>
+
 ## Quality Gates
 
 To ensure this system remains maintainable by a small team, we implemented rigorous automated quality checks.
@@ -112,6 +74,8 @@ To ensure this system remains maintainable by a small team, we implemented rigor
 - **Integration Testing**: Replay system that tests mappings against captured production webhooks.
 - **CI/CD**: GitHub Actions pipeline that lints, types, tests, and deploys to staging automatically.
 - **Observability**: Prometheus metrics for queue depth and error rates; Sentry for exception tracking.
+
+<RedactionNote reason="Client-specific pipeline and credential handling removed." />
 
 ## UI Master Plan
 

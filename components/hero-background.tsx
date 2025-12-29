@@ -10,7 +10,7 @@ import {
   useReducedMotion,
   useInView,
 } from "framer-motion";
-import { MouseEvent, useRef, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 
 type Trace = { id: string; label: string; d: string; speed: number; delay: number };
 
@@ -57,18 +57,27 @@ const TRACES: Trace[] = [
     d: "M -50 350 C 100 300, 300 400, 500 320 S 700 450, 900 380",
     speed: 28,
     delay: 0.5,
-  }
+  },
 ];
 
 export function HeroBackground() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const [active, setActive] = useState<string | null>(null);
+  const [pointerCoarse, setPointerCoarse] = useState(false);
   const prefersReducedMotion = useReducedMotion() ?? false;
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { amount: 0.2 });
 
   const tooltip = useMotionTemplate`translate(${mouseX}px, ${mouseY}px)`;
+
+  useEffect(() => {
+    const media = window.matchMedia("(pointer: coarse)");
+    const update = () => setPointerCoarse(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   // Base time-based offset for continuous animation
   const timeOffset = useMotionValue(0);
@@ -79,12 +88,13 @@ export function HeroBackground() {
   });
 
   const { scrollY } = useScroll();
-  
+
   // Parallax for the grid and background elements
   const gridY = useTransform(scrollY, [0, 1000], [0, 200]);
   const ambientY = useTransform(scrollY, [0, 1000], [0, 150]);
 
   function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
+    if (pointerCoarse) return;
     const rect = e.currentTarget.getBoundingClientRect();
     mouseX.set(e.clientX - rect.left);
     mouseY.set(e.clientY - rect.top);
@@ -109,26 +119,28 @@ export function HeroBackground() {
       />
 
       {/* Mouse follower beam */}
-      <motion.div
-        className="pointer-events-none absolute -inset-px"
-        style={{
-          background: useMotionTemplate`
-            radial-gradient(
-              650px circle at ${mouseX}px ${mouseY}px,
-              hsl(var(--primary) / 0.18),
-              transparent 78%
-            )
-          `,
-          opacity: 0.0,
-        }}
-        animate={prefersReducedMotion ? { opacity: 0 } : { opacity: 1 }}
-        transition={{ duration: prefersReducedMotion ? 0 : 0.35 }}
-      />
+      {!pointerCoarse && (
+        <motion.div
+          className="pointer-events-none absolute -inset-px"
+          style={{
+            background: useMotionTemplate`
+              radial-gradient(
+                650px circle at ${mouseX}px ${mouseY}px,
+                hsl(var(--primary) / 0.35),
+                transparent 80%
+              )
+            `,
+            opacity: 0.0,
+          }}
+          animate={prefersReducedMotion ? { opacity: 0 } : { opacity: 1 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.35 }}
+        />
+      )}
 
       {/* Ambient system pulse (subtle) */}
-      <motion.div 
+      <motion.div
         style={{ y: ambientY }}
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[420px] rounded-full bg-primary/5 blur-[130px] mix-blend-screen animate-pulse [animation-duration:4200ms]" 
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[420px] rounded-full bg-primary/5 blur-[130px] mix-blend-screen animate-pulse [animation-duration:4200ms]"
       />
 
       {/* Trace overlay */}
@@ -155,10 +167,10 @@ export function HeroBackground() {
 
           {/* animated traces */}
           {TRACES.map((t) => (
-            <TracePath 
-              key={t.id} 
-              trace={t} 
-              timeOffset={timeOffset} 
+            <TracePath
+              key={t.id}
+              trace={t}
+              timeOffset={timeOffset}
               scrollY={scrollY}
               isActive={active === t.id}
               onActive={() => setActive(t.id)}
@@ -169,40 +181,42 @@ export function HeroBackground() {
         </svg>
 
         {/* Tooltip (appears only when hovering a trace) */}
-        <motion.div
-          className={[
-            "pointer-events-none absolute left-0 top-0",
-            "rounded-full border border-white/10 bg-background/70 backdrop-blur-md",
-            "px-3 py-1 text-xs font-medium text-foreground/90 shadow-sm",
-            active ? "opacity-100" : "opacity-0",
-          ].join(" ")}
-          style={{
-            transform: tooltip,
-            // offset tooltip from cursor a bit
-            marginLeft: 14,
-            marginTop: 14,
-          }}
-          transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
-        >
-          {active ? `${active.toUpperCase()} ROUTE` : ""}
-        </motion.div>
+        {!pointerCoarse && (
+          <motion.div
+            className={[
+              "pointer-events-none absolute left-0 top-0",
+              "rounded-full border border-white/10 bg-background/70 backdrop-blur-md",
+              "px-3 py-1 text-xs font-medium text-foreground/90 shadow-sm",
+              active ? "opacity-100" : "opacity-0",
+            ].join(" ")}
+            style={{
+              transform: tooltip,
+              // offset tooltip from cursor a bit
+              marginLeft: 14,
+              marginTop: 14,
+            }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
+          >
+            {active ? `${active.toUpperCase()} ROUTE` : ""}
+          </motion.div>
+        )}
       </div>
     </div>
   );
 }
 
-function TracePath({ 
-  trace, 
-  timeOffset, 
-  scrollY, 
-  isActive, 
-  onActive, 
+function TracePath({
+  trace,
+  timeOffset,
+  scrollY,
+  isActive,
+  onActive,
   onInactive,
   prefersReducedMotion,
-}: { 
-  trace: Trace; 
-  timeOffset: any; 
-  scrollY: any; 
+}: {
+  trace: Trace;
+  timeOffset: any;
+  scrollY: any;
   isActive: boolean;
   onActive: () => void;
   onInactive: () => void;
@@ -238,10 +252,10 @@ function TracePath({
       {/* animated “data” dash */}
       <motion.path
         d={trace.d}
-        style={{ 
+        style={{
           strokeDashoffset: dashOffset,
           y: yOffset,
-          opacity: isActive ? 1 : 0.72 
+          opacity: isActive ? 1 : 0.72,
         }}
         fill="none"
         stroke="currentColor"

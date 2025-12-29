@@ -3,6 +3,7 @@ import type { Mode } from "@/components/case-mode-toggle";
 type CaseModeData = {
   kpis: Record<Mode, { label: string; value: string; desc?: string }[]>;
   failures: Record<Exclude<Mode, "normal">, string[]>;
+  narratives: Record<Mode, string>;
 };
 
 export const caseModePresets: Record<
@@ -40,6 +41,11 @@ export const caseModePresets: Record<
           "Replay ledger validates idempotency before retry.",
           "Alerting routes to on-call within 60 seconds.",
         ],
+      },
+      narratives: {
+        normal: "Nominal flow: webhooks enter the queue, transformer stabilizes payloads, ERP writes commit within SLA.",
+        scale: "Scale mode: autoscaling expands workers, rails prioritize critical order deltas, backlog stays bounded.",
+        incident: "Incident mode: safety gates clamp throughput, replay ledger validates recovery before writes resume.",
       },
     },
   },

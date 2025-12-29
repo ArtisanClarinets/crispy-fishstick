@@ -64,7 +64,8 @@ export function Header() {
               {link.label}
             </VTLink>
           ))}
-          <ThemeToggle />
+          {/* Desktop toggle — use data-testid so tests can target this specific instance */}
+          <ThemeToggle data-testid="theme-toggle-desktop" />
           <Button asChild variant="default" className="rounded-full px-6">
             <VTLink href={siteConfig.cta.primary.href}>
               {siteConfig.cta.primary.text}
@@ -74,7 +75,8 @@ export function Header() {
 
         {/* Mobile Menu Toggle */}
         <div className="flex md:hidden items-center gap-4">
-          <ThemeToggle />
+          {/* Mobile theme toggle — share the same accessible name but expose a different data-testid for tests */}
+          <ThemeToggle data-testid="theme-toggle-mobile" />
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="p-2 text-foreground"

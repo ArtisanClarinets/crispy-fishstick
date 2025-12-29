@@ -2,6 +2,9 @@ import fs from "fs";
 import path from "path";
 import { compileMDX } from "next-mdx-remote/rsc";
 import { CaseModePanel } from "@/components/case-mode-panel";
+import { ShopifySyncDiagram } from "@/components/mdx/ShopifySyncDiagram";
+import { RedactionNote } from "@/components/mdx/RedactionNote";
+import { SystemSpec } from "@/components/mdx/SystemSpec";
 
 const root = process.cwd();
 const contentRoot = path.resolve(root, "content") + path.sep;
@@ -33,17 +36,11 @@ export async function getMdxContent(dir: string, slug: string) {
 
   const source = fs.readFileSync(filePath, "utf8");
 
-  // We only parse frontmatter here, but return raw source for the component to handle
-  // OR we can compile it here.
-  // Given we are using next-mdx-remote/rsc in the page, let's keep it simple:
-  // Return the raw source and frontmatter.
-
-  // We use compileMDX just to extract frontmatter easily, but we can also just use it for everything.
-  // If we return 'content' (React Element) from here, we can't serialize it easily if this was an API,
-  // but since we are in RSC -> RSC, we CAN return the element!
-
   const mdxComponents = {
     CaseModePanel,
+    ShopifySyncDiagram,
+    RedactionNote,
+    SystemSpec,
   };
 
   const { content, frontmatter } = await compileMDX<{
@@ -59,7 +56,6 @@ export async function getMdxContent(dir: string, slug: string) {
   }>({
     source,
     options: { parseFrontmatter: true },
-    // We can pass components here if we want them available during compilation
     components: mdxComponents,
   });
 

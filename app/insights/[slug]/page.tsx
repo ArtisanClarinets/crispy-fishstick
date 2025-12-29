@@ -36,7 +36,7 @@ export default async function InsightPostPage({ params }: Props) {
   const { content, frontmatter } = post;
 
   return (
-    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8" data-system-tone="insights">
       <div className="mx-auto max-w-3xl">
         {/* Back Button */}
         <Link
