@@ -1,0 +1,78 @@
+
+> crispy-fishstick@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+   automatically enabled Fast Refresh for 1 custom loader
+ ✓ Ready in 1857ms
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 572ms (72 modules)
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 8.3s (1379 modules)
+ GET /non-existent-page 404 in 9239ms
+ ✓ Compiled in 947ms (679 modules)
+ ○ Compiling /contact ...
+ ✓ Compiled /contact in 7.7s (1382 modules)
+ GET /contact 200 in 8042ms
+ GET /contact? 200 in 49ms
+ GET /non-existent-page 404 in 147ms
+ GET /contact 200 in 85ms
+ GET /contact? 200 in 71ms
+ GET /contact 200 in 68ms
+ GET /contact? 200 in 44ms
+ ✓ Compiled in 1498ms (1395 modules)
+ GET /contact 200 in 255ms
+ GET /contact? 200 in 48ms
+ ✓ Compiled in 882ms (1395 modules)
+ GET /contact 200 in 218ms
+ GET /contact? 200 in 44ms
+ GET /contact 200 in 44ms
+ GET /contact? 200 in 44ms
+ GET /contact 200 in 44ms
+ GET /contact? 200 in 51ms
+ GET /contact 200 in 41ms
+ GET /contact? 200 in 48ms
+ ✓ Compiled in 734ms (691 modules)
+ ○ Compiling /contact ...
+ ✓ Compiled /contact in 697ms (704 modules)
+ GET /contact 200 in 991ms
+ GET /contact? 200 in 74ms
+ ✓ Compiled in 544ms (72 modules)
+ GET /contact 200 in 86ms
+ ✓ Compiled in 193ms (72 modules)
+ GET /contact 200 in 95ms
+ ○ Compiling /api/proof/headers ...
+ ✓ Compiled /api/proof/headers in 1955ms (196 modules)
+ GET /api/proof/headers 200 in 2279ms
+ GET /api/proof/headers 200 in 10ms
+ ✓ Compiled in 3.6s (1395 modules)
+ROOT LAYOUT: x-nonce header value: 70e52f0b7c7d44d6b0c7b0396f275164
+ GET /contact 200 in 494ms
+ GET /api/proof/headers 200 in 307ms
+ GET /api/proof/headers 200 in 299ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1226ms (705 modules)
+ ⨯ TypeError: Cannot read properties of undefined (reading 'clientModules')
+    at /app/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:40:25679
+    at /app/node_modules/next/dist/server/lib/trace/tracer.js:191:62
+    at /app/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NoopTracer.startActiveSpan (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18093)
+    at ProxyTracer.startActiveSpan (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18854)
+    at /app/node_modules/next/dist/server/lib/trace/tracer.js:122:103
+    at NoopContextManager.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NextTracerImpl.trace (/app/node_modules/next/dist/server/lib/trace/tracer.js:122:28)
+    at /app/node_modules/next/dist/server/lib/trace/tracer.js:191:31
+    at ne (/app/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:42:1678)
+    at async doRender (/app/node_modules/next/dist/server/base-server.js:1427:30)
+    at async cacheEntry.responseCache.get.routeKind (/app/node_modules/next/dist/server/base-server.js:1588:28)
+   automatically enabled Fast Refresh for 1 custom loader
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 2.8s (1609 modules)
+ GET /contact 500 in 6768ms
+[?25h
