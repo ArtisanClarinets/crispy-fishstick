@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { motion } from "framer-motion"
-import { Check, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { motion } from "framer-motion";
+import { Check, ChevronRight, FileText } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const steps = [
   {
@@ -11,56 +11,63 @@ const steps = [
     label: "Diagnose",
     description: "Identify conversion leaks, technical issues, and quick wins.",
     deliverables: ["Conversion leaks report", "Technical audit", "Quick win list"],
+    evidence: ["Audit checklist", "Risk register", "Priority fixes"],
   },
   {
     id: "plan",
     label: "Plan",
     description: "Map out the site structure, goals, and content strategy.",
     deliverables: ["Sitemap", "Page goals definitions", "Content plan"],
+    evidence: ["Scope doc", "Milestone calendar", "Success metrics"],
   },
   {
     id: "design",
     label: "Design",
     description: "Create the visual structure and component system.",
     deliverables: ["Wireframes", "Component system", "High-fidelity mocks"],
+    evidence: ["Component spec", "Token inventory", "Interaction map"],
   },
   {
     id: "build",
     label: "Build",
     description: "Develop the site with a focus on performance and accessibility.",
     deliverables: ["Performance optimized code", "SEO foundation", "Accessibility baseline"],
+    evidence: ["Performance budget", "Header checklist", "Proof Panel scan"],
   },
   {
     id: "test",
     label: "Test",
-    description: " rigorous QA to ensure everything works across devices.",
+    description: "Rigorous QA to ensure everything works across devices.",
     deliverables: ["QA checklist", "Cross-device verification", "Analytics verification"],
+    evidence: ["Audit report", "Bug ledger", "Rerun log"],
   },
   {
     id: "launch",
     label: "Launch",
     description: "Go live with confidence, ensuring no downtime or lost traffic.",
     deliverables: ["Redirect strategy", "Backups", "Uptime monitoring"],
+    evidence: ["Launch checklist", "Rollback plan", "Monitoring handoff"],
   },
   {
     id: "support",
     label: "Support",
     description: "Handover and ongoing support options.",
     deliverables: ["Handover documentation", "Training session", "Optional maintenance"],
+    evidence: ["Runbook", "Ownership transfer", "Support SLOs"],
   },
-]
+];
 
 export function BuildPlanModule() {
-  const [activeStepIndex, setActiveStepIndex] = React.useState(0)
+  const [activeStepIndex, setActiveStepIndex] = React.useState(0);
 
-  const activeStep = steps[activeStepIndex]
+  const activeStep = steps[activeStepIndex];
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 md:p-8 bg-background/50 border border-border/50 rounded-2xl backdrop-blur-sm shadow-sm">
+    <div className="w-full max-w-4xl mx-auto p-6 md:p-8 glass-card surface-rim rounded-2xl">
       <div className="mb-8 text-center md:text-left">
         <h3 className="text-2xl font-bold tracking-tight mb-2">The Build Plan</h3>
         <p className="text-muted-foreground">
-          A predictable, transparent pipeline. No black boxes.
+          A predictable, transparent pipeline backed by measurable evidence.
         </p>
       </div>
 
@@ -127,6 +134,20 @@ export function BuildPlanModule() {
                 ))}
               </ul>
             </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-muted-foreground">
+                <FileText className="h-4 w-4" /> Evidence
+              </div>
+              <ul className="grid gap-3">
+                {activeStep.evidence.map((item) => (
+                  <li key={item} className="flex items-start gap-3 p-3 rounded-lg border border-border/50 bg-background/70">
+                    <span className="w-2 h-2 mt-2 rounded-full bg-primary/60" />
+                    <span className="text-foreground">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </motion.div>
         </div>
       </div>
@@ -139,5 +160,5 @@ export function BuildPlanModule() {
         />
       </div>
     </div>
-  )
+  );
 }

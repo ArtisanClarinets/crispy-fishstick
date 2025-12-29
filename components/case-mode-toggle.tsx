@@ -22,6 +22,7 @@ export function CaseModeToggle({ mode, setMode }: CaseModeToggleProps) {
         <button
           key={m.id}
           onClick={() => setMode(m.id)}
+          aria-pressed={mode === m.id}
           className={`relative px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
             mode === m.id ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
           }`}
