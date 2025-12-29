@@ -38,7 +38,7 @@ export function VTLink({ href, onClick, ...props }: VTLinkProps) {
         const transition = (document as { startViewTransition?: (cb: () => void) => void }).startViewTransition;
         if (transition) {
           triggerScan();
-          transition(() => navigate());
+          transition.call(document, () => navigate());
         } else {
           triggerScan();
           navigate();
