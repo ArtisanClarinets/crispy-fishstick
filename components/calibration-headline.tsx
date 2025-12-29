@@ -20,6 +20,7 @@ interface CalibrationHeadlineProps {
 }
 
 export function CalibrationHeadline({ text, className }: CalibrationHeadlineProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [locked, setLocked] = useState(false);
   const [auditLabel, setAuditLabel] = useState("AUDIT: CHECKING");
   const [buildLabel, setBuildLabel] = useState("BUILD: CHECKING");

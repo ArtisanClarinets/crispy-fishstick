@@ -18,6 +18,7 @@ export function ScrambleText({
   className,
   scrambleSpeed = 25,
   delay = 0,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   scrambledClassName = "opacity-60",
 }: ScrambleTextProps) {
   const prefersReducedMotion = useReducedMotion();
@@ -50,7 +51,7 @@ export function ScrambleText({
 
     let iterations = 0;
     const interval = setInterval(() => {
-      setDisplayText((current) =>
+      setDisplayText(() =>
         text
           .split("")
           .map((char, index) => {
