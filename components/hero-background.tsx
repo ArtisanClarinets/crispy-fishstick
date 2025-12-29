@@ -126,8 +126,8 @@ export function HeroBackground() {
             background: useMotionTemplate`
               radial-gradient(
                 650px circle at ${mouseX}px ${mouseY}px,
-                hsl(var(--primary) / 0.18),
-                transparent 78%
+                hsl(var(--primary) / 0.35),
+                transparent 80%
               )
             `,
             opacity: 0.0,
