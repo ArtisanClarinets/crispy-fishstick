@@ -7,10 +7,9 @@ import { cn } from "@/lib/utils";
 interface CoverArtProps {
   slug: string;
   className?: string;
-  variant?: "card" | "hero";
 }
 
-export function CoverArt({ slug, className, variant = "card" }: CoverArtProps) {
+export function CoverArt({ slug, className }: CoverArtProps) {
   const spec = useMemo(() => getCoverSpec(slug), [slug]);
 
   const style = {

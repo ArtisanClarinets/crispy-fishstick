@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Code, Palette, Zap, Layers, BarChart, ShieldCheck, Database, Search } from "lucide-react";
+import { Code, Layers, ShieldCheck, Database } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Services",
