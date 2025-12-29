@@ -5,17 +5,25 @@ import { Mode, CaseModeToggle } from "./case-mode-toggle";
 import { CaseArchitectureDiagram } from "./case-architecture-diagram";
 import { CaseKpis } from "./case-kpis";
 import { CaseFailureModes } from "./case-failure-modes";
+import { caseModePresets, type CaseModePresetKey } from "@/lib/case-modes/presets";
 
 interface CaseModePanelProps {
   initialMode?: Mode;
-  data: {
-     kpis: Record<Mode, { label: string; value: string; desc?: string }[]>;
-     failures: Record<Exclude<Mode, "normal">, string[]>;
+  preset?: CaseModePresetKey;
+  data?: {
+    kpis: Record<Mode, { label: string; value: string; desc?: string }[]>;
+    failures: Record<Exclude<Mode, "normal">, string[]>;
   };
 }
 
-export function CaseModePanel({ initialMode = "normal", data }: CaseModePanelProps) {
-  const [mode, setMode] = useState<Mode>(initialMode);
+export function CaseModePanel({ initialMode = "normal", data, preset }: CaseModePanelProps) {
+  const resolvedData = preset ? caseModePresets[preset].data : data;
+  const resolvedInitialMode = preset ? caseModePresets[preset].initialMode : initialMode;
+  const [mode, setMode] = useState<Mode>(resolvedInitialMode);
+
+  if (!resolvedData) {
+    return null;
+  }
 
   return (
     <div className="my-12 rounded-2xl border border-border bg-card/50 overflow-hidden shadow-sm">
@@ -40,7 +48,7 @@ export function CaseModePanel({ initialMode = "normal", data }: CaseModePanelPro
                {/* Contextual Failure Log Overlay */}
                {mode !== "normal" && (
                    <div className="mt-6">
-                      <CaseFailureModes mode={mode} failures={data.failures[mode as Exclude<Mode, "normal">] || []} />
+                  <CaseFailureModes mode={mode} failures={resolvedData.failures[mode as Exclude<Mode, "normal">] || []} />
                    </div>
                )}
             </div>
@@ -48,7 +56,7 @@ export function CaseModePanel({ initialMode = "normal", data }: CaseModePanelPro
             {/* Right: KPIs */}
             <div className="p-6 bg-secondary/5 space-y-6">
                <div className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Performance Metrics</div>
-               <CaseKpis mode={mode} data={data.kpis} />
+               <CaseKpis mode={mode} data={resolvedData.kpis} />
             </div>
 
         </div>

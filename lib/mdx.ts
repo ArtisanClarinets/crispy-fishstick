@@ -1,17 +1,18 @@
 import fs from "fs";
 import path from "path";
 import { compileMDX } from "next-mdx-remote/rsc";
+import { CaseModePanel } from "@/components/case-mode-panel";
 
 const root = process.cwd();
+const contentRoot = path.resolve(root, "content") + path.sep;
 
 export async function getMdxFiles(dir: string) {
   try {
-    const contentDir = path.join(root, "content");
-    const joinedPath = path.join(contentDir, dir);
+    const joinedPath = path.resolve(contentRoot, dir);
     const targetPath = path.normalize(joinedPath);
 
     // Ensure the resolved path stays within the intended content directory
-    if (!targetPath.startsWith(contentDir)) {
+    if (!targetPath.startsWith(contentRoot)) {
       throw new Error("Invalid directory path");
     }
 
@@ -22,12 +23,11 @@ export async function getMdxFiles(dir: string) {
 }
 
 export async function getMdxContent(dir: string, slug: string) {
-  const contentDir = path.join(root, "content");
-  const joinedPath = path.join(contentDir, dir, `${slug}.mdx`);
+  const joinedPath = path.resolve(contentRoot, dir, `${slug}.mdx`);
   const filePath = path.normalize(joinedPath);
 
   // Ensure the resulting path is within the intended content directory
-  if (!filePath.startsWith(contentDir)) {
+  if (!filePath.startsWith(contentRoot)) {
     throw new Error("Invalid path specified!");
   }
 
@@ -41,6 +41,10 @@ export async function getMdxContent(dir: string, slug: string) {
   // We use compileMDX just to extract frontmatter easily, but we can also just use it for everything.
   // If we return 'content' (React Element) from here, we can't serialize it easily if this was an API,
   // but since we are in RSC -> RSC, we CAN return the element!
+
+  const mdxComponents = {
+    CaseModePanel,
+  };
 
   const { content, frontmatter } = await compileMDX<{
     title: string;
@@ -56,7 +60,7 @@ export async function getMdxContent(dir: string, slug: string) {
     source,
     options: { parseFrontmatter: true },
     // We can pass components here if we want them available during compilation
-    // components: { ... }
+    components: mdxComponents,
   });
 
   return {

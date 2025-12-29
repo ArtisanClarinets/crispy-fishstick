@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { VTLink } from "@/components/vt-link";
 import { siteConfig } from "@/lib/site";
 import { Github, Linkedin, Twitter } from "lucide-react";
 
@@ -21,19 +21,19 @@ export function Footer() {
             <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground/80">Services</h4>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/services" className="text-foreground/80 hover:text-foreground transition-colors">
+                <VTLink href="/services" className="text-foreground/80 hover:text-foreground transition-colors">
                   Design Engineering
-                </Link>
+                </VTLink>
               </li>
               <li>
-                <Link href="/services" className="text-foreground/80 hover:text-foreground transition-colors">
+                <VTLink href="/services" className="text-foreground/80 hover:text-foreground transition-colors">
                   Frontend Architecture
-                </Link>
+                </VTLink>
               </li>
               <li>
-                <Link href="/services" className="text-foreground/80 hover:text-foreground transition-colors">
+                <VTLink href="/services" className="text-foreground/80 hover:text-foreground transition-colors">
                   Commerce Systems
-                </Link>
+                </VTLink>
               </li>
             </ul>
           </div>
@@ -80,12 +80,12 @@ export function Footer() {
             &copy; {currentYear} {siteConfig.company}. All rights reserved.
           </p>
           <div className="flex gap-6 text-xs text-muted-foreground">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+            <VTLink href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</VTLink>
+            <VTLink href="/terms" className="hover:text-foreground transition-colors">Terms of Service</VTLink>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-             <span>Systems Operational</span>
+             <span className="w-2 h-2 rounded-full bg-primary/60"></span>
+             <span>Proof Panel: Live Audit</span>
           </div>
         </div>
       </div>

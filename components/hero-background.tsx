@@ -1,7 +1,16 @@
 "use client";
 
-import { motion, useMotionTemplate, useMotionValue, useScroll, useTransform, useAnimationFrame } from "framer-motion";
-import React, { MouseEvent, useState } from "react";
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useScroll,
+  useTransform,
+  useAnimationFrame,
+  useReducedMotion,
+  useInView,
+} from "framer-motion";
+import { MouseEvent, useRef, useState } from "react";
 
 type Trace = { id: string; label: string; d: string; speed: number; delay: number };
 
@@ -55,13 +64,18 @@ export function HeroBackground() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const [active, setActive] = useState<string | null>(null);
+  const prefersReducedMotion = useReducedMotion() ?? false;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { amount: 0.2 });
 
   const tooltip = useMotionTemplate`translate(${mouseX}px, ${mouseY}px)`;
 
   // Base time-based offset for continuous animation
   const timeOffset = useMotionValue(0);
   useAnimationFrame((t) => {
-    timeOffset.set(t / 1000);
+    if (!prefersReducedMotion && isInView) {
+      timeOffset.set(t / 1000);
+    }
   });
 
   const { scrollY } = useScroll();
@@ -78,6 +92,7 @@ export function HeroBackground() {
 
   return (
     <div
+      ref={containerRef}
       className="absolute inset-0 -z-10 overflow-hidden bg-background"
       onMouseMove={handleMouseMove}
     >
@@ -106,8 +121,8 @@ export function HeroBackground() {
           `,
           opacity: 0.0,
         }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.35 }}
+        animate={prefersReducedMotion ? { opacity: 0 } : { opacity: 1 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.35 }}
       />
 
       {/* Ambient system pulse (subtle) */}
@@ -148,6 +163,7 @@ export function HeroBackground() {
               isActive={active === t.id}
               onActive={() => setActive(t.id)}
               onInactive={() => setActive(null)}
+              prefersReducedMotion={prefersReducedMotion}
             />
           ))}
         </svg>
@@ -166,7 +182,7 @@ export function HeroBackground() {
             marginLeft: 14,
             marginTop: 14,
           }}
-          transition={{ duration: 0.15 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
         >
           {active ? `${active.toUpperCase()} ROUTE` : ""}
         </motion.div>
@@ -181,7 +197,8 @@ function TracePath({
   scrollY, 
   isActive, 
   onActive, 
-  onInactive 
+  onInactive,
+  prefersReducedMotion,
 }: { 
   trace: Trace; 
   timeOffset: any; 
@@ -189,15 +206,22 @@ function TracePath({
   isActive: boolean;
   onActive: () => void;
   onInactive: () => void;
+  prefersReducedMotion: boolean;
 }) {
   // Combine time and scroll for the dash offset
   // This ensures it animates even if Framer Motion's 'animate' prop is suppressed
   const dashOffset = useTransform([timeOffset, scrollY], ([t, s]) => {
+    if (prefersReducedMotion) {
+      return 0;
+    }
     return -(t as number * trace.speed) - (s as number * 0.4);
   });
 
   // Subtle parallax/morph effect on scroll
-  const yOffset = useTransform(scrollY, [0, 1000], [0, trace.id.length % 2 === 0 ? -30 : 30]);
+  const yOffset = useTransform(scrollY, [0, 1000], [
+    0,
+    prefersReducedMotion ? 0 : trace.id.length % 2 === 0 ? -30 : 30,
+  ]);
 
   return (
     <g>

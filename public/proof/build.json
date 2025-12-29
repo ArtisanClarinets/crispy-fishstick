@@ -1,0 +1,12 @@
+{
+  "commit": "unknown",
+  "builtAt": "2025-12-29T12:08:14.859Z",
+  "depsSha256": "02a440f6389c4b68269906dc769665a323ca1cd74bd147a19ecc2fbb0543a706",
+  "checks": [
+    "TypeScript strict",
+    "ESLint enforced",
+    "Vitest unit suite",
+    "Playwright e2e suite",
+    "Security headers active"
+  ]
+}

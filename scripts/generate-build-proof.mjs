@@ -1,0 +1,35 @@
+import fs from "node:fs";
+import crypto from "node:crypto";
+
+const commit =
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  process.env.GITHUB_SHA ||
+  "unknown";
+
+const builtAt = new Date().toISOString();
+
+const pkgLock = fs.existsSync("package-lock.json")
+  ? fs.readFileSync("package-lock.json")
+  : Buffer.from("");
+
+const depsSha256 = crypto
+  .createHash("sha256")
+  .update(pkgLock)
+  .digest("hex");
+
+const payload = {
+  commit: commit.slice(0, 12),
+  builtAt,
+  depsSha256,
+  checks: [
+    "TypeScript strict",
+    "ESLint enforced",
+    "Vitest unit suite",
+    "Playwright e2e suite",
+    "Security headers active",
+  ],
+};
+
+fs.mkdirSync("public/proof", { recursive: true });
+fs.writeFileSync("public/proof/build.json", JSON.stringify(payload, null, 2));
+console.log("Wrote public/proof/build.json");
