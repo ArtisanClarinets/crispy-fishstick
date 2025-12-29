@@ -59,7 +59,7 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    // Validate the request body
+    // 3. Validate the request body (includes honeypot check)
     const validatedData = contactFormSchema.parse(body);
 
     if (validatedData.honeypot && validatedData.honeypot.length > 0) {
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
 
     // In a real application, you would send this to an email service or CRM
     // For now, we'll log it to simulate the process
-    console.log("Contact form submitted:", validatedData);
+    console.log("Contact form submitted:", { ...validatedData, company_address: undefined });
 
     const response = NextResponse.json(
       { message: "Message received successfully" },
