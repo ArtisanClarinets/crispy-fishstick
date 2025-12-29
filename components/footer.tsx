@@ -84,8 +84,8 @@ export function Footer() {
             <VTLink href="/terms" className="hover:text-foreground transition-colors">Terms of Service</VTLink>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-             <span>Systems Operational</span>
+             <span className="w-2 h-2 rounded-full bg-primary/60"></span>
+             <span>Proof Panel: Live Audit</span>
           </div>
         </div>
       </div>

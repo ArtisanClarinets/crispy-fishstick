@@ -15,7 +15,7 @@ export function middleware(request: Request) {
 
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http:`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https:`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data:",
     "font-src 'self' data:",
@@ -34,7 +34,6 @@ export function middleware(request: Request) {
   });
 
   response.headers.set("Content-Security-Policy", csp);
-  response.headers.set("x-nonce", nonce);
   SECURITY_HEADERS.forEach(([key, value]) => response.headers.set(key, value));
 
   return response;

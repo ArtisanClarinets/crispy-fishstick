@@ -12,6 +12,7 @@ type HeaderStatus = {
 type BuildProof = {
   commit: string;
   builtAt: string;
+  depsSha256?: string;
   checks: string[];
 };
 
@@ -119,6 +120,11 @@ export function ProofPanel() {
           <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Build Proof</div>
           <div className="font-semibold text-foreground mt-2">Commit: {buildProof.commit}</div>
           <div className="text-muted-foreground">Built: {buildProof.builtAt}</div>
+          {buildProof.depsSha256 ? (
+            <div className="text-muted-foreground text-xs mt-2">
+              Deps SHA256: {buildProof.depsSha256.slice(0, 12)}
+            </div>
+          ) : null}
         </div>
       </div>
 
