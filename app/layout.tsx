@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
@@ -11,7 +10,7 @@ import { SystemLayer } from "@/components/system-layer";
 import { ConsoleHud } from "@/components/console-hud";
 import { RouteTransitionLayer } from "@/components/route-transition-layer";
 import { AppMotionConfig } from "@/components/motion-config";
-
+import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -19,6 +18,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://thompsonsystems.com"),
   title: {
     default: "Thompson Systems | High-Trust Engineering",
     template: "%s | Thompson Systems",
@@ -55,14 +55,16 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const nonce = headers().get("x-nonce") ?? undefined;
+  // const headersList = headers();
+  // const nonce = headersList.get("x-nonce") ?? undefined;
+
+  // console.log("ROOT LAYOUT: x-nonce header value:", nonce);
 
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
@@ -75,7 +77,7 @@ export default function RootLayout({
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
-          nonce={nonce}
+          // nonce={nonce} // Disabled nonce to avoid hydration mismatch, relying on unsafe-inline for now
         >
           <AppMotionConfig>
             {/* Background system layer (always present) */}
@@ -95,6 +97,7 @@ export default function RootLayout({
               </PageTransition>
               <Footer />
             </div>
+            <Toaster />
           </AppMotionConfig>
         </ThemeProvider>
       </body>

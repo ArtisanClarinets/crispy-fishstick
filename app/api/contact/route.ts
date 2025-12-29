@@ -11,6 +11,16 @@ const contactFormSchema = z.object({
   honeypot: z.string().optional(),
 });
 
+/**
+ * RATE LIMITING NOTE:
+ * This implementation uses an in-memory Map which is not suitable for scalable,
+ * multi-instance production environments (e.g., Vercel Serverless Functions) as state
+ * is not shared between instances and is lost on cold starts.
+ *
+ * TODO for Production:
+ * 1. Move to a persistent store like Redis (Upstash).
+ * 2. Or use edge-native rate limiting (e.g., @vercel/kv).
+ */
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 6;
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
