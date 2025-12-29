@@ -23,8 +23,8 @@ test.describe("Homepage", () => {
 
   test("should have theme toggle", async ({ page }) => {
     await page.goto("/");
-    const themeToggle = page.getByLabel("Toggle theme");
-    await expect(themeToggle).toBeVisible();
+    // Target the desktop toggle specifically using data-testid to avoid strict-mode collisions
+    await expect(page.getByTestId("theme-toggle-desktop")).toBeVisible();
   });
 
   test("should have accessible hero section", async ({ page }) => {

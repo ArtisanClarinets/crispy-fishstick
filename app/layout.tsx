@@ -71,7 +71,8 @@ export default function RootLayout({
       )}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          // Follow the user's device preference by default
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
           nonce={nonce}

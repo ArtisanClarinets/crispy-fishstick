@@ -1,6 +1,5 @@
 
 import "@testing-library/jest-dom";
-import { vi } from "vitest";
 
 // Mock IntersectionObserver for Playwright
 if (typeof window !== "undefined") {
