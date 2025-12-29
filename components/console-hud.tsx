@@ -10,6 +10,8 @@ export function ConsoleHud() {
   const [section, setSection] = useState<string>("--");
   const [time, setTime] = useState<string>("00:00:00");
   const [syncing, setSyncing] = useState(false);
+  const [ttfb, setTtfb] = useState<number | null>(null);
+  const [cspReady, setCspReady] = useState(false);
   const pathname = usePathname();
   const startTime = useRef<number>(Date.now());
   const prefersReducedMotion = useReducedMotion();
@@ -74,6 +76,25 @@ export function ConsoleHud() {
     return () => clearInterval(interval);
   }, []);
 
+  // Proof checks
+  useEffect(() => {
+    const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    if (navEntry) {
+      setTtfb(Math.round(navEntry.responseStart));
+    }
+
+    const checkCsp = async () => {
+      try {
+        const res = await fetch("/api/proof/headers", { cache: "no-store" });
+        setCspReady(res.ok);
+      } catch {
+        setCspReady(false);
+      }
+    };
+
+    void checkCsp();
+  }, []);
+
   // Sync Blip on navigation
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -113,11 +134,13 @@ export function ConsoleHud() {
             <div
               className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-4 py-1.5 rounded-full bg-background/50 backdrop-blur border border-white/5 shadow-sm whitespace-nowrap"
             >
-               <span>BUILD: HARDENED</span>
+               <span>BUILD: VERIFIED</span>
                <span className="text-border">|</span>
-               <span>CSP: STRICT</span>
+               <span>{cspReady ? "CSP: VERIFIED" : "CSP: CHECKING"}</span>
                <span className="text-border">|</span>
-               <span className={cn("hud-sync transition-colors duration-300", syncing ? "text-primary" : "")}>LATENCY: &lt;50ms</span>
+               <span className={cn("hud-sync transition-colors duration-300", syncing ? "text-primary" : "")}>
+                 {ttfb === null ? "TTFB: --" : `TTFB: ${ttfb}ms`}
+               </span>
             </div>
           </motion.div>
         )}

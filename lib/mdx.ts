@@ -4,15 +4,15 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import { CaseModePanel } from "@/components/case-mode-panel";
 
 const root = process.cwd();
+const contentRoot = path.resolve(root, "content") + path.sep;
 
 export async function getMdxFiles(dir: string) {
   try {
-    const contentDir = path.join(root, "content");
-    const joinedPath = path.join(contentDir, dir);
+    const joinedPath = path.resolve(contentRoot, dir);
     const targetPath = path.normalize(joinedPath);
 
     // Ensure the resolved path stays within the intended content directory
-    if (!targetPath.startsWith(contentDir)) {
+    if (!targetPath.startsWith(contentRoot)) {
       throw new Error("Invalid directory path");
     }
 
@@ -23,12 +23,11 @@ export async function getMdxFiles(dir: string) {
 }
 
 export async function getMdxContent(dir: string, slug: string) {
-  const contentDir = path.join(root, "content");
-  const joinedPath = path.join(contentDir, dir, `${slug}.mdx`);
+  const joinedPath = path.resolve(contentRoot, dir, `${slug}.mdx`);
   const filePath = path.normalize(joinedPath);
 
   // Ensure the resulting path is within the intended content directory
-  if (!filePath.startsWith(contentDir)) {
+  if (!filePath.startsWith(contentRoot)) {
     throw new Error("Invalid path specified!");
   }
 
