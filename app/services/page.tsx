@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Code, Palette, Zap, Layers, BarChart, ShieldCheck, Database, Search } from "lucide-react";
+import { Code, Layers, ShieldCheck, Database } from "lucide-react";
+import { VTLink } from "@/components/vt-link";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -121,12 +122,12 @@ export default function ServicesPage() {
                   I often take on custom engineering challenges that don&apos;t fit neatly into a bucket.
                   If you need a reliable partner to solve a hard problem, let&apos;s talk.
                 </p>
-                <a
+                <VTLink
                   href="/contact"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all font-medium text-lg"
                 >
                   Book a Consultation
-                </a>
+                </VTLink>
             </div>
         </div>
       </div>

@@ -1,18 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import { motion } from "framer-motion";
 import { CoverArt } from "@/components/cover-art";
+import { VTLink } from "@/components/vt-link";
 
 interface WorkDetailHeroProps {
   slug: string;
   title: string;
   description: string;
   tags?: string[];
-  imageUrl?: string;
-  placeholderGradient?: string;
 }
 
 export function WorkDetailHero({
@@ -20,8 +18,6 @@ export function WorkDetailHero({
   title,
   description,
   tags,
-  imageUrl,
-  placeholderGradient,
 }: WorkDetailHeroProps) {
   return (
     <div className={`relative w-full h-[60vh] md:h-[70vh] flex flex-col justify-end pb-12 md:pb-24 overflow-hidden`}>
@@ -30,17 +26,17 @@ export function WorkDetailHero({
         layoutId={`cover-${slug}`}
         className="absolute inset-0 z-0 bg-secondary"
       >
-        <CoverArt slug={slug} variant="hero" />
+        <CoverArt slug={slug} />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
       </motion.div>
 
       <div className="container relative z-10">
-        <Link
+        <VTLink
           href="/work"
           className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8 transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Work
-        </Link>
+        </VTLink>
 
         {/* Shared Element Title */}
         <div className="mb-6">

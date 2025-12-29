@@ -1,44 +1,14 @@
-import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/reveal";
-import { siteConfig, getWorkPlaceholder } from "@/lib/site";
-import { Card } from "@/components/ui/card";
+import { siteConfig } from "@/lib/site";
 import { BuildPlanModule } from "@/components/build-plan-module";
 import { AuditModal } from "@/components/audit-modal";
 import { CalibrationHeadline } from "@/components/calibration-headline";
-
-// Premium Stack Chips
-const stack = [
-  "Next.js App Router",
-  "React Server Components",
-  "TypeScript Strict",
-  "Tailwind CSS v3",
-  "Framer Motion",
-  "PostgreSQL / Prisma",
-  "Docker / K8s",
-  "GraphQL Federation"
-];
-
-const principles = [
-  {
-    title: "Clarity",
-    desc: "Code that explains itself. Interfaces that need no manual."
-  },
-  {
-    title: "Reliability",
-    desc: "Systems designed to fail safely and recover instantly."
-  },
-  {
-    title: "Performance",
-    desc: "Sub-100ms interactions. Core Web Vitals optimized."
-  },
-  {
-    title: "Accessibility",
-    desc: "Inclusive by default. WCAG AA compliance baked in."
-  }
-];
+import { VTLink } from "@/components/vt-link";
+import { HomeFeaturedWork } from "@/components/home-featured-work";
+import { ProofPanel } from "@/components/proof-panel";
 
 export default function Home() {
   return (
@@ -78,9 +48,9 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center">
                 <AuditModal />
                 <Button asChild variant="ghost" size="lg" className="h-14 px-8 text-lg rounded-full hover:bg-background/80">
-                  <Link href="/work">
+                  <VTLink href="/work">
                     See real outcomes <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
+                  </VTLink>
                 </Button>
               </div>
             </Reveal>
@@ -96,34 +66,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SOCIAL PROOF / METRICS */}
+      {/* SELF-AUDIT PROOF PANEL */}
       <section
-        className="py-12 border-b border-border/50 bg-background/50"
+        className="py-16 border-b border-border/50 bg-background/50"
         data-hud-section="Proof"
       >
         <div className="container">
-           <p className="text-center text-sm font-medium text-muted-foreground uppercase tracking-widest mb-8">
-             Delivering outcomes for high-growth companies
-           </p>
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-              {/* Using text-based metrics/logos for premium feel if no logos available */}
-              <div className="text-center">
-                 <h4 className="text-3xl font-bold text-foreground">$50M+</h4>
-                 <p className="text-xs text-muted-foreground">Revenue Processed</p>
-              </div>
-              <div className="text-center">
-                 <h4 className="text-3xl font-bold text-foreground">99.99%</h4>
-                 <p className="text-xs text-muted-foreground">Uptime Delivered</p>
-              </div>
-              <div className="text-center">
-                 <h4 className="text-3xl font-bold text-foreground">1M+</h4>
-                 <p className="text-xs text-muted-foreground">Daily Active Users</p>
-              </div>
-              <div className="text-center">
-                 <h4 className="text-3xl font-bold text-foreground">SOC2</h4>
-                 <p className="text-xs text-muted-foreground">Compliance Ready</p>
-              </div>
-           </div>
+          <ProofPanel />
         </div>
       </section>
 
@@ -141,37 +90,15 @@ export default function Home() {
               </p>
             </div>
             <Button variant="ghost" className="hidden md:flex group" asChild>
-                <Link href="/work">View All Projects <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link>
+                <VTLink href="/work">View All Projects <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></VTLink>
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {siteConfig.featuredWork.map((project, i) => (
-              <Reveal key={project.slug} delay={i * 0.1}>
-                <Link href={`/work/${project.slug}`} className="group block h-full">
-                  <div className="relative overflow-hidden rounded-2xl bg-secondary aspect-[4/3] mb-6 border border-border/50">
-                     {/* Abstract Gradient Cover */}
-                     <div className={`absolute inset-0 bg-gradient-to-br ${getWorkPlaceholder(project.slug).gradient} opacity-80 transition-transform duration-700 group-hover:scale-105`} />
-
-                     <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                        <div className="self-end p-2 bg-background/10 backdrop-blur-md rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-                           <ArrowRight className="text-white h-5 w-5" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-white tracking-tight">{project.title}</h3>
-                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-primary/60 uppercase tracking-wider">Case Study</p>
-                    <p className="text-muted-foreground line-clamp-2">{project.description}</p>
-                  </div>
-                </Link>
-              </Reveal>
-            ))}
-          </div>
+          <HomeFeaturedWork />
 
           <div className="mt-12 md:hidden">
             <Button variant="outline" className="w-full" asChild>
-                <Link href="/work">View All Projects</Link>
+                <VTLink href="/work">View All Projects</VTLink>
             </Button>
           </div>
         </div>
@@ -188,7 +115,7 @@ export default function Home() {
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                     {principles.map((p) => (
+                     {siteConfig.principles.map((p) => (
                         <div key={p.title} className="bg-background/50 p-6 rounded-xl border border-border/50">
                            <h4 className="font-semibold mb-2 flex items-center gap-2">
                               <CheckCircle2 className="h-4 w-4 text-primary" />
@@ -203,7 +130,7 @@ export default function Home() {
                <div className="flex flex-col justify-center">
                   <h3 className="text-xl font-semibold mb-8">Primary Technical Stack</h3>
                   <div className="flex flex-wrap gap-3">
-                     {stack.map((tech, i) => (
+                     {siteConfig.stackPrimary.map((tech) => (
                         <span
                            key={tech}
                            className="px-4 py-2 rounded-full bg-background border border-border text-sm font-medium text-foreground/80 hover:border-primary/50 transition-colors cursor-default"
@@ -214,9 +141,9 @@ export default function Home() {
                   </div>
 
                   <div className="mt-12 p-8 rounded-2xl bg-gradient-to-br from-background to-secondary border border-border">
-                     <h4 className="text-lg font-bold mb-4">Capabilities</h4>
+                     <h4 className="text-lg font-bold mb-4">Secondary Systems Focus</h4>
                      <ul className="space-y-3">
-                        {["System Architecture", "Frontend Performance", "API Design", "Database Modeling", "CI/CD Pipelines"].map((cap) => (
+                        {siteConfig.stackSecondary.map((cap) => (
                            <li key={cap} className="flex items-center gap-3 text-muted-foreground">
                               <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
                               {cap}
@@ -241,10 +168,10 @@ export default function Home() {
             </h2>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
                <Button asChild size="lg" className="rounded-full px-10 h-14 text-lg">
-                  <Link href="/contact">Book a Consultation</Link>
+                  <VTLink href="/contact">Book a Consultation</VTLink>
                </Button>
                <Button asChild variant="outline" size="lg" className="rounded-full px-10 h-14 text-lg">
-                  <Link href="mailto:dylan@thompsonsystems.com">Email Me</Link>
+                  <a href="mailto:dylan@thompsonsystems.com">Email Me</a>
                </Button>
             </div>
          </div>

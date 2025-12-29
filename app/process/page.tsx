@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CheckCircle } from "lucide-react";
+import { VTLink } from "@/components/vt-link";
 
 export const metadata: Metadata = {
   title: "Process",
@@ -147,12 +148,12 @@ export default function ProcessPage() {
             Let&apos;s discuss your project and how our process can help achieve your
             goals.
           </p>
-          <a
+          <VTLink
             href="/contact"
             className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-colors font-medium"
           >
             Start a Project
-          </a>
+          </VTLink>
         </div>
       </div>
     </div>

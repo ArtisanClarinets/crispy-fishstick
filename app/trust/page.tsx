@@ -1,4 +1,4 @@
-import { Shield, CheckCircle, AlertTriangle, Lock, FileText, Activity } from "lucide-react"
+import { Shield, CheckCircle, AlertTriangle, Lock, FileText } from "lucide-react"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -40,7 +40,7 @@ export default function TrustCenterPage() {
           <div className="p-6 rounded-2xl bg-secondary/30 border border-border/50">
              <h3 className="font-semibold text-lg mb-2">Zero Vendor Lock-in</h3>
              <p className="text-muted-foreground">
-               I use standard, widely-supported technologies (React, Next.js, Postgres). Any competent engineer can pick up where I leave off. No proprietary "black box" CMS.
+               I use standard, widely-supported technologies (React, Next.js, Postgres). Any competent engineer can pick up where I leave off. No proprietary &quot;black box&quot; CMS.
              </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export default function TrustCenterPage() {
               </div>
               <div>
                  <h4 className="font-semibold text-lg">Weekly Updates</h4>
-                 <p className="text-muted-foreground">You get a plain-English status update every week. What I did, what's next, and any blockers.</p>
+                 <p className="text-muted-foreground">You get a plain-English status update every week. What I did, what&apos;s next, and any blockers.</p>
               </div>
            </div>
         </div>
@@ -118,15 +118,15 @@ export default function TrustCenterPage() {
         <ul className="space-y-4">
            <li className="flex gap-3">
               <span className="text-red-500 font-bold">•</span>
-              <span className="text-foreground/80"><strong>No Admin Access:</strong> If a vendor won't give you full admin access to your own site or hosting, run. They are holding you hostage.</span>
+              <span className="text-foreground/80"><strong>No Admin Access:</strong> If a vendor won&apos;t give you full admin access to your own site or hosting, run. They are holding you hostage.</span>
            </li>
            <li className="flex gap-3">
               <span className="text-red-500 font-bold">•</span>
-              <span className="text-foreground/80"><strong>Vague Pricing:</strong> "It depends" is fine for an estimate, but you need a fixed project fee or a clear hourly rate with a cap.</span>
+              <span className="text-foreground/80"><strong>Vague Pricing:</strong> &quot;It depends&quot; is fine for an estimate, but you need a fixed project fee or a clear hourly rate with a cap.</span>
            </li>
            <li className="flex gap-3">
               <span className="text-red-500 font-bold">•</span>
-              <span className="text-foreground/80"><strong>No Deliverables List:</strong> If they can't list exactly what you are paying for (e.g., "Home page, About page, Contact form"), you will likely be disappointed.</span>
+              <span className="text-foreground/80"><strong>No Deliverables List:</strong> If they can&apos;t list exactly what you are paying for (e.g., &quot;Home page, About page, Contact form&quot;), you will likely be disappointed.</span>
            </li>
         </ul>
       </section>
