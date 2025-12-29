@@ -324,3 +324,16 @@
     animation: none;
   }
 }
+
+/* ---------------------------
+   Console HUD Sync Pulse
+---------------------------- */
+
+.console-hud[data-sync="1"] .hud-sync {
+  animation: hudSync 350ms ease-out;
+}
+
+@keyframes hudSync {
+  0% { opacity: 0.4; filter: blur(1px); }
+  100% { opacity: 1; filter: blur(0px); }
+}

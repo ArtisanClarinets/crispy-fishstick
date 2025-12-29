@@ -9,6 +9,7 @@ interface CaseArchitectureDiagramProps {
 
 export function CaseArchitectureDiagram({ mode }: CaseArchitectureDiagramProps) {
   // Simplified SVG diagram with nodes that light up based on mode
+  const gridId = `grid-${mode}`;
   const getStrokeWidth = (targetMode: string) => {
     if (mode === "scale") return 2;
     if (mode === "incident" && targetMode === "db") return 2;
@@ -18,10 +19,10 @@ export function CaseArchitectureDiagram({ mode }: CaseArchitectureDiagramProps) 
   return (
     <svg viewBox="0 0 400 200" className="w-full h-full text-sm font-mono select-none">
        {/* Background Grid */}
-       <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+       <pattern id={gridId} width="20" height="20" patternUnits="userSpaceOnUse">
          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-border opacity-20"/>
        </pattern>
-       <rect width="400" height="200" fill="url(#grid)" />
+       <rect width="400" height="200" fill={`url(#${gridId})`} />
 
        {/* Edges */}
        <motion.path

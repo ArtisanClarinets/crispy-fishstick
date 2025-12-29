@@ -1,8 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
+import { checksumHex } from "@/lib/cover/seed";
 
 interface CalibrationHeadlineProps {
   text: string;
@@ -11,13 +12,36 @@ interface CalibrationHeadlineProps {
 
 export function CalibrationHeadline({ text, className }: CalibrationHeadlineProps) {
   const [locked, setLocked] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+  const checksum = useMemo(() => checksumHex(text), [text]);
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      setLocked(true);
+      return;
+    }
     const timer = setTimeout(() => {
       setLocked(true);
     }, 800); // slightly longer than animation to be safe
     return () => clearTimeout(timer);
-  }, []);
+  }, [prefersReducedMotion]);
+
+  if (prefersReducedMotion) {
+    return (
+      <div className={cn("relative inline-block", className)}>
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/70 pb-2">
+          {text}
+        </h1>
+        <div className="absolute -bottom-8 left-0 flex items-center gap-4 text-[10px] font-mono tracking-[0.22em] text-muted-foreground uppercase">
+          <span>CHK: {checksum}</span>
+          <span className="text-primary/20">•</span>
+          <span>BUILD: HARDENED</span>
+          <span className="text-primary/20">•</span>
+          <span>SLA: READY</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("relative inline-block", className)}>
@@ -72,7 +96,7 @@ export function CalibrationHeadline({ text, className }: CalibrationHeadlineProp
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.3 }}
       >
-        <span>CHK: 9F2A</span>
+        <span>CHK: {checksum}</span>
         <span className="text-primary/20">•</span>
         <span>BUILD: HARDENED</span>
         <span className="text-primary/20">•</span>

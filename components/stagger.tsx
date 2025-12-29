@@ -34,8 +34,8 @@ export function StaggerItem({ children, className }: StaggerItemProps) {
     <motion.div
       className={className}
       variants={{
-        hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
-        show: { opacity: 1, y: 0, filter: "blur(0px)" },
+        hidden: { opacity: 0, y: 16 },
+        show: { opacity: 1, y: 0 },
       }}
       transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
     >

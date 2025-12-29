@@ -4,8 +4,10 @@ import createMDX from "@next/mdx";
 const nextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   images: {
-    remotePatterns: [], // lock down
+    remotePatterns: [],
   },
+  poweredByHeader: false,
+  reactStrictMode: true,
 };
 
 const withMDX = createMDX({

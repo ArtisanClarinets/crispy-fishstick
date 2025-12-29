@@ -3,16 +3,16 @@ import { test, expect } from "@playwright/test";
 test.describe("Homepage", () => {
   test("should load the homepage", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/Studio/);
+    await expect(page).toHaveTitle(/Thompson Systems/);
   });
 
   test("should have navigation links", async ({ page }) => {
     await page.goto("/");
     // Use .first() because links appear in both nav and footer
     await expect(page.getByRole("link", { name: "Work" }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "Services" }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "About" }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "Contact" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Lab" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Process" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Trust Center" }).first()).toBeVisible();
   });
 
   test("should navigate to work page", async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe("Homepage", () => {
   test("should have accessible hero section", async ({ page }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { level: 1, name: /Reliable Systems/ })
+      page.getByRole("heading", { level: 1, name: /Engineering for High-Trust Products/ })
     ).toBeVisible();
   });
 });
@@ -54,15 +54,13 @@ test.describe("Work Page", () => {
 test.describe("Contact Page", () => {
   test("should have contact form", async ({ page }) => {
     await page.goto("/contact");
-    await expect(page.getByLabel("Name")).toBeVisible();
-    await expect(page.getByLabel("Email")).toBeVisible();
-    await expect(page.getByLabel("Subject")).toBeVisible();
-    await expect(page.getByLabel("Message")).toBeVisible();
+    await expect(page.getByLabel("What's your name?")).toBeVisible();
+    await expect(page.getByLabel("What is your role?")).toBeVisible();
   });
 
   test("should validate required fields", async ({ page }) => {
     await page.goto("/contact");
-    await page.getByRole("button", { name: /Send Message/ }).click();
+    await page.getByRole("button", { name: /Next Step/ }).click();
     // HTML5 validation will prevent form submission
     await expect(page).toHaveURL(/\/contact/);
   });

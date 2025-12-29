@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import { motion } from "framer-motion";
 import { CoverArt } from "@/components/cover-art";
+import { VTLink } from "@/components/vt-link";
 
 interface WorkDetailHeroProps {
   slug: string;
@@ -31,12 +31,12 @@ export function WorkDetailHero({
       </motion.div>
 
       <div className="container relative z-10">
-        <Link
+        <VTLink
           href="/work"
           className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8 transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Work
-        </Link>
+        </VTLink>
 
         {/* Shared Element Title */}
         <div className="mb-6">

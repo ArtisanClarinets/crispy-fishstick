@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 export function ConsoleHud() {
   const [visible, setVisible] = useState(false);
@@ -12,6 +12,7 @@ export function ConsoleHud() {
   const [syncing, setSyncing] = useState(false);
   const pathname = usePathname();
   const startTime = useRef<number>(Date.now());
+  const prefersReducedMotion = useReducedMotion();
 
   // Scroll visibility logic
   useEffect(() => {
@@ -75,20 +76,24 @@ export function ConsoleHud() {
 
   // Sync Blip on navigation
   useEffect(() => {
+    if (prefersReducedMotion) return;
     setSyncing(true);
     const t = setTimeout(() => setSyncing(false), 350);
     return () => clearTimeout(t);
-  }, [pathname]);
+  }, [pathname, prefersReducedMotion]);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[9999] text-[10px] font-mono tracking-wider text-muted-foreground select-none overflow-hidden">
+    <div
+      className="console-hud fixed inset-0 pointer-events-none z-[9999] text-[10px] font-mono tracking-wider text-muted-foreground select-none overflow-hidden"
+      data-sync={syncing ? "1" : "0"}
+    >
       <AnimatePresence>
         {visible && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
             className="w-full h-full relative"
           >
             {/* Top Right Pill */}
@@ -107,13 +112,12 @@ export function ConsoleHud() {
             {/* Bottom Bar */}
             <div
               className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-4 py-1.5 rounded-full bg-background/50 backdrop-blur border border-white/5 shadow-sm whitespace-nowrap"
-              data-sync={syncing ? "1" : "0"}
             >
                <span>BUILD: HARDENED</span>
                <span className="text-border">|</span>
                <span>CSP: STRICT</span>
                <span className="text-border">|</span>
-               <span className={cn("transition-colors duration-300", syncing ? "text-primary" : "")}>LATENCY: &lt;50ms</span>
+               <span className={cn("hud-sync transition-colors duration-300", syncing ? "text-primary" : "")}>LATENCY: &lt;50ms</span>
             </div>
           </motion.div>
         )}

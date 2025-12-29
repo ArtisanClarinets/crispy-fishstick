@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { compileMDX } from "next-mdx-remote/rsc";
+import { CaseModePanel } from "@/components/case-mode-panel";
 
 const root = process.cwd();
 
@@ -42,6 +43,10 @@ export async function getMdxContent(dir: string, slug: string) {
   // If we return 'content' (React Element) from here, we can't serialize it easily if this was an API,
   // but since we are in RSC -> RSC, we CAN return the element!
 
+  const mdxComponents = {
+    CaseModePanel,
+  };
+
   const { content, frontmatter } = await compileMDX<{
     title: string;
     description: string;
@@ -56,7 +61,7 @@ export async function getMdxContent(dir: string, slug: string) {
     source,
     options: { parseFrontmatter: true },
     // We can pass components here if we want them available during compilation
-    // components: { ... }
+    components: mdxComponents,
   });
 
   return {
