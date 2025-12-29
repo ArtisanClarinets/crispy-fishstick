@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
@@ -10,7 +11,6 @@ import { SystemLayer } from "@/components/system-layer";
 import { ConsoleHud } from "@/components/console-hud";
 import { RouteTransitionLayer } from "@/components/route-transition-layer";
 import { AppMotionConfig } from "@/components/motion-config";
-import { headers } from "next/headers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -55,7 +55,6 @@ export const metadata: Metadata = {
   },
 };
 
-// required for per-request nonce
 export const dynamic = "force-dynamic";
 
 export default function RootLayout({

@@ -1,0 +1,10 @@
+{
+  "commit": "local-dev",
+  "builtAt": "local",
+  "checks": [
+    "TypeScript strict",
+    "ESLint enforced",
+    "Playwright ready",
+    "Security headers active"
+  ]
+}

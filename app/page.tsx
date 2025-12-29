@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeroBackground } from "@/components/hero-background";
@@ -7,8 +6,9 @@ import { siteConfig } from "@/lib/site";
 import { BuildPlanModule } from "@/components/build-plan-module";
 import { AuditModal } from "@/components/audit-modal";
 import { CalibrationHeadline } from "@/components/calibration-headline";
-import { Stagger, StaggerItem } from "@/components/stagger";
-import { CoverArt } from "@/components/cover-art";
+import { VTLink } from "@/components/vt-link";
+import { HomeFeaturedWork } from "@/components/home-featured-work";
+import { ProofPanel } from "@/components/proof-panel";
 
 export default function Home() {
   return (
@@ -48,9 +48,9 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center">
                 <AuditModal />
                 <Button asChild variant="ghost" size="lg" className="h-14 px-8 text-lg rounded-full hover:bg-background/80">
-                  <Link href="/work">
+                  <VTLink href="/work">
                     See real outcomes <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
+                  </VTLink>
                 </Button>
               </div>
             </Reveal>
@@ -66,34 +66,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SOCIAL PROOF / METRICS */}
+      {/* SELF-AUDIT PROOF PANEL */}
       <section
-        className="py-12 border-b border-border/50 bg-background/50"
+        className="py-16 border-b border-border/50 bg-background/50"
         data-hud-section="Proof"
       >
         <div className="container">
-           <p className="text-center text-sm font-medium text-muted-foreground uppercase tracking-widest mb-8">
-             Delivering outcomes for high-growth companies
-           </p>
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-              {/* Using text-based metrics/logos for premium feel if no logos available */}
-              <div className="text-center">
-                 <h4 className="text-3xl font-bold text-foreground">$50M+</h4>
-                 <p className="text-xs text-muted-foreground">Revenue Processed</p>
-              </div>
-              <div className="text-center">
-                 <h4 className="text-3xl font-bold text-foreground">99.99%</h4>
-                 <p className="text-xs text-muted-foreground">Uptime Delivered</p>
-              </div>
-              <div className="text-center">
-                 <h4 className="text-3xl font-bold text-foreground">1M+</h4>
-                 <p className="text-xs text-muted-foreground">Daily Active Users</p>
-              </div>
-              <div className="text-center">
-                 <h4 className="text-3xl font-bold text-foreground">SOC2</h4>
-                 <p className="text-xs text-muted-foreground">Compliance Ready</p>
-              </div>
-           </div>
+          <ProofPanel />
         </div>
       </section>
 
@@ -111,39 +90,15 @@ export default function Home() {
               </p>
             </div>
             <Button variant="ghost" className="hidden md:flex group" asChild>
-                <Link href="/work">View All Projects <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></Link>
+                <VTLink href="/work">View All Projects <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></VTLink>
             </Button>
           </div>
 
-          <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {siteConfig.featuredWork.map((project) => (
-              <StaggerItem key={project.slug}>
-                <Link href={`/work/${project.slug}`} className="group block h-full">
-                  <div className="relative overflow-hidden rounded-2xl bg-secondary aspect-[4/3] mb-6 border border-border/50">
-                    <CoverArt slug={project.slug} className="transition-transform duration-700 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/30 to-transparent" />
-                    <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                      <div className="self-end p-2 bg-background/10 backdrop-blur-md rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-                        <ArrowRight className="text-white h-5 w-5" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white tracking-tight">{project.title}</h3>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <p className="text-sm font-medium text-primary/60 uppercase tracking-wider">Case Study</p>
-                    <p className="text-muted-foreground line-clamp-2">{project.description}</p>
-                    <div className="text-sm text-foreground/80">
-                      <span className="font-semibold text-foreground">Outcome:</span> {project.outcome}
-                    </div>
-                  </div>
-                </Link>
-              </StaggerItem>
-            ))}
-          </Stagger>
+          <HomeFeaturedWork />
 
           <div className="mt-12 md:hidden">
             <Button variant="outline" className="w-full" asChild>
-                <Link href="/work">View All Projects</Link>
+                <VTLink href="/work">View All Projects</VTLink>
             </Button>
           </div>
         </div>
@@ -213,10 +168,10 @@ export default function Home() {
             </h2>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
                <Button asChild size="lg" className="rounded-full px-10 h-14 text-lg">
-                  <Link href="/contact">Book a Consultation</Link>
+                  <VTLink href="/contact">Book a Consultation</VTLink>
                </Button>
                <Button asChild variant="outline" size="lg" className="rounded-full px-10 h-14 text-lg">
-                  <Link href="mailto:dylan@thompsonsystems.com">Email Me</Link>
+                  <a href="mailto:dylan@thompsonsystems.com">Email Me</a>
                </Button>
             </div>
          </div>

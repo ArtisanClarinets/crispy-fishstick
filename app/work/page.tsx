@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 import { Reveal } from "@/components/reveal";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Stagger, StaggerItem } from "@/components/stagger";
 import { CoverArt } from "@/components/cover-art";
+import { VTLink } from "@/components/vt-link";
 
 export default function WorkPage() {
   return (
@@ -26,7 +26,7 @@ export default function WorkPage() {
         {siteConfig.featuredWork.map((project, i) => (
           <StaggerItem key={project.slug} className="group grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Image Column */}
-            <Link href={`/work/${project.slug}`} className="block w-full">
+            <VTLink href={`/work/${project.slug}`} className="block w-full">
               <div className="rounded-2xl border border-white/10 bg-card/50 backdrop-blur-sm overflow-hidden card-precision">
                 <motion.div
                   layoutId={`cover-${project.slug}`}
@@ -36,7 +36,7 @@ export default function WorkPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </motion.div>
               </div>
-            </Link>
+            </VTLink>
 
             {/* Text Column */}
             <div className="space-y-6">
@@ -45,14 +45,14 @@ export default function WorkPage() {
                 <span className="text-sm font-medium uppercase tracking-widest text-muted-foreground">0{i + 1}</span>
               </div>
 
-              <Link href={`/work/${project.slug}`}>
+              <VTLink href={`/work/${project.slug}`}>
                 <motion.h2
                   layoutId={`title-${project.slug}`}
                   className="text-3xl md:text-4xl font-bold tracking-tight group-hover:text-primary transition-colors inline-block"
                 >
                   {project.title}
                 </motion.h2>
-              </Link>
+              </VTLink>
 
               <p className="text-lg text-muted-foreground leading-relaxed">
                 {project.description}
@@ -67,9 +67,9 @@ export default function WorkPage() {
                 </p>
               </div>
 
-              <Link href={`/work/${project.slug}`} className="flex items-center text-primary font-medium group-hover:underline underline-offset-4">
+              <VTLink href={`/work/${project.slug}`} className="flex items-center text-primary font-medium group-hover:underline underline-offset-4">
                 Read Case Study <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+              </VTLink>
             </div>
           </StaggerItem>
         ))}

@@ -1,10 +1,9 @@
 import { getMdxContent, getMdxFiles } from "@/lib/mdx";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { Calendar, User, BarChart, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 import { WorkDetailHero } from "@/components/work-detail-hero";
+import { VTLink } from "@/components/vt-link";
 
 export default async function WorkDetail({ params }: { params: { slug: string } }) {
   const { slug } = params;
@@ -72,7 +71,7 @@ export default async function WorkDetail({ params }: { params: { slug: string } 
             <div className="mt-24 pt-12 border-t border-border flex justify-between items-center not-prose">
                <h4 className="font-bold text-xl">Ready to build something similar?</h4>
                <Button asChild size="lg" className="rounded-full">
-                  <Link href="/contact">Book a Consultation</Link>
+                  <VTLink href="/contact">Book a Consultation</VTLink>
                </Button>
             </div>
          </div>
