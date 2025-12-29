@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useAnimation, useInView } from "framer-motion";
+import { motion, useAnimation, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 
 interface RevealProps {
@@ -23,12 +23,21 @@ export const Reveal = ({
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const mainControls = useAnimation();
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (isInView) {
       mainControls.start("visible");
     }
   }, [isInView, mainControls]);
+
+  if (prefersReducedMotion) {
+    return (
+      <div ref={ref} style={{ position: "relative", width }} className={className}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div ref={ref} style={{ position: "relative", width }} className={className}>
@@ -39,7 +48,7 @@ export const Reveal = ({
         }}
         initial="hidden"
         animate={mainControls}
-        transition={{ duration, delay, ease: [0.25, 0.25, 0, 1] }} // Ease-out-quart ish
+        transition={{ duration, delay, ease: [0.25, 0.25, 0, 1] }}
       >
         {children}
       </motion.div>

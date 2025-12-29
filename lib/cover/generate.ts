@@ -3,23 +3,7 @@
  * Returns deterministic specs based on slug for consistent rendering.
  */
 
-// Seeded PRNG for deterministic generation
-class SeededRNG {
-  private seed: number;
-
-  constructor(seed: number) {
-    this.seed = seed;
-  }
-
-  next(): number {
-    this.seed = (this.seed * 9301 + 49297) % 233280;
-    return this.seed / 233280;
-  }
-
-  range(min: number, max: number): number {
-    return min + this.next() * (max - min);
-  }
-}
+import { mulberry32, slugToSeed } from "@/lib/cover/seed";
 
 export interface CoverSpec {
   palette: {
@@ -57,73 +41,98 @@ export interface CoverSpec {
   };
 }
 
-/**
- * Hash a string to a seed for deterministic PRNG
- */
-function hashSlug(slug: string): number {
-  let hash = 0;
-  for (let i = 0; i < slug.length; i++) {
-    const char = slug.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return Math.abs(hash);
+const SPEC_CACHE = new Map<string, CoverSpec>();
+
+function range(rng: () => number, min: number, max: number) {
+  return min + rng() * (max - min);
+}
+
+function snap(value: number, grid: number) {
+  return Math.round(value / grid) * grid;
+}
+
+function orthogonalRoute(rng: () => number) {
+  const grid = 20;
+  const start = {
+    x: snap(range(rng, 60, 740), grid),
+    y: snap(range(rng, 60, 540), grid),
+  };
+  const mid = {
+    x: snap(range(rng, 120, 680), grid),
+    y: snap(range(rng, 120, 480), grid),
+  };
+  const end = {
+    x: snap(range(rng, 60, 740), grid),
+    y: snap(range(rng, 60, 540), grid),
+  };
+
+  return {
+    points: [
+      start,
+      { x: mid.x, y: start.y },
+      mid,
+      { x: mid.x, y: end.y },
+      end,
+    ],
+  };
 }
 
 export function getCoverSpec(slug: string): CoverSpec {
-  const rng = new SeededRNG(hashSlug(slug));
+  const cached = SPEC_CACHE.get(slug);
+  if (cached) {
+    return cached;
+  }
+
+  const seed = slugToSeed(slug);
+  const rng = mulberry32(seed);
 
   // Color palette
-  const hue = Math.round(rng.range(0, 360));
-  const secHue = Math.round((hue + rng.range(120, 240)) % 360);
+  const hue = Math.round(range(rng, 0, 360));
+  const secHue = Math.round((hue + range(rng, 120, 240)) % 360);
 
   // Hatch pattern
-  const hatchSpacing = rng.range(8, 16);
-  const hatchAngle = rng.range(0, 90);
+  const hatchSpacing = range(rng, 8, 16);
+  const hatchAngle = range(rng, 0, 90);
 
   // Heat blobs
-  const blobCount = Math.floor(rng.range(3, 7));
+  const blobCount = Math.floor(range(rng, 3, 7));
   const blobs = Array.from({ length: blobCount }, () => ({
-    cx: rng.range(100, 700),
-    cy: rng.range(100, 500),
-    r: rng.range(50, 200),
-    intensity: rng.range(0.3, 0.8),
+    cx: range(rng, 100, 700),
+    cy: range(rng, 100, 500),
+    r: range(rng, 50, 200),
+    intensity: range(rng, 0.3, 0.8),
   }));
 
   // Topographic layers (sine waves)
-  const topoLayers = Math.floor(rng.range(2, 4));
+  const topoLayers = Math.floor(range(rng, 2, 4));
   const topo = Array.from({ length: topoLayers }, () => ({
-    y: rng.range(100, 500),
-    freq: rng.range(0.01, 0.05),
-    phase: rng.range(0, Math.PI * 2),
-    amplitude: rng.range(20, 80),
-    strokeOpacity: rng.range(0.4, 0.8),
+    y: range(rng, 100, 500),
+    freq: range(rng, 0.01, 0.05),
+    phase: range(rng, 0, Math.PI * 2),
+    amplitude: range(rng, 20, 80),
+    strokeOpacity: range(rng, 0.4, 0.8),
   }));
 
   // Circuit traces
-  const nodeCount = Math.floor(rng.range(4, 8));
+  const nodeCount = Math.floor(range(rng, 4, 8));
   const nodes = Array.from({ length: nodeCount }, () => ({
-    cx: rng.range(50, 750),
-    cy: rng.range(50, 550),
-    r: rng.range(2, 6),
+    cx: range(rng, 50, 750),
+    cy: range(rng, 50, 550),
+    r: range(rng, 2, 6),
   }));
 
-  const routeCount = Math.floor(rng.range(3, 6));
+  const routeCount = Math.floor(range(rng, 3, 6));
   const routes = Array.from({ length: routeCount }, () => {
-    const pointCount = Math.floor(rng.range(3, 8));
-    const points = Array.from({ length: pointCount }, () => ({
-      x: rng.range(50, 750),
-      y: rng.range(50, 550),
-    }));
+    const path = orthogonalRoute(rng);
 
     return {
-      points,
-      width: rng.range(0.5, 2),
-      dash: rng.next() > 0.5 ? "5,5" : "none",
+      points: path.points,
+      width: range(rng, 0.5, 2),
+      dash: rng() > 0.5 ? "5,5" : "none",
     };
   });
 
-  return {
+  const spec = {
     palette: {
       hue,
       secHue,
@@ -139,4 +148,7 @@ export function getCoverSpec(slug: string): CoverSpec {
       nodes,
     },
   };
+
+  SPEC_CACHE.set(slug, spec);
+  return spec;
 }

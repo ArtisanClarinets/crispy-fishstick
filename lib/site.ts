@@ -25,41 +25,57 @@ export const siteConfig = {
       title: "Shopify Admin Sync",
       description: "Enterprise synchronization engine for Shopify Plus → ERPNext.",
       slug: "shopify-admin-sync",
-      image: "/images/shopify-sync-hero.jpg",
+      outcome: "100% data integrity across 500k+ SKUs",
+      constraints: "Black Friday traffic spikes, strict ERPNext schema enforcement.",
     },
     {
       title: "Fintech Dashboard",
       description: "Real-time analytics and reporting for a Series B fintech.",
       slug: "fintech-dashboard",
-      image: "/images/fintech-hero.jpg",
+      outcome: "Sub-200ms analytics refresh under 30M events/day.",
+      constraints: "Regulatory audit trails and SOC2 logging requirements.",
     },
     {
       title: "HealthTech Patient Portal",
       description: "HIPAA-compliant patient onboarding and scheduling system.",
       slug: "healthtech-platform",
-      image: "/images/healthtech-hero.jpg",
+      outcome: "42% reduction in intake time across 12 clinics.",
+      constraints: "HIPAA safeguards with legacy EMR integrations.",
     },
   ],
-  // Used for placeholder generation if no image provided
-  workPlaceholders: {
-    "shopify-admin-sync": {
-      gradient: "from-blue-500/20 to-cyan-500/20",
-      accent: "text-blue-500",
+  stackPrimary: [
+    "Next.js App Router",
+    "TypeScript Strict",
+    "Framer Motion",
+    "PostgreSQL / Prisma",
+    "Frappe ERPNext Integrations",
+    "GraphQL Federation",
+  ],
+  stackSecondary: [
+    "Event-driven systems",
+    "Observability / SLOs",
+    "Infrastructure as Code",
+    "Design Systems",
+    "Security Reviews",
+  ],
+  principles: [
+    {
+      title: "Clarity",
+      desc: "Code that explains itself. Interfaces that need no manual.",
     },
-    "fintech-dashboard": {
-      gradient: "from-emerald-500/20 to-teal-500/20",
-      accent: "text-emerald-500",
+    {
+      title: "Reliability",
+      desc: "Systems designed to fail safely and recover instantly.",
     },
-    "healthtech-platform": {
-      gradient: "from-rose-500/20 to-orange-500/20",
-      accent: "text-rose-500",
+    {
+      title: "Performance",
+      desc: "Sub-100ms interactions. Core Web Vitals optimized.",
     },
-  },
+    {
+      title: "Accessibility",
+      desc: "Inclusive by default. WCAG AA compliance baked in.",
+    },
+  ],
 };
 
 export type SiteConfig = typeof siteConfig;
-
-export function getWorkPlaceholder(slug: string) {
-  const placeholders = siteConfig.workPlaceholders as Record<string, { gradient: string; accent: string } | undefined>;
-  return placeholders[slug] || { gradient: "from-gray-800 to-black", accent: "text-primary" };
-}

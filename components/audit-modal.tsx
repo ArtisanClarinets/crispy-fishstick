@@ -14,7 +14,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
 
 const questions = [
   {
@@ -236,7 +235,7 @@ export function AuditModal() {
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">What I'd deliver:</p>
+                    <p className="text-sm font-medium">What I&apos;d deliver:</p>
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {result.deliverables.map((item) => (
                         <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">

@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 interface CoverArtProps {
   slug: string;
   className?: string;
-  variant?: "card" | "hero";
 }
 
-export function CoverArt({ slug, className, variant = "card" }: CoverArtProps) {
+export function CoverArt({ slug, className }: CoverArtProps) {
   const spec = useMemo(() => getCoverSpec(slug), [slug]);
+  const safeId = slug.replace(/[^a-zA-Z0-9_-]/g, "-");
 
   const style = {
     "--cover-hue": spec.palette.hue,
@@ -63,7 +63,7 @@ export function CoverArt({ slug, className, variant = "card" }: CoverArtProps) {
       >
         <defs>
           <pattern
-            id={`hatch-${slug}`}
+            id={`hatch-${safeId}`}
             width={spec.hatch.spacing}
             height={spec.hatch.spacing}
             patternUnits="userSpaceOnUse"
@@ -80,7 +80,7 @@ export function CoverArt({ slug, className, variant = "card" }: CoverArtProps) {
             />
           </pattern>
 
-          <radialGradient id={`glow-${slug}`}>
+          <radialGradient id={`glow-${safeId}`}>
             <stop offset="0%" stopColor="hsl(var(--cover-hue) 80% 60%)" stopOpacity="0.6" />
             <stop offset="50%" stopColor="hsl(var(--cover-hue) 80% 40%)" stopOpacity="0.2" />
             <stop offset="100%" stopColor="transparent" stopOpacity="0" />
@@ -88,7 +88,7 @@ export function CoverArt({ slug, className, variant = "card" }: CoverArtProps) {
         </defs>
 
         {/* 2. Blueprint Hatch */}
-        <rect width="100%" height="100%" fill={`url(#hatch-${slug})`} opacity="0.3" />
+        <rect width="100%" height="100%" fill={`url(#hatch-${safeId})`} opacity="0.3" />
 
         {/* 3. Heat Blobs */}
         {spec.blobs.map((blob, i) => (
@@ -97,7 +97,7 @@ export function CoverArt({ slug, className, variant = "card" }: CoverArtProps) {
             cx={blob.cx}
             cy={blob.cy}
             r={blob.r}
-            fill={`url(#glow-${slug})`}
+            fill={`url(#glow-${safeId})`}
             style={{ opacity: blob.intensity, mixBlendMode: "screen" }}
           />
         ))}

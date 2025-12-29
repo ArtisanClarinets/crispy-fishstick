@@ -2,11 +2,11 @@
 title: "Shopify Admin Sync — Enterprise Shopify → ERPNext synchronization engine"
 description: "A high-performance synchronization engine handling 40+ entity types with reliability, observability, and operational safety."
 date: "2023-10-15"
-image: "/images/shopify-sync-hero.jpg"
 tags: ["System Architecture", "GraphQL", "Python", "ERPNext", "Shopify Plus"]
 role: "Lead Engineer"
 timeline: "4 months"
 outcome: "100% data integrity across 500k+ SKUs"
+constraints: "Black Friday traffic spikes, strict ERPNext schema enforcement."
 ---
 
 ## The Challenge
@@ -28,6 +28,8 @@ We architected and built a bespoke synchronization engine designed for **reliabi
 ## System Architecture
 
 The system uses a producer-consumer architecture with Redis queues to handle high throughput and ensure no data is lost during spikes.
+
+<CaseModePanel preset="shopify-admin-sync" />
 
 <div className="my-12 p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
 <svg viewBox="0 0 800 320" className="w-full h-auto font-sans text-xs">
