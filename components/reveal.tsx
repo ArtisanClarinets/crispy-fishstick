@@ -43,12 +43,12 @@ export const Reveal = ({
     <div ref={ref} style={{ position: "relative", width }} className={className}>
       <motion.div
         variants={{
-          hidden: { opacity: 0, y: yOffset },
-          visible: { opacity: 1, y: 0 },
+          hidden: { opacity: 0, y: yOffset, filter: "blur(4px)" },
+          visible: { opacity: 1, y: 0, filter: "blur(0px)" },
         }}
         initial="hidden"
         animate={mainControls}
-        transition={{ duration, delay, ease: [0.25, 0.25, 0, 1] }}
+        transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
       >
         {children}
       </motion.div>
