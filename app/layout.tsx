@@ -10,6 +10,7 @@ import { SystemLayer } from "@/components/system-layer";
 import { ConsoleHud } from "@/components/console-hud";
 import { RouteTransitionLayer } from "@/components/route-transition-layer";
 import { AppMotionConfig } from "@/components/motion-config";
+import { headers } from "next/headers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -54,11 +55,16 @@ export const metadata: Metadata = {
   },
 };
 
+// required for per-request nonce
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = headers().get("x-nonce") ?? undefined;
+
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className={cn(
@@ -70,6 +76,7 @@ export default function RootLayout({
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
+          nonce={nonce}
         >
           <AppMotionConfig>
             {/* Background system layer (always present) */}
