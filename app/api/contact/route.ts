@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import fs from "fs";
+import path from "path";
 
 const contactFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -11,16 +13,7 @@ const contactFormSchema = z.object({
   honeypot: z.string().optional(),
 });
 
-/**
- * RATE LIMITING NOTE:
- * This implementation uses an in-memory Map which is not suitable for scalable,
- * multi-instance production environments (e.g., Vercel Serverless Functions) as state
- * is not shared between instances and is lost on cold starts.
- *
- * TODO for Production:
- * 1. Move to a persistent store like Redis (Upstash).
- * 2. Or use edge-native rate limiting (e.g., @vercel/kv).
- */
+// Simple in-memory rate limiting
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 6;
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
@@ -47,6 +40,26 @@ function isRateLimited(ip: string) {
   return false;
 }
 
+// Durable storage for submissions (simulating a DB/Email service)
+const SUBMISSIONS_FILE = path.join(process.cwd(), "contact_submissions.json");
+
+function saveSubmission(data: any) {
+  try {
+    const submissions = fs.existsSync(SUBMISSIONS_FILE)
+      ? JSON.parse(fs.readFileSync(SUBMISSIONS_FILE, "utf-8"))
+      : [];
+    submissions.push({
+      ...data,
+      receivedAt: new Date().toISOString(),
+    });
+    fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(submissions, null, 2));
+    return true;
+  } catch (error) {
+    console.error("Failed to save submission:", error);
+    return false;
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const origin = req.headers.get("origin");
@@ -54,7 +67,9 @@ export async function POST(req: Request) {
       .split(",")
       .map((value) => value.trim())
       .filter(Boolean);
-    if (origin && !allowedOrigins.includes(origin)) {
+
+    // Strict Origin Check
+    if (!origin || !allowedOrigins.includes(origin)) {
       const response = NextResponse.json({ message: "Origin not allowed" }, { status: 403 });
       response.headers.set("Cache-Control", "no-store");
       return response;
@@ -69,28 +84,48 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    // 3. Validate the request body (includes honeypot check)
+    // Validate the request body
     const validatedData = contactFormSchema.parse(body);
 
     if (validatedData.honeypot && validatedData.honeypot.length > 0) {
-      const response = NextResponse.json(
+      // Silently ignore honeypot submissions
+      return NextResponse.json(
         { message: "Message received successfully" },
         { status: 200 }
       );
-      response.headers.set("Cache-Control", "no-store");
-      return response;
     }
 
-    // In a real application, you would send this to an email service or CRM
-    // For now, we'll log it to simulate the process
-    console.log("Contact form submitted:", { ...validatedData, company_address: undefined });
+    // Save to durable storage instead of just logging
+    const saved = saveSubmission({
+        name: validatedData.name,
+        role: validatedData.role,
+        budget: validatedData.budget,
+        message: validatedData.message,
+        email: validatedData.email,
+        website: validatedData.website
+    });
+
+    if (!saved) {
+         return NextResponse.json(
+          { message: "Failed to save submission" },
+          { status: 502 }
+        );
+    }
+
+    // Log metadata only (No PII)
+    console.log("Contact submission received", {
+      ip: "REDACTED", // or hash it
+      timestamp: new Date().toISOString(),
+      status: "saved"
+    });
 
     const response = NextResponse.json(
       { message: "Message received successfully" },
-      { status: 200 }
+      { status: 201 }
     );
     response.headers.set("Cache-Control", "no-store");
     return response;
+
   } catch (error) {
     if (error instanceof z.ZodError) {
       const response = NextResponse.json(
@@ -101,7 +136,7 @@ export async function POST(req: Request) {
       return response;
     }
 
-    console.error("Error processing contact form:", error);
+    console.error("Error processing contact form (metadata only):", error instanceof Error ? error.message : "Unknown error");
     const response = NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

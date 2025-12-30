@@ -48,7 +48,7 @@ export function ConsoleHud() {
       }
     };
 
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 

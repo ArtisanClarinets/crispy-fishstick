@@ -29,7 +29,7 @@ export default function Error({
 
         <p className="text-muted-foreground mb-8 text-sm leading-relaxed">
           An unexpected error has occurred in the application layer.
-          Our engineering team has been automatically notified.
+          If this persists, please contact support directly.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
