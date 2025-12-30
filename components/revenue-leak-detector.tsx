@@ -129,15 +129,19 @@ export function RevenueLeakDetector() {
          <div className="space-y-8 flex-1">
             {/* Revenue Input */}
             <div className="space-y-3 group">
-               <label className="text-xs font-mono uppercase text-muted-foreground group-hover:text-primary transition-colors">Monthly Revenue ($)</label>
+               <label htmlFor="revenue-input" className="text-xs font-mono uppercase text-muted-foreground group-hover:text-primary transition-colors">Monthly Revenue ($)</label>
                <div className="flex items-center gap-4">
                   <input
+                     id="revenue-input"
+                     name="revenue"
                      type="number"
                      value={revenue}
                      onChange={(e) => setRevenue(Number(e.target.value))}
                      className="bg-background border border-border px-3 py-2 w-32 font-mono text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded-sm"
                   />
                   <input
+                     id="revenue-range"
+                     name="revenueRange"
                      type="range"
                      min="10000" max="1000000" step="1000"
                      value={revenue}
@@ -149,9 +153,11 @@ export function RevenueLeakDetector() {
 
              {/* Conversion Input */}
              <div className="space-y-3 group">
-               <label className="text-xs font-mono uppercase text-muted-foreground group-hover:text-primary transition-colors">Conversion Rate (%)</label>
+               <label htmlFor="conversion-input" className="text-xs font-mono uppercase text-muted-foreground group-hover:text-primary transition-colors">Conversion Rate (%)</label>
                <div className="flex items-center gap-4">
                   <input
+                     id="conversion-input"
+                     name="conversion"
                      type="number"
                      min="0.1" max="100" step="0.1"
                      value={conversion}
@@ -159,6 +165,8 @@ export function RevenueLeakDetector() {
                      className="bg-background border border-border px-3 py-2 w-32 font-mono text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded-sm"
                   />
                   <input
+                     id="conversion-range"
+                     name="conversionRange"
                      type="range"
                      min="0.1" max="10.0" step="0.1"
                      value={conversion}
@@ -170,9 +178,11 @@ export function RevenueLeakDetector() {
 
              {/* Response Time Input */}
              <div className="space-y-3 group">
-               <label className="text-xs font-mono uppercase text-muted-foreground group-hover:text-primary transition-colors">Lead Response Time (min)</label>
+               <label htmlFor="response-time-input" className="text-xs font-mono uppercase text-muted-foreground group-hover:text-primary transition-colors">Lead Response Time (min)</label>
                <div className="flex items-center gap-4">
                   <input
+                     id="response-time-input"
+                     name="responseTime"
                      type="number"
                      min="0" max="1440"
                      value={responseTime}
@@ -180,6 +190,8 @@ export function RevenueLeakDetector() {
                      className="bg-background border border-border px-3 py-2 w-32 font-mono text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded-sm"
                   />
                   <input
+                     id="response-time-range"
+                     name="responseTimeRange"
                      type="range"
                      min="1" max="120" step="1"
                      value={responseTime}
