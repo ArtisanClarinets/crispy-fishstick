@@ -81,6 +81,8 @@ export function Header() {
             onClick={() => setIsOpen(!isOpen)}
             className="p-2 text-foreground"
             aria-label="Toggle menu"
+            aria-expanded={isOpen}
+            aria-controls="mobile-nav"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -99,7 +101,10 @@ export function Header() {
 
       {/* Mobile Nav */}
       {isOpen && (
-        <div className="md:hidden fixed inset-0 top-20 bg-background border-t border-border z-40 p-6 flex flex-col gap-6 animate-in slide-in-from-top-5 fade-in duration-200">
+        <div
+          id="mobile-nav"
+          className="md:hidden fixed inset-0 top-20 bg-background border-t border-border z-40 p-6 flex flex-col gap-6 animate-in slide-in-from-top-5 fade-in duration-200"
+        >
           <nav className="flex flex-col gap-6">
             {navLinks.map((link) => (
               <VTLink

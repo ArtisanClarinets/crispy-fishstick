@@ -1,9 +1,29 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { VTLink } from "@/components/vt-link";
+import { cn } from "@/lib/utils";
+import { getAuditStatus, loadProofSnapshot } from "@/lib/proof";
 import { siteConfig } from "@/lib/site";
 import { Github, Linkedin, Twitter } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const [proofStatus, setProofStatus] = useState<"idle" | "verified" | "degraded">("idle");
+  const [proofLabel, setProofLabel] = useState("Proof Panel: Runtime Audit");
+
+  useEffect(() => {
+    const snapshot = loadProofSnapshot();
+    if (!snapshot) return;
+    const audit = getAuditStatus(snapshot.headers, snapshot.buildProof);
+    if (audit.auditOk) {
+      setProofStatus("verified");
+      setProofLabel("Proof Panel: Verified");
+      return;
+    }
+    setProofStatus("degraded");
+    setProofLabel("Proof Panel: Degraded");
+  }, []);
 
   return (
     <footer className="border-t border-border bg-background/50 backdrop-blur-sm">
@@ -90,8 +110,13 @@ export function Footer() {
             <VTLink href="/terms" className="hover:text-foreground transition-colors">Terms of Service</VTLink>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="w-2 h-2 rounded-full bg-primary/60"></span>
-            <span>Proof Panel: Live Audit</span>
+            <span
+              className={cn(
+                "w-2 h-2 rounded-full",
+                proofStatus === "verified" ? "bg-emerald-500" : proofStatus === "degraded" ? "bg-amber-500" : "bg-primary/60"
+              )}
+            ></span>
+            <span>{proofLabel}</span>
           </div>
         </div>
       </div>

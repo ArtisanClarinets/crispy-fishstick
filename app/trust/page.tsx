@@ -1,5 +1,6 @@
 import { Shield, CheckCircle, AlertTriangle, Lock, FileText } from "lucide-react";
 import { Metadata } from "next";
+import { ProofPanel } from "@/components/proof-panel";
 import { VTLink } from "@/components/vt-link";
 
 export const metadata: Metadata = {
@@ -139,6 +140,18 @@ export default function TrustCenterPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="space-y-6" id="trust-proof">
+        <div className="space-y-2 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Runtime Proof Panel</p>
+          <h2 className="text-3xl font-bold">Live verification you can inspect.</h2>
+          <p className="text-muted-foreground">
+            This panel validates the real response headers, confirms the build fingerprint, and
+            reports the client runtime scan that backs the Definition of Done above.
+          </p>
+        </div>
+        <ProofPanel />
       </section>
 
       {/* 4. Red Flags */}

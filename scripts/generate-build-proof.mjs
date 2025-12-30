@@ -32,10 +32,22 @@ const gatesConfigured = [
   "Security headers active",
 ];
 
-const gatesRan = gatesConfigured.map((name) => ({
-  name,
-  ran: false,
-}));
+const gateResults = {
+  "ESLint enforced": process.env.PROOF_GATE_LINT,
+  "Vitest unit suite": process.env.PROOF_GATE_TEST,
+  "Playwright e2e suite": process.env.PROOF_GATE_E2E,
+};
+
+const gatesRan = gatesConfigured.map((name) => {
+  const result = gateResults[name];
+  const ran = typeof result === "string";
+  const passed = result === "success" || result === "passed" || result === "true";
+  return {
+    name,
+    ran,
+    ...(ran ? { passed } : {}),
+  };
+});
 
 const payload = {
   commit: commit.slice(0, 12),

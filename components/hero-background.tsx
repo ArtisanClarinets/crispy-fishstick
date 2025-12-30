@@ -92,6 +92,13 @@ export function HeroBackground() {
   // Parallax for the grid and background elements
   const gridY = useTransform(scrollY, [0, 1000], [0, 200]);
   const ambientY = useTransform(scrollY, [0, 1000], [0, 150]);
+  const gridSize = useTransform(scrollY, [0, 1000], [44, 32]);
+  const gridOpacity = useTransform(scrollY, [0, 800], [0.35, 0.18]);
+  const traceOpacity = useTransform(scrollY, [0, 1000], [0.7, 0.95]);
+  const cameraScale = useTransform(scrollY, [0, 900], [1, 1.04]);
+  const scanlineY = useTransform(scrollY, [0, 1200], [0, 320]);
+  const scanlineOpacity = useTransform(scrollY, [0, 400], [0.1, 0.22]);
+  const gridBackgroundSize = useMotionTemplate`${gridSize}px ${gridSize}px`;
 
   function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
     if (pointerCoarse) return;
@@ -106,101 +113,115 @@ export function HeroBackground() {
       className="absolute inset-0 -z-10 overflow-hidden bg-background"
       onMouseMove={handleMouseMove}
     >
-      {/* Base Precision Grid */}
       <motion.div
-        style={{ y: gridY }}
-        className="
-          absolute inset-0
-          bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)]
-          bg-[size:44px_44px]
-          [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,#000_65%,transparent_100%)]
-          opacity-35
-        "
-      />
-
-      {/* Mouse follower beam */}
-      {!pointerCoarse && (
+        className="absolute inset-0"
+        style={{
+          scale: cameraScale,
+        }}
+      >
+        {/* Base Precision Grid */}
         <motion.div
-          className="pointer-events-none absolute -inset-px"
-          style={{
-            background: useMotionTemplate`
-              radial-gradient(
-                650px circle at ${mouseX}px ${mouseY}px,
-                hsl(var(--primary) / 0.35),
-                transparent 80%
-              )
-            `,
-            opacity: 0.0,
-          }}
-          animate={prefersReducedMotion ? { opacity: 0 } : { opacity: 1 }}
-          transition={{ duration: prefersReducedMotion ? 0 : 0.35 }}
+          style={{ y: gridY, opacity: gridOpacity, backgroundSize: gridBackgroundSize }}
+          className="
+            absolute inset-0
+            bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)]
+            [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,#000_65%,transparent_100%)]
+          "
         />
-      )}
 
-      {/* Ambient system pulse (subtle) */}
-      <motion.div
-        style={{ y: ambientY }}
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[420px] rounded-full bg-primary/5 blur-[130px] mix-blend-screen animate-pulse [animation-duration:4200ms]"
-      />
-
-      {/* Trace overlay */}
-      <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,#000_60%,transparent_100%)]">
-        <svg
-          className="absolute inset-0 w-full h-full opacity-70"
-          viewBox="0 0 800 600"
-          preserveAspectRatio="xMidYMin slice"
-        >
-          {/* faint “nodes” */}
-          <g opacity="0.35">
-            {[
-              [120, 120],
-              [220, 260],
-              [420, 130],
-              [560, 240],
-              [700, 160],
-              [300, 450],
-              [600, 380],
-            ].map(([cx, cy], idx) => (
-              <circle key={idx} cx={cx} cy={cy} r="2.4" fill="currentColor" className="text-primary/60" />
-            ))}
-          </g>
-
-          {/* animated traces */}
-          {TRACES.map((t) => (
-            <TracePath
-              key={t.id}
-              trace={t}
-              timeOffset={timeOffset}
-              scrollY={scrollY}
-              isActive={active === t.id}
-              onActive={() => setActive(t.id)}
-              onInactive={() => setActive(null)}
-              prefersReducedMotion={prefersReducedMotion}
-            />
-          ))}
-        </svg>
-
-        {/* Tooltip (appears only when hovering a trace) */}
+        {/* Mouse follower beam */}
         {!pointerCoarse && (
           <motion.div
-            className={[
-              "pointer-events-none absolute left-0 top-0",
-              "rounded-full border border-white/10 bg-background/70 backdrop-blur-md",
-              "px-3 py-1 text-xs font-medium text-foreground/90 shadow-sm",
-              active ? "opacity-100" : "opacity-0",
-            ].join(" ")}
+            className="pointer-events-none absolute -inset-px"
             style={{
-              transform: tooltip,
-              // offset tooltip from cursor a bit
-              marginLeft: 14,
-              marginTop: 14,
+              background: useMotionTemplate`
+                radial-gradient(
+                  650px circle at ${mouseX}px ${mouseY}px,
+                  hsl(var(--primary) / 0.35),
+                  transparent 80%
+                )
+              `,
+              opacity: 0.0,
             }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
-          >
-            {active ? `${active.toUpperCase()} ROUTE` : ""}
-          </motion.div>
+            animate={prefersReducedMotion ? { opacity: 0 } : { opacity: 1 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.35 }}
+          />
         )}
-      </div>
+
+        {/* Ambient system pulse (subtle) */}
+        <motion.div
+          style={{ y: ambientY }}
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[420px] rounded-full bg-primary/5 blur-[130px] mix-blend-screen animate-pulse [animation-duration:4200ms]"
+        />
+
+        {/* Scanline sweep */}
+        <motion.div
+          className="pointer-events-none absolute inset-x-0 h-24 bg-gradient-to-b from-primary/30 via-primary/10 to-transparent mix-blend-screen"
+          style={{ y: scanlineY, opacity: scanlineOpacity }}
+        />
+
+        {/* Trace overlay */}
+        <motion.div
+          className="absolute inset-0 [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,#000_60%,transparent_100%)]"
+          style={{ opacity: traceOpacity }}
+        >
+          <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 800 600"
+            preserveAspectRatio="xMidYMin slice"
+          >
+            {/* faint “nodes” */}
+            <g opacity="0.35">
+              {[
+                [120, 120],
+                [220, 260],
+                [420, 130],
+                [560, 240],
+                [700, 160],
+                [300, 450],
+                [600, 380],
+              ].map(([cx, cy], idx) => (
+                <circle key={idx} cx={cx} cy={cy} r="2.4" fill="currentColor" className="text-primary/60" />
+              ))}
+            </g>
+
+            {/* animated traces */}
+            {TRACES.map((t) => (
+              <TracePath
+                key={t.id}
+                trace={t}
+                timeOffset={timeOffset}
+                scrollY={scrollY}
+                isActive={active === t.id}
+                onActive={() => setActive(t.id)}
+                onInactive={() => setActive(null)}
+                prefersReducedMotion={prefersReducedMotion}
+              />
+            ))}
+          </svg>
+
+          {/* Tooltip (appears only when hovering a trace) */}
+          {!pointerCoarse && (
+            <motion.div
+              className={[
+                "pointer-events-none absolute left-0 top-0",
+                "rounded-full border border-white/10 bg-background/70 backdrop-blur-md",
+                "px-3 py-1 text-xs font-medium text-foreground/90 shadow-sm",
+                active ? "opacity-100" : "opacity-0",
+              ].join(" ")}
+              style={{
+                transform: tooltip,
+                // offset tooltip from cursor a bit
+                marginLeft: 14,
+                marginTop: 14,
+              }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
+            >
+              {active ? `${active.toUpperCase()} ROUTE` : ""}
+            </motion.div>
+          )}
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
