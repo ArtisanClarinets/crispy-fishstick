@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 
-export const runtime = "edge";
-
-export async function GET() {
-  const res = NextResponse.json(
-    { ok: true, ts: new Date().toISOString() },
-    { status: 200 }
-  );
-  res.headers.set("Cache-Control", "no-store, max-age=0");
-  return res;
+export function GET() {
+  const response = NextResponse.json({
+    ok: true,
+    issuedAt: new Date().toISOString(),
+  });
+  response.headers.set("Cache-Control", "no-store");
+  return response;
 }

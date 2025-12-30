@@ -137,6 +137,8 @@ export function ProofPanel() {
   );
 
   const auditStatus = useMemo(() => getAuditStatus(headers, buildProof), [headers, buildProof]);
+  const ranGates = useMemo(() => buildProof.gatesRan ?? [], [buildProof.gatesRan]);
+  const ranSummary = useMemo(() => ranGates.filter((gate) => gate.ran).length, [ranGates]);
 
   return (
     <div className="rounded-3xl glass-card surface-rim p-8 md:p-10 shadow-xl shadow-primary/5">
@@ -246,6 +248,29 @@ export function ProofPanel() {
                 ))}
               </ul>
             </div>
+            {ranGates.length > 0 ? (
+              <div>
+                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">
+                  Gates Ran ({ranSummary}/{ranGates.length})
+                </div>
+                <ul className="space-y-2">
+                  {ranGates.map((gate) => {
+                    const status = gate.ran ? (gate.passed ? "Passed" : "Failed") : "Not run";
+                    const statusClass = gate.ran
+                      ? gate.passed
+                        ? "text-emerald-500"
+                        : "text-destructive"
+                      : "text-muted-foreground";
+                    return (
+                      <li key={gate.name} className="flex items-center justify-between gap-2">
+                        <span>{gate.name}</span>
+                        <span className={`text-xs font-semibold ${statusClass}`}>{status}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
