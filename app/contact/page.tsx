@@ -23,6 +23,7 @@ export default function ContactPage() {
     email: "",
     website: "",
     honeypot: "",
+    startedAt: Date.now(),
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
