@@ -10,8 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "postinstall": "node -e \"if (process.env.CI) { require('child_process').execSync('npx playwright install', { stdio: 'inherit' }); }\""
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.0.1",
