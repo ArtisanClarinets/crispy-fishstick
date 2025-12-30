@@ -7,7 +7,6 @@ import {
   PROOF_HEADERS,
   loadProofSnapshot,
   saveProofSnapshot,
-  mapHeaders,
 } from "@/lib/proof";
 
 const FALLBACK_BUILD: BuildProof = {

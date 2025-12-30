@@ -89,7 +89,7 @@ export async function POST(req: Request) {
       .map((value) => value.trim())
       .filter(Boolean);
 
-<<<<<<< HEAD
+    // Strict Origin Check
     if (!origin && !referer) {
       const response = NextResponse.json({ message: "Origin required" }, { status: 403 });
       response.headers.set("Cache-Control", "no-store");
@@ -107,11 +107,7 @@ export async function POST(req: Request) {
       }
     }
 
-    if (requestOrigin && !allowedOrigins.includes(requestOrigin)) {
-=======
-    // Strict Origin Check
-    if (!origin || !allowedOrigins.includes(origin)) {
->>>>>>> main
+    if (!requestOrigin || !allowedOrigins.includes(requestOrigin)) {
       const response = NextResponse.json({ message: "Origin not allowed" }, { status: 403 });
       response.headers.set("Cache-Control", "no-store");
       return response;
@@ -140,7 +136,6 @@ export async function POST(req: Request) {
       );
     }
 
-<<<<<<< HEAD
     const submittedInMs = Date.now() - validatedData.startedAt;
     if (Number.isFinite(submittedInMs) && submittedInMs < MIN_SUBMIT_TIME_MS) {
       const response = NextResponse.json(
@@ -151,11 +146,6 @@ export async function POST(req: Request) {
       return response;
     }
 
-    // In a real application, you would send this to an email service or CRM
-    // For now, we'll log it to simulate the process
-    const requestId = crypto.randomUUID();
-    console.info("Contact form submitted", { requestId, receivedAt: new Date().toISOString() });
-=======
     // Save to durable storage instead of just logging
     const saved = saveSubmission({
         name: validatedData.name,
@@ -179,7 +169,6 @@ export async function POST(req: Request) {
       timestamp: new Date().toISOString(),
       status: "saved"
     });
->>>>>>> main
 
     const response = NextResponse.json(
       { message: "Message received successfully" },
