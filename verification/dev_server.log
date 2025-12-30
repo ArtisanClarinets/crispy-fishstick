@@ -6,73 +6,34 @@
   - Local:        http://localhost:3000
 
  ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
    automatically enabled Fast Refresh for 1 custom loader
- ✓ Ready in 1857ms
+ ✓ Ready in 2.9s
  ○ Compiling /middleware ...
- ✓ Compiled /middleware in 572ms (72 modules)
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 8.3s (1379 modules)
- GET /non-existent-page 404 in 9239ms
- ✓ Compiled in 947ms (679 modules)
- ○ Compiling /contact ...
- ✓ Compiled /contact in 7.7s (1382 modules)
- GET /contact 200 in 8042ms
- GET /contact? 200 in 49ms
- GET /non-existent-page 404 in 147ms
- GET /contact 200 in 85ms
- GET /contact? 200 in 71ms
- GET /contact 200 in 68ms
- GET /contact? 200 in 44ms
- ✓ Compiled in 1498ms (1395 modules)
- GET /contact 200 in 255ms
- GET /contact? 200 in 48ms
- ✓ Compiled in 882ms (1395 modules)
- GET /contact 200 in 218ms
- GET /contact? 200 in 44ms
- GET /contact 200 in 44ms
- GET /contact? 200 in 44ms
- GET /contact 200 in 44ms
- GET /contact? 200 in 51ms
- GET /contact 200 in 41ms
- GET /contact? 200 in 48ms
- ✓ Compiled in 734ms (691 modules)
- ○ Compiling /contact ...
- ✓ Compiled /contact in 697ms (704 modules)
- GET /contact 200 in 991ms
- GET /contact? 200 in 74ms
- ✓ Compiled in 544ms (72 modules)
- GET /contact 200 in 86ms
- ✓ Compiled in 193ms (72 modules)
- GET /contact 200 in 95ms
+ ✓ Compiled /middleware in 857ms (72 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 12.1s (1581 modules)
+ GET / 200 in 13688ms
+ ✓ Compiled in 1587ms (775 modules)
  ○ Compiling /api/proof/headers ...
- ✓ Compiled /api/proof/headers in 1955ms (196 modules)
- GET /api/proof/headers 200 in 2279ms
- GET /api/proof/headers 200 in 10ms
- ✓ Compiled in 3.6s (1395 modules)
-ROOT LAYOUT: x-nonce header value: 70e52f0b7c7d44d6b0c7b0396f275164
- GET /contact 200 in 494ms
- GET /api/proof/headers 200 in 307ms
- GET /api/proof/headers 200 in 299ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 1226ms (705 modules)
- ⨯ TypeError: Cannot read properties of undefined (reading 'clientModules')
-    at /app/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:40:25679
-    at /app/node_modules/next/dist/server/lib/trace/tracer.js:191:62
-    at /app/node_modules/next/dist/server/lib/trace/tracer.js:140:36
-    at NoopContextManager.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
-    at ContextAPI.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
-    at NoopTracer.startActiveSpan (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18093)
-    at ProxyTracer.startActiveSpan (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18854)
-    at /app/node_modules/next/dist/server/lib/trace/tracer.js:122:103
-    at NoopContextManager.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
-    at ContextAPI.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
-    at NextTracerImpl.trace (/app/node_modules/next/dist/server/lib/trace/tracer.js:122:28)
-    at /app/node_modules/next/dist/server/lib/trace/tracer.js:191:31
-    at ne (/app/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:42:1678)
-    at async doRender (/app/node_modules/next/dist/server/base-server.js:1427:30)
-    at async cacheEntry.responseCache.get.routeKind (/app/node_modules/next/dist/server/base-server.js:1588:28)
-   automatically enabled Fast Refresh for 1 custom loader
- ○ Compiling /_error ...
- ✓ Compiled /_error in 2.8s (1609 modules)
- GET /contact 500 in 6768ms
-[?25h
+ ✓ Compiled /api/proof/headers in 6.6s (196 modules)
+ GET /api/proof/headers 200 in 6841ms
+ GET /api/proof/headers 200 in 6907ms
+ GET /api/proof/headers 200 in 36ms
+ GET /api/proof/headers 200 in 35ms
+ GET /api/proof/headers 200 in 19ms
+ GET /api/proof/headers 200 in 28ms
+ ○ Compiling /work ...
+ ✓ Compiled /work in 2.8s (1556 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /work 200 in 3095ms
+ GET /api/proof/headers 200 in 100ms
+ GET /api/proof/headers 200 in 91ms
+ ✓ Compiled /contact in 496ms (1570 modules)
+ GET /contact 200 in 610ms
+ GET /api/proof/headers 200 in 83ms
+ GET /api/proof/headers 200 in 82ms
