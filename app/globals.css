@@ -4,6 +4,12 @@
 
 @layer base {
   :root {
+    /* Local font stacks (avoid build-time network fetches from next/font/google) */
+    --font-inter: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+      "Apple Color Emoji", "Segoe UI Emoji";
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+
     /* Premium Light Mode: slightly warm, very clean */
     --background: 0 0% 100%;
     --foreground: 220 15% 10%; /* Darker, less pure black */

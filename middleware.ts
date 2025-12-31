@@ -12,11 +12,8 @@ export function middleware(request: Request) {
   const nonce = crypto.randomUUID().replace(/-/g, "");
   const requestHeaders = new Headers(request.headers);
   // requestHeaders.set("x-nonce", nonce); // Disabled to prevent Next.js from adding empty nonce
-  const isDev = process.env.NODE_ENV !== "production";
 
-  const scriptSrc = isDev
-    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self' 'unsafe-inline'";
+  const scriptSrc = "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
   const csp = [
     "default-src 'self'",

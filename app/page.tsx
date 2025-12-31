@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/reveal";
 import { siteConfig } from "@/lib/site";
-import { BuildPlanModule } from "@/components/build-plan-module";
 import { AuditModal } from "@/components/audit-modal";
 import { CalibrationHeadline } from "@/components/calibration-headline";
 import { VTLink } from "@/components/vt-link";
 import { HomeFeaturedWork } from "@/components/home-featured-work";
 import { ProofPanel } from "@/components/proof-panel";
+import { LivingBlueprintSection } from "@/components/living-blueprint-section";
+import { SplitText } from "@/components/react-bits/SplitText";
+import { ScrambleText } from "@/components/scramble-text";
 
 export default function Home() {
   return (
@@ -28,14 +30,15 @@ export default function Home() {
             <Reveal>
               <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-8 backdrop-blur-sm">
                 <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
-                Transparent. Predictable. Done.
+                <ScrambleText text="Transparent. Predictable. Done." />
               </div>
             </Reveal>
 
             <Reveal delay={0.1}>
-              <CalibrationHeadline
+              <SplitText
                 text={siteConfig.tagline}
-                className="mb-10"
+                className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-10"
+                delay={0.2}
               />
             </Reveal>
 
@@ -60,12 +63,49 @@ export default function Home() {
           {/* RIGHT: Build Plan Module */}
           <div className="flex-1 w-full max-w-2xl">
             <Reveal delay={0.4}>
-              <BuildPlanModule />
+              <div className="glass-card surface-rim rounded-2xl p-6 md:p-8">
+                <div className="flex items-start justify-between gap-6">
+                  <div>
+                    <p className="text-sm font-medium tracking-wider text-primary/90 uppercase">New</p>
+                    <h2 className="mt-2 text-2xl font-bold tracking-tight">The Living Blueprint</h2>
+                    <p className="mt-3 text-muted-foreground leading-relaxed">
+                      A scroll-driven assembly that turns the build plan into something you can inspect.
+                    </p>
+                  </div>
+                </div>
+
+                <ul className="mt-6 space-y-3 text-sm">
+                  {["8-phase assembly (0→7)", "Sticky split-screen on desktop", "Mobile-safe simplified fallback"].map(
+                    (item) => (
+                      <li key={item} className="flex items-center gap-3 text-foreground/90">
+                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                        <span>{item}</span>
+                      </li>
+                    )
+                  )}
+                </ul>
+
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <Button asChild size="lg" className="rounded-full h-12 px-7">
+                    <a href="#living-blueprint">
+                      Explore the Blueprint <ArrowRight className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
+                  <Button asChild variant="ghost" size="lg" className="rounded-full h-12 px-7">
+                    <VTLink href="/process">
+                      See the full process <ArrowRight className="ml-2 h-4 w-4" />
+                    </VTLink>
+                  </Button>
+                </div>
+              </div>
             </Reveal>
           </div>
 
         </div>
       </section>
+
+      {/* THE LIVING BLUEPRINT (STICKY SCROLL) */}
+      <LivingBlueprintSection />
 
       {/* SELF-AUDIT PROOF PANEL */}
       <section

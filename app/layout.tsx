@@ -3,7 +3,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import { PageTransition } from "@/components/page-transition";
 import { cn } from "@/lib/utils";
 import { SystemLayer } from "@/components/system-layer";
@@ -13,17 +12,6 @@ import { AppMotionConfig } from "@/components/motion-config";
 import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider } from "@/components/session-provider";
 import { ErrorBoundary } from "@/components/error-boundary";
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://thompsonsystems.com"),
@@ -76,8 +64,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className={cn(
-        inter.variable,
-        jetbrainsMono.variable,
         "font-sans antialiased min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary"
       )}>
         <ThemeProvider

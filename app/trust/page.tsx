@@ -2,6 +2,9 @@ import { Shield, CheckCircle, AlertTriangle, Lock, FileText } from "lucide-react
 import { Metadata } from "next";
 import { ProofPanel } from "@/components/proof-panel";
 import { VTLink } from "@/components/vt-link";
+import { SplitText } from "@/components/react-bits/SplitText";
+import { ScrambleText } from "@/components/scramble-text";
+import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
   title: "Trust Center | Thompson Systems",
@@ -46,17 +49,25 @@ export default function TrustCenterPage() {
     <div className="container max-w-4xl py-24 space-y-24" data-system-tone="default">
       {/* Header */}
       <section className="space-y-6 text-center">
-        <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-4">
-          <Shield className="w-4 h-4 mr-2" />
-          The Anti-Scam Shield
-        </div>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-balance">
-          Trust Center
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-          The software industry is full of vague promises and vendor lock-in.
-          Here is exactly how I protect your business, your budget, and your sanity.
-        </p>
+        <Reveal>
+          <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-4">
+            <Shield className="w-4 h-4 mr-2" />
+            <ScrambleText text="The Anti-Scam Shield" />
+          </div>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <SplitText
+            text="Trust Center"
+            className="text-4xl md:text-6xl font-bold tracking-tight text-balance"
+            delay={0.2}
+          />
+        </Reveal>
+        <Reveal delay={0.2}>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
+            The software industry is full of vague promises and vendor lock-in.
+            Here is exactly how I protect your business, your budget, and your sanity.
+          </p>
+        </Reveal>
       </section>
 
       {/* 1. Ownership */}

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/components/ui/use-toast";
+import { SplitText } from "@/components/react-bits/SplitText";
 
 export default function ContactPage() {
   const { toast } = useToast();
@@ -144,7 +145,7 @@ export default function ContactPage() {
     <div className="min-h-screen py-24 container px-4 flex flex-col items-center justify-center relative">
       <div className="max-w-2xl w-full">
          <div className="mb-12 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Let&apos;s talk engineering.</h1>
+            <SplitText text="Let's talk engineering." className="text-4xl md:text-5xl font-bold tracking-tight mb-4 justify-center" />
             <p className="text-xl text-muted-foreground">
                Tell me about the problem you&apos;re trying to solve.
             </p>
