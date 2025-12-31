@@ -9,9 +9,11 @@ interface CoverArtProps {
   slug: string;
   className?: string;
   imageSrc?: string | null;
+  priority?: boolean;
+  sizes?: string;
 }
 
-export function CoverArt({ slug, className, imageSrc }: CoverArtProps) {
+export function CoverArt({ slug, className, imageSrc, priority = false, sizes }: CoverArtProps) {
   const spec = useMemo(() => getCoverSpec(slug), [slug]);
   const safeId = slug.replace(/[^a-zA-Z0-9_-]/g, "-");
 
@@ -40,9 +42,9 @@ export function CoverArt({ slug, className, imageSrc }: CoverArtProps) {
           src={imageSrc}
           alt=""
           fill
-          sizes="(max-width: 768px) 100vw, 50vw"
+          sizes={sizes || "(max-width: 768px) 100vw, 50vw"}
           className="object-cover"
-          priority={false}
+          priority={priority}
         />
       ) : null}
 

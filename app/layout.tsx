@@ -12,6 +12,7 @@ import { RouteTransitionLayer } from "@/components/route-transition-layer";
 import { AppMotionConfig } from "@/components/motion-config";
 import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider } from "@/components/session-provider";
+import { ErrorBoundary } from "@/components/error-boundary";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -102,7 +103,9 @@ export default function RootLayout({
               <div className="relative z-10 min-h-dvh flex flex-col">
                 <Header />
                 <PageTransition>
-                  <main className="flex-1 pt-20">{children}</main>
+                  <ErrorBoundary>
+                    <main className="flex-1 pt-20">{children}</main>
+                  </ErrorBoundary>
                 </PageTransition>
                 <Footer />
               </div>

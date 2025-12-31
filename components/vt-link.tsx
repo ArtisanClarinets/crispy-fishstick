@@ -6,9 +6,10 @@ import { startTransition } from "react";
 
 type VTLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   href: string;
+  disableViewTransition?: boolean;
 };
 
-export function VTLink({ href, onClick, ...props }: VTLinkProps) {
+export function VTLink({ href, onClick, disableViewTransition, ...props }: VTLinkProps) {
   const router = useRouter();
   const url = href;
 
@@ -34,6 +35,11 @@ export function VTLink({ href, onClick, ...props }: VTLinkProps) {
           window.dispatchEvent(new CustomEvent("route-transition-start"));
 
         const navigate = () => startTransition(() => router.push(url));
+
+        if (disableViewTransition) {
+          navigate();
+          return;
+        }
 
         const transition = (document as { startViewTransition?: (cb: () => void) => void }).startViewTransition;
         if (transition) {

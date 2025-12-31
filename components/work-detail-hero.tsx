@@ -34,7 +34,7 @@ export function WorkDetailHero({
         layoutId={`cover-${slug}`}
         className="absolute inset-0 z-0 bg-secondary"
       >
-        <CoverArt slug={slug} imageSrc={coverImage} />
+        <CoverArt slug={slug} imageSrc={coverImage} priority sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-6 border border-white/10 rounded-[32px]" />
@@ -49,6 +49,7 @@ export function WorkDetailHero({
         <VTLink
           href="/work"
           className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8 transition-colors"
+          disableViewTransition
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Work
         </VTLink>
