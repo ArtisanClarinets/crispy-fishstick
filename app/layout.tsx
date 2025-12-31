@@ -11,6 +11,7 @@ import { ConsoleHud } from "@/components/console-hud";
 import { RouteTransitionLayer } from "@/components/route-transition-layer";
 import { AppMotionConfig } from "@/components/motion-config";
 import { Toaster } from "@/components/ui/toaster";
+import { SessionProvider } from "@/components/session-provider";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -86,26 +87,28 @@ export default function RootLayout({
           disableTransitionOnChange
           // nonce={nonce} // Disabled nonce to avoid hydration mismatch, relying on unsafe-inline for now
         >
-          <AppMotionConfig>
-            {/* Background system layer (always present) */}
-            <SystemLayer />
+          <SessionProvider>
+            <AppMotionConfig>
+              {/* Background system layer (always present) */}
+              <SystemLayer />
 
-            {/* Console HUD (system overlay) */}
-            <ConsoleHud />
+              {/* Console HUD (system overlay) */}
+              <ConsoleHud />
 
-            {/* Route Transition Overlay */}
-            <RouteTransitionLayer />
+              {/* Route Transition Overlay */}
+              <RouteTransitionLayer />
 
-            {/* Foreground app chrome */}
-            <div className="relative z-10 min-h-dvh flex flex-col">
-              <Header />
-              <PageTransition>
-                <main className="flex-1 pt-20">{children}</main>
-              </PageTransition>
-              <Footer />
-            </div>
-            <Toaster />
-          </AppMotionConfig>
+              {/* Foreground app chrome */}
+              <div className="relative z-10 min-h-dvh flex flex-col">
+                <Header />
+                <PageTransition>
+                  <main className="flex-1 pt-20">{children}</main>
+                </PageTransition>
+                <Footer />
+              </div>
+              <Toaster />
+            </AppMotionConfig>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

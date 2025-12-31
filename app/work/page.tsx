@@ -1,9 +1,4 @@
-import { siteConfig } from "@/lib/site";
 import { Reveal } from "@/components/reveal";
-import { ArrowRight } from "lucide-react";
-import { Stagger, StaggerItem } from "@/components/stagger";
-import { CoverArt } from "@/components/cover-art";
-import { VTLink } from "@/components/vt-link";
 import { WorkList } from "@/components/work-list";
 
 export default function WorkPage() {
