@@ -88,8 +88,6 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
