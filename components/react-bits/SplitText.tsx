@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { motionTokens } from "@/lib/motion-tokens";
 
 interface SplitTextProps {
   text: string;

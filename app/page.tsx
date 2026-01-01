@@ -4,11 +4,9 @@ import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/reveal";
 import { siteConfig } from "@/lib/site";
 import { AuditModal } from "@/components/audit-modal";
-import { CalibrationHeadline } from "@/components/calibration-headline";
 import { VTLink } from "@/components/vt-link";
 import { HomeFeaturedWork } from "@/components/home-featured-work";
 import { ProofPanel } from "@/components/proof-panel";
-import { LivingBlueprintSection } from "@/components/living-blueprint-section";
 import { SplitText } from "@/components/react-bits/SplitText";
 import { ScrambleText } from "@/components/scramble-text";
 
@@ -35,11 +33,13 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <SplitText
-                text={siteConfig.tagline}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-10"
-                delay={0.2}
-              />
+              <h1 className="mb-10">
+                <SplitText
+                  text={siteConfig.tagline}
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight"
+                  delay={0.2}
+                />
+              </h1>
             </Reveal>
 
             <Reveal delay={0.2}>
@@ -87,9 +87,9 @@ export default function Home() {
 
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
                   <Button asChild size="lg" className="rounded-full h-12 px-7">
-                    <a href="#living-blueprint">
+                    <VTLink href="/living-blueprint">
                       Explore the Blueprint <ArrowRight className="ml-2 h-4 w-4" />
-                    </a>
+                    </VTLink>
                   </Button>
                   <Button asChild variant="ghost" size="lg" className="rounded-full h-12 px-7">
                     <VTLink href="/process">
@@ -103,9 +103,6 @@ export default function Home() {
 
         </div>
       </section>
-
-      {/* THE LIVING BLUEPRINT (STICKY SCROLL) */}
-      <LivingBlueprintSection />
 
       {/* SELF-AUDIT PROOF PANEL */}
       <section

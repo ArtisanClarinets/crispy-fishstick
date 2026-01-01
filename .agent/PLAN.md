@@ -1,29 +1,37 @@
-# The Living Blueprint — Homepage Upgrade Plan
-
-## Repo path reality check
-- Requested path: `/mnt/data/crispy-fishstick-main`
-- Actual accessible repo root: `/home/meb/crispy-fishstick` (verified via `git rev-parse --show-toplevel`).
+# Mission Plan: Living Blueprint Implementation
 
 ## Goal
-Replace the repetitive Build Plan card module on the homepage with a scroll-triggered sticky split section (“The Living Blueprint”):
-- Desktop (md+): 50/50 layout; left sticky Spline visual; right 7 tall step panels.
-- Scroll drives 3D object through **8 phases minimum (0..7)**.
-- Mobile (sm): no sticky split; provide accessible fallback (reuse existing BuildPlanModule).
+Ship a "Lusion-level" homepage experience with a Sticky Scroll "Living Blueprint" section driving a self-hosted Spline scene.
 
-## Key decisions
-- Use `framer-motion` scroll progress (`useScroll`) to compute:
-  - `progress` in [0,1]
-  - `phase` as an integer in [0,7]
-- Encapsulate all Spline runtime interaction in `components/spline-blueprint-canvas.tsx`.
-- Fail gracefully: if the self-hosted `.splinecode` file is missing or Spline runtime API isn’t available, render a polished CSS fallback (no crashes, no console spam).
-- Respect `prefers-reduced-motion`: snap only on phase changes (no per-frame scrubbing).
-- Performance: lazy-mount Spline canvas via IntersectionObserver.
+## Phases
 
-## Work sequence
-1) Baseline: install/build/lint/e2e; capture outputs.
-2) Read required files before edits.
-3) Add Spline deps.
-4) Implement `SplineBlueprintCanvas` + `LivingBlueprintSection`.
-5) Wire into `app/page.tsx` (hero preview links to section).
-6) Update Playwright tests to assert section/panels exist (no WebGL dependency).
-7) Rerun lint/build/e2e; then dev server + manual verification.
+### A. Baseline & Setup
+- [ ] Initialize agent context files.
+- [ ] Run baseline checks (node, npm, lint, build, test).
+- [ ] Record findings in .agent/VERIFY.md.
+
+### B. Tooling Fix
+- [ ] Check for ESLint 9 vs Next.js compatibility issues.
+- [ ] Fix if found (likely downgrade to ESLint 8 or config adjustment).
+- [ ] Verify clean lint and build.
+
+### C. Spline Integration
+- [ ] Install @splinetool/react-spline @splinetool/runtime.
+- [ ] Create components/spline-blueprint-canvas.tsx.
+- [ ] Implement robust loading, error handling, and variable control (phase, progress).
+
+### D. Sticky Scroll Section
+- [ ] Create components/living-blueprint-section.tsx.
+- [ ] Implement Desktop Sticky Layout (50/50).
+- [ ] Implement Mobile Fallback.
+- [ ] Implement Scroll Logic (Phase 0-7).
+
+### E. Homepage Wiring
+- [ ] Update app/page.tsx to include the new section.
+
+### F. Verification
+- [ ] Update Playwright tests.
+- [ ] Verify UI logic.
+
+### G. Final Polish
+- [ ] Ensure 0 errors/warnings in all steps.

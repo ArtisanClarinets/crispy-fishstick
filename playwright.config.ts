@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:3001",
+    baseURL: "http://localhost:3002",
     trace: "on-first-retry",
   },
   projects: [
@@ -19,10 +19,10 @@ export default defineConfig({
   ],
   webServer: {
     // Force using an explicit port to avoid accidentally hitting an unrelated server
-    command: "npm run build && npm run start -- -p 3001",
-    url: "http://localhost:3001",
+    command: "npm run build && npm run start -- -p 3002",
+    url: "http://localhost:3002",
     // Always start a fresh server locally for deterministic test runs
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },
 });

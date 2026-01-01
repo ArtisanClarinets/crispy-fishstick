@@ -43,8 +43,6 @@ export function Squares({
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const startX = Math.floor(gridOffset.current.x / squareSize);
-      const startY = Math.floor(gridOffset.current.y / squareSize);
       const offsetX = gridOffset.current.x % squareSize;
       const offsetY = gridOffset.current.y % squareSize;
 
