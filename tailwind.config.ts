@@ -94,12 +94,28 @@ const config = {
           "0%": { backgroundPosition: "120% 0%" },
           "100%": { backgroundPosition: "-120% 100%" },
         },
+        "aurora-1": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "50%": { transform: "translate(20px, -20px) scale(1.1)" },
+        },
+        "aurora-2": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "50%": { transform: "translate(-20px, 10px) scale(0.9)" },
+        },
+        "aurora-3": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "50%": { transform: "translate(10px, 10px) scale(1.05)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in-up": "fade-in-up 0.5s ease-out forwards",
         "cover-shimmer": "cover-shimmer 2.8s ease-in-out infinite",
+        "aurora-1": "aurora-1 10s ease-in-out infinite alternate",
+        "aurora-2": "aurora-2 12s ease-in-out infinite alternate",
+        "aurora-3": "aurora-3 8s ease-in-out infinite alternate",
+        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       transitionTimingFunction: {
         "precision": "cubic-bezier(0.25, 1, 0.5, 1)",

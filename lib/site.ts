@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "Dylan Thompson",
-  company: "Thompson Systems",
-  tagline: "Engineering for High-Trust Products",
+  company: "Copper & Code",
+  tagline: "Digital Alchemy & Engineering Precision",
   description:
-    "A specialized engineering studio for founders who demand production-grade quality, rigorous systems, and Apple-caliber interfaces.",
-  email: "dylan@thompsonsystems.com",
+    "A specialized engineering lab demonstrating production-grade quality, rigorous systems, and refined digital craftsmanship.",
+  email: "hello@copperandcode.com",
   links: {
     github: null,
     linkedin: null,

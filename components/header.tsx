@@ -39,17 +39,18 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-300",
+        "fixed top-0 w-full z-50 transition-all duration-500",
         isScrolled
-          ? "bg-background/80 backdrop-blur-md border-b border-border/50"
+          ? "bg-background/60 backdrop-blur-xl border-b border-white/5 shadow-sm supports-[backdrop-filter]:bg-background/60"
           : "bg-transparent"
       )}
     >
       <div className="container flex h-20 items-center justify-between">
         <VTLink
             href="/"
-            className="text-lg font-bold tracking-tight transition-opacity hover:opacity-80"
+            className="text-lg font-bold tracking-tight transition-opacity hover:opacity-80 flex items-center gap-2"
         >
+          <div className="w-3 h-3 rounded-full bg-primary animate-pulse-slow" />
           {siteConfig.company}
         </VTLink>
 
@@ -66,7 +67,7 @@ export function Header() {
           ))}
           {/* Desktop toggle — use data-testid so tests can target this specific instance */}
           <ThemeToggle data-testid="theme-toggle-desktop" />
-          <Button asChild variant="default" className="rounded-full px-6">
+          <Button asChild variant="default" className="rounded-full px-6 copper-sheen">
             <VTLink href={siteConfig.cta.primary.href}>
               {siteConfig.cta.primary.text}
             </VTLink>
