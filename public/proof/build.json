@@ -1,7 +1,7 @@
 {
-  "commit": "c3f53b888fda",
-  "builtAt": "2025-12-29T19:31:54.869Z",
-  "depsSha256": "b3124839dafeaf962c873015958338921fcb36d1237ea43278ce1d80c76a36f3",
+  "commit": "d25b8f78a1a2",
+  "builtAt": "2026-01-03T21:36:25.689Z",
+  "depsSha256": "759b53eab01f2e60fcd8e4c8cf2139b7738072a5b384fc7a986bf00233354f9b",
   "generated": true,
   "gatesConfigured": [
     "TypeScript strict",
