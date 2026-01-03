@@ -63,7 +63,7 @@ export default function Home() {
           {/* RIGHT: Build Plan Module */}
           <div className="flex-1 w-full max-w-2xl">
             <Reveal delay={0.4}>
-              <div className="glass-card surface-rim rounded-2xl p-6 md:p-8">
+              <div className="glass-card rounded-2xl p-6 md:p-8 copper-sheen">
                 <div className="flex items-start justify-between gap-6">
                   <div>
                     <p className="text-sm font-medium tracking-wider text-primary/90 uppercase">New</p>
@@ -86,7 +86,7 @@ export default function Home() {
                 </ul>
 
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <Button asChild size="lg" className="rounded-full h-12 px-7">
+                  <Button asChild size="lg" className="rounded-full h-12 px-7 copper-sheen">
                     <VTLink href="/living-blueprint">
                       Explore the Blueprint <ArrowRight className="ml-2 h-4 w-4" />
                     </VTLink>

@@ -31,7 +31,7 @@ test.describe("Homepage", () => {
   test("should have accessible hero section", async ({ page }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { level: 1, name: /Engineering for High-Trust Products/ })
+      page.getByRole("heading", { level: 1, name: /Digital Alchemy/ })
     ).toBeVisible();
   });
 });

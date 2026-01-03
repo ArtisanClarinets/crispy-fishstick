@@ -3,7 +3,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms governing use of the Thompson Systems website and services.",
+  description: "Terms governing use of the Copper & Code website and services.",
 };
 
 export default function TermsPage() {

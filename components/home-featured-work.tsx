@@ -16,7 +16,7 @@ function FeaturedWorkCard({ project }: { project: (typeof siteConfig.featuredWor
       <motion.div
         ref={ref}
         layoutId={`cover-${project.slug}`}
-        className="relative overflow-hidden rounded-2xl bg-secondary aspect-[4/3] mb-6 glass-card surface-rim [transform-style:preserve-3d] [--tilt-x:0deg] [--tilt-y:0deg] [--card-scale:1] [--card-lift:0px] [--spot-x:50%] [--spot-y:50%] group-hover:[--card-scale:1.02] group-hover:[--card-lift:-6px] transition-transform duration-500"
+        className="relative overflow-hidden rounded-2xl aspect-[4/3] mb-6 glass-card [transform-style:preserve-3d] [--tilt-x:0deg] [--tilt-y:0deg] [--card-scale:1] [--card-lift:0px] [--spot-x:50%] [--spot-y:50%] group-hover:[--card-scale:1.02] group-hover:[--card-lift:-6px] transition-transform duration-500 copper-sheen"
         style={{
           transform:
             "perspective(900px) translateY(var(--card-lift)) scale(var(--card-scale)) rotateX(var(--tilt-x)) rotateY(var(--tilt-y))",
@@ -30,38 +30,38 @@ function FeaturedWorkCard({ project }: { project: (typeof siteConfig.featuredWor
           imageSrc={project.coverImage}
           className="transition-transform duration-700 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
         <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
           <div
-            className="absolute inset-0 mix-blend-screen"
+            className="absolute inset-0 mix-blend-overlay"
             style={{
               background:
-                "radial-gradient(circle at var(--spot-x) var(--spot-y), rgba(255,255,255,0.35), transparent 55%)",
+                "radial-gradient(circle at var(--spot-x) var(--spot-y), rgba(255,255,255,0.4), transparent 50%)",
             }}
           />
         </div>
         <div className="absolute inset-0 p-6 flex flex-col justify-between">
-          <div className="self-end p-2 bg-background/10 backdrop-blur-md rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+          <div className="self-end p-2 bg-black/40 backdrop-blur-md rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
             <ArrowRight className="text-white h-5 w-5" />
           </div>
           <div className="space-y-3">
-            <motion.h3 layoutId={`title-${project.slug}`} className="text-2xl font-bold text-white tracking-tight">
+            <motion.h3 layoutId={`title-${project.slug}`} className="text-2xl font-bold text-white tracking-tight drop-shadow-md">
               {project.title}
             </motion.h3>
-            <div className="rounded-xl bg-background/60 border border-white/10 backdrop-blur-md px-4 py-3 text-xs text-white/80 space-y-2">
+            <div className="rounded-xl bg-black/50 border border-white/10 backdrop-blur-md px-4 py-3 text-xs text-white/90 space-y-2 shadow-lg">
               <div className="flex items-center justify-between gap-3">
-                <span className="uppercase tracking-[0.24em] text-white/50">Outcome</span>
-                <span className="text-white/90 text-right">{project.outcome}</span>
+                <span className="uppercase tracking-[0.2em] text-white/60 font-medium">Outcome</span>
+                <span className="text-right font-medium">{project.outcome}</span>
               </div>
-              <div className="spec-divider" />
+              <div className="h-px bg-white/10 w-full" />
               <div className="flex items-center justify-between gap-3">
-                <span className="uppercase tracking-[0.24em] text-white/50">Constraint</span>
-                <span className="text-white/90 text-right line-clamp-1">{project.constraints}</span>
+                <span className="uppercase tracking-[0.2em] text-white/60 font-medium">Constraint</span>
+                <span className="text-right line-clamp-1 font-medium">{project.constraints}</span>
               </div>
-              <div className="spec-divider" />
+              <div className="h-px bg-white/10 w-full" />
               <div className="flex items-center justify-between gap-3">
-                <span className="uppercase tracking-[0.24em] text-white/50">Role</span>
-                <span className="text-white/90">{project.role}</span>
+                <span className="uppercase tracking-[0.2em] text-white/60 font-medium">Role</span>
+                <span className="font-medium">{project.role}</span>
               </div>
             </div>
           </div>

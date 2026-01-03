@@ -7,7 +7,7 @@ import { ScrambleText } from "@/components/scramble-text";
 import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
-  title: "Trust Center | Thompson Systems",
+  title: "Trust Center | Copper & Code",
   description: "How I protect your IP, ensure predictability, and define success. No black boxes.",
 };
 

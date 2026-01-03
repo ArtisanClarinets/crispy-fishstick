@@ -16,11 +16,11 @@ import { ErrorBoundary } from "@/components/error-boundary";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://thompsonsystems.com"),
   title: {
-    default: "Thompson Systems | High-Trust Engineering",
-    template: "%s | Thompson Systems",
+    default: "Copper & Code | Digital Alchemy",
+    template: "%s | Copper & Code",
   },
   description:
-    "A specialized engineering studio for founders who demand production-grade quality, rigorous systems, and Apple-caliber interfaces.",
+    "A specialized engineering lab demonstrating production-grade quality, rigorous systems, and refined digital craftsmanship.",
   keywords: [
     "Software Engineering",
     "Systems Architecture",
@@ -29,20 +29,21 @@ export const metadata: Metadata = {
     "TypeScript",
     "High-Performance",
     "Design Engineering",
+    "Copper & Code",
   ],
   authors: [{ name: "Dylan Thompson" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://thompsonsystems.com",
-    title: "Thompson Systems",
+    url: "https://copperandcode.com",
+    title: "Copper & Code",
     description:
-      "Engineering for High-Trust Products. Production-grade quality from day one.",
-    siteName: "Thompson Systems",
+      "Digital Alchemy & Engineering Precision. Production-grade quality from day one.",
+    siteName: "Copper & Code",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Thompson Systems",
+    title: "Copper & Code",
   },
   robots: {
     index: true,
@@ -51,13 +52,15 @@ export const metadata: Metadata = {
 };
 
 
+import { headers } from "next/headers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const headersList = headers();
-  // const nonce = headersList.get("x-nonce") ?? undefined;
+  const headersList = headers();
+  const nonce = headersList.get("x-nonce") ?? undefined;
 
   // console.log("ROOT LAYOUT: x-nonce header value:", nonce);
 
@@ -72,7 +75,7 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-          // nonce={nonce} // Disabled nonce to avoid hydration mismatch, relying on unsafe-inline for now
+          nonce={nonce}
         >
           <SessionProvider>
             <AppMotionConfig>
