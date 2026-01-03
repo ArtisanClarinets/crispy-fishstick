@@ -1,6 +1,5 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/reveal";
 import { siteConfig } from "@/lib/site";
 import { AuditModal } from "@/components/audit-modal";
@@ -9,6 +8,7 @@ import { HomeFeaturedWork } from "@/components/home-featured-work";
 import { ProofPanel } from "@/components/proof-panel";
 import { SplitText } from "@/components/react-bits/SplitText";
 import { ScrambleText } from "@/components/scramble-text";
+import { Waves } from "@/components/react-bits/Waves";
 
 export default function Home() {
   return (
@@ -19,7 +19,7 @@ export default function Home() {
         data-hud-section="Hero"
         data-system-tone="home"
       >
-        <HeroBackground />
+        <Waves lineColor="rgba(255, 255, 255, 0.15)" />
 
         <div className="container relative z-10 px-4 md:px-6 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
