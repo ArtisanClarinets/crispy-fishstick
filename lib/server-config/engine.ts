@@ -55,8 +55,19 @@ export function calculateRequirements(intent: WorkloadIntent): RecommendationRes
     factor: 'Baseline',
   };
 
+  // Validate persistence key to prevent arbitrary object access (Semgrep blocking finding)
+  const allowedPersistence = ['ephemeral', 'persistent'];
+  if (!allowedPersistence.includes(intent.persistence)) {
+    throw new Error('Invalid persistence type');
+  }
   const headroom = HEADROOM[intent.persistence];
   explanation.headroom = `${(headroom - 1) * 100}% Safety Margin`;
+
+  // Validate traffic key for use in MULTIPLIERS lookups (Semgrep blocking finding)
+  const allowedTraffic = ['low', 'medium', 'high'];
+  if (!allowedTraffic.includes(intent.traffic)) {
+    throw new Error('Invalid traffic level');
+  }
 
   switch (intent.appType) {
     case 'web':

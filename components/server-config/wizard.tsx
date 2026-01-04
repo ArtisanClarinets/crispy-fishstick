@@ -108,21 +108,30 @@ export function ServerConfigWizard() {
             {appType === 'db' && (
                <div className="space-y-2">
                  <Label>Estimated Data Size (GB)</Label>
-                 <Input type="number" {...register('dataSizeGb', { valueAsNumber: true })} placeholder="e.g. 10" />
+                 <Input type="number" {...register('dataSizeGb', {
+                   valueAsNumber: true,
+                   setValueAs: (v) => v === '' ? undefined : Number(v)
+                 })} placeholder="e.g. 10" />
                </div>
             )}
 
             {appType === 'cache' && (
                <div className="space-y-2">
                  <Label>Cache Size (GB)</Label>
-                 <Input type="number" {...register('dataSizeGb', { valueAsNumber: true })} placeholder="e.g. 5" />
+                 <Input type="number" {...register('dataSizeGb', {
+                   valueAsNumber: true,
+                   setValueAs: (v) => v === '' ? undefined : Number(v)
+                 })} placeholder="e.g. 5" />
                </div>
             )}
 
             {appType === 'ml' && (
                <div className="space-y-2">
                  <Label>Model Size (GB)</Label>
-                 <Input type="number" {...register('modelSizeGb', { valueAsNumber: true })} placeholder="e.g. 2" />
+                 <Input type="number" {...register('modelSizeGb', {
+                   valueAsNumber: true,
+                   setValueAs: (v) => v === '' ? undefined : Number(v)
+                 })} placeholder="e.g. 2" />
                </div>
             )}
 
