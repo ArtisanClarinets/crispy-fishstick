@@ -26,11 +26,14 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="border-t border-border bg-background/50 backdrop-blur-sm">
+    <footer className="border-t border-border/40 bg-background">
       <div className="container py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="md:col-span-2 space-y-6">
-            <h3 className="text-xl font-bold tracking-tight">Vantus Systems</h3>
+            <h3 className="text-lg font-bold tracking-tight flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)]" />
+              Vantus Systems
+            </h3>
             <p className="text-muted-foreground max-w-sm leading-relaxed text-sm">
               Engineering rigorous, high-trust digital systems.
               Built on principles of clarity, reliability, and performance.

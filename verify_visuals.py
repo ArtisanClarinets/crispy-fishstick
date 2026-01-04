@@ -1,31 +1,41 @@
 from playwright.sync_api import sync_playwright
 
-def verify_visuals():
+def verify_styling():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
-        # 1. Verify Home Page (Hero + System Layer)
-        page.goto("http://localhost:3000")
-        page.wait_for_timeout(2000) # Wait for animations
-        page.screenshot(path="verification_home_hero.png")
-        print("Captured Home Hero")
+        # Navigate to homepage
+        try:
+            page.goto("http://localhost:3000")
+            page.wait_for_load_state("networkidle")
 
-        # 2. Verify Work Page (Listing)
-        page.goto("http://localhost:3000/work")
-        page.wait_for_timeout(2000)
-        page.screenshot(path="verification_work_list.png")
-        print("Captured Work List")
+            # Take screenshot of Hero Section
+            page.screenshot(path="verification/home_hero.png")
+            print("Captured home_hero.png")
 
-        # 3. Verify Detail Page (Shared Element)
-        # Click the first project to test transition
-        page.locator("a[href^='/work/']").first.click()
-        page.wait_for_url("**/work/*")
-        page.wait_for_timeout(1000) # Wait for transition
-        page.screenshot(path="verification_work_detail.png")
-        print("Captured Work Detail")
+            # Scroll down to work section and capture
+            page.evaluate("window.scrollBy(0, 1000)")
+            page.wait_for_timeout(1000)
+            page.screenshot(path="verification/home_work.png")
+            print("Captured home_work.png")
 
-        browser.close()
+            # Navigate to Services
+            page.goto("http://localhost:3000/services")
+            page.wait_for_load_state("networkidle")
+            page.screenshot(path="verification/services.png")
+            print("Captured services.png")
+
+            # Navigate to Contact
+            page.goto("http://localhost:3000/contact")
+            page.wait_for_load_state("networkidle")
+            page.screenshot(path="verification/contact.png")
+            print("Captured contact.png")
+
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
-    verify_visuals()
+    verify_styling()

@@ -63,7 +63,7 @@ export default function Home() {
           {/* RIGHT: Build Plan Module */}
           <div className="flex-1 w-full max-w-2xl">
             <Reveal delay={0.4}>
-              <div className="glass-card rounded-2xl p-6 md:p-8 signal-sheen">
+              <div className="card-precision rounded-2xl p-6 md:p-8 signal-sheen backdrop-blur-md bg-background/50">
                 <div className="flex items-start justify-between gap-6">
                   <div>
                     <p className="text-sm font-medium tracking-wider text-primary/90 uppercase">New</p>
