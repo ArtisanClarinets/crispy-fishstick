@@ -107,7 +107,7 @@ export function SignalLinesField() {
       if (!canvasRef.current) return;
       const parent = canvasRef.current.parentElement;
       if (parent) {
-        const dpr = Math.min(window.devicePixelRatio, 2); // Clamp DPR
+        const dpr = Math.min(window.devicePixelRatio, 1.5); // Clamp DPR for performance
         canvasRef.current.width = parent.clientWidth * dpr;
         canvasRef.current.height = parent.clientHeight * dpr;
         canvasRef.current.style.width = `${parent.clientWidth}px`;
