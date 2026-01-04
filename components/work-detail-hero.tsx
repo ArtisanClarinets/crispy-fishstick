@@ -38,10 +38,10 @@ export function WorkDetailHero({
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-6 border border-border/10 rounded-[32px]" />
-          <div className="absolute inset-6 rounded-[32px] bg-gradient-to-b from-white/10 via-transparent to-transparent" />
-          <div className="absolute top-10 left-10 h-3 w-16 bg-white/60 blur-sm opacity-40" />
-          <div className="absolute top-12 right-16 h-2 w-10 bg-white/50 blur-sm opacity-40" />
-          <div className="absolute bottom-12 right-12 h-2 w-12 bg-white/40 blur-sm opacity-30" />
+          <div className="absolute inset-6 rounded-[32px] bg-gradient-to-b from-foreground/10 via-transparent to-transparent" />
+          <div className="absolute top-10 left-10 h-3 w-16 bg-foreground/30 blur-sm opacity-40" />
+          <div className="absolute top-12 right-16 h-2 w-10 bg-foreground/20 blur-sm opacity-40" />
+          <div className="absolute bottom-12 right-12 h-2 w-12 bg-foreground/20 blur-sm opacity-30" />
         </div>
       </motion.div>
 
