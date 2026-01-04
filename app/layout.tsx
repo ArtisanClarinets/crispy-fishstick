@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { PageTransition } from "@/components/page-transition";
 import { cn } from "@/lib/utils";
-import { SystemLayer } from "@/components/system-layer";
-import { ConsoleHud } from "@/components/console-hud";
-import { RouteTransitionLayer } from "@/components/route-transition-layer";
 import { AppMotionConfig } from "@/components/motion-config";
 import { Toaster } from "@/components/ui/toaster";
-import { SessionProvider } from "@/components/session-provider";
-import { ErrorBoundary } from "@/components/error-boundary";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { VisitedPathProvider } from "@/components/visited-path-provider";
+import { AuthProvider } from "@/components/auth-provider";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://thompsonsystems.com"),
@@ -51,8 +47,7 @@ export const metadata: Metadata = {
   },
 };
 
-
-import { headers } from "next/headers";
+import { PointerSignalProvider } from "@/components/pointer-signal-provider";
 
 export default function RootLayout({
   children,
@@ -62,8 +57,6 @@ export default function RootLayout({
   const headersList = headers();
   const nonce = headersList.get("x-nonce") ?? undefined;
 
-  // console.log("ROOT LAYOUT: x-nonce header value:", nonce);
-
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className={cn(
@@ -71,36 +64,21 @@ export default function RootLayout({
       )}>
         <ThemeProvider
           attribute="class"
-          // Follow the user's device preference by default
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
           nonce={nonce}
         >
-          <SessionProvider>
-            <AppMotionConfig>
-              {/* Background system layer (always present) */}
-              <SystemLayer />
-
-              {/* Console HUD (system overlay) */}
-              <ConsoleHud />
-
-              {/* Route Transition Overlay */}
-              <RouteTransitionLayer />
-
-              {/* Foreground app chrome */}
-              <div className="relative z-10 min-h-dvh flex flex-col">
-                <Header />
-                <PageTransition>
-                  <ErrorBoundary>
-                    <main className="flex-1 pt-20">{children}</main>
-                  </ErrorBoundary>
-                </PageTransition>
-                <Footer />
-              </div>
-              <Toaster />
-            </AppMotionConfig>
-          </SessionProvider>
+          <PointerSignalProvider />
+          <AuthProvider>
+            <VisitedPathProvider>
+              <AppMotionConfig>
+                {children}
+                <Toaster />
+                <SonnerToaster />
+              </AppMotionConfig>
+            </VisitedPathProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

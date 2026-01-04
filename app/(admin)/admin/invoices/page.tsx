@@ -1,0 +1,99 @@
+import { requireAdmin } from "@/lib/admin/guards";
+import { prisma } from "@/lib/prisma";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Plus, Receipt } from "lucide-react";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { formatDate, formatCurrency } from "@/lib/utils";
+
+export default async function InvoicesPage() {
+  await requireAdmin({ permissions: ["invoices.read"] });
+
+  const invoices = await prisma.invoice.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      Tenant: true,
+    },
+  });
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Invoices</h1>
+          <p className="text-muted-foreground">Manage billing and invoices.</p>
+        </div>
+        <Button asChild>
+          <Link href="/admin/invoices/new">
+            <Plus className="mr-2 h-4 w-4" />
+            New Invoice
+          </Link>
+        </Button>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Invoices</CardTitle>
+          <CardDescription>
+            A list of all invoices and their payment status.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Number</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Issue Date</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {invoices.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    No invoices found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                invoices.map((invoice) => (
+                  <TableRow key={invoice.id}>
+                    <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                            <Receipt className="h-4 w-4 text-muted-foreground" />
+                            {invoice.number}
+                        </div>
+                    </TableCell>
+                    <TableCell>{invoice.Tenant.name}</TableCell>
+                    <TableCell>
+                      <Badge variant={
+                        invoice.status === "paid" ? "default" :
+                        invoice.status === "overdue" ? "destructive" :
+                        invoice.status === "sent" ? "secondary" : "outline"
+                      }>
+                        {invoice.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{formatCurrency(invoice.totalAmount)}</TableCell>
+                    <TableCell>{formatDate(invoice.issueDate)}</TableCell>
+                    <TableCell>{formatDate(invoice.dueDate)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/admin/invoices/${invoice.id}`}>View</Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

@@ -3,17 +3,17 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-interface SessionContextType {
+interface VisitedPathContextType {
   hasVisited: (path: string) => boolean;
 }
 
-const SessionContext = createContext<SessionContextType>({
+const VisitedPathContext = createContext<VisitedPathContextType>({
   hasVisited: () => false,
 });
 
-export const useSession = () => useContext(SessionContext);
+export const useVisitedPath = () => useContext(VisitedPathContext);
 
-export function SessionProvider({ children }: { children: React.ReactNode }) {
+export function VisitedPathProvider({ children }: { children: React.ReactNode }) {
   const [visitedPaths, setVisitedPaths] = useState<Set<string>>(new Set());
   const pathname = usePathname();
 
@@ -33,8 +33,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <SessionContext.Provider value={{ hasVisited }}>
+    <VisitedPathContext.Provider value={{ hasVisited }}>
       {children}
-    </SessionContext.Provider>
+    </VisitedPathContext.Provider>
   );
 }

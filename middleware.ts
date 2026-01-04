@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+import type { NextRequest } from "next/server";
 
 const SECURITY_HEADERS = [
   ["X-Content-Type-Options", "nosniff"],
@@ -8,7 +10,7 @@ const SECURITY_HEADERS = [
   ["Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload"],
 ];
 
-export function middleware(request: Request) {
+export async function middleware(request: NextRequest) {
   const nonce = crypto.randomUUID().replace(/-/g, "");
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
@@ -30,6 +32,21 @@ export function middleware(request: Request) {
     "frame-ancestors 'none'",
     "upgrade-insecure-requests",
   ].join("; ");
+
+  // AUTHENTICATION LOGIC
+  const pathname = request.nextUrl.pathname;
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    const token = await getToken({ 
+      req: request, 
+      secret: process.env.NEXTAUTH_SECRET 
+    });
+
+    if (!token) {
+      const url = new URL("/admin/login", request.url);
+      url.searchParams.set("callbackUrl", encodeURI(request.url));
+      return NextResponse.redirect(url);
+    }
+  }
 
   const response = NextResponse.next({
     request: {

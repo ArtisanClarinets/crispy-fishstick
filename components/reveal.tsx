@@ -2,7 +2,7 @@
 
 import { motion, useAnimation, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
-import { useSession } from "@/components/session-provider";
+import { useVisitedPath } from "@/components/visited-path-provider";
 import { usePathname } from "next/navigation";
 
 interface RevealProps {
@@ -26,7 +26,7 @@ export const Reveal = ({
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const mainControls = useAnimation();
   const prefersReducedMotion = useReducedMotion();
-  const { hasVisited } = useSession();
+  const { hasVisited } = useVisitedPath();
   const pathname = usePathname();
   const shouldAnimate = !hasVisited(pathname);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useSession } from "@/components/session-provider";
+import { useVisitedPath } from "@/components/visited-path-provider";
 import { usePathname } from "next/navigation";
 
 interface StaggerProps {
@@ -10,7 +10,7 @@ interface StaggerProps {
 }
 
 export function Stagger({ children, className }: StaggerProps) {
-  const { hasVisited } = useSession();
+  const { hasVisited } = useVisitedPath();
   const pathname = usePathname();
   const shouldAnimate = !hasVisited(pathname);
 
