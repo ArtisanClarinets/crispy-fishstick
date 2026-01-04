@@ -8,7 +8,7 @@ import { HomeFeaturedWork } from "@/components/home-featured-work";
 import { ProofPanel } from "@/components/proof-panel";
 import { SplitText } from "@/components/react-bits/SplitText";
 import { ScrambleText } from "@/components/scramble-text";
-import { Waves } from "@/components/react-bits/Waves";
+import { SignalLinesField } from "@/features/home-hero/components/SignalLinesField";
 
 export default function Home() {
   return (
@@ -19,7 +19,7 @@ export default function Home() {
         data-hud-section="Hero"
         data-system-tone="home"
       >
-        <Waves lineColor="rgba(255, 255, 255, 0.15)" />
+        <SignalLinesField />
 
         <div className="container relative z-10 px-4 md:px-6 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 

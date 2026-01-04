@@ -1,0 +1,53 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { authenticator } from "otplib";
+import { z } from "zod";
+import { rateLimit } from "@/lib/rate-limit";
+
+export const dynamic = "force-dynamic";
+
+const enableSchema = z.object({
+  token: z.string().min(6),
+  secret: z.string(),
+});
+
+export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  const limitResult = await rateLimit({
+    key: `mfa-enable:${session.user.id}`,
+    limit: 5,
+    windowMs: 60_000,
+  });
+
+  if (!limitResult.success) {
+    return new NextResponse("Too many requests", { status: 429 });
+  }
+
+  try {
+    const body = await req.json();
+    const { token, secret } = enableSchema.parse(body);
+
+    const isValid = authenticator.check(token, secret);
+
+    if (!isValid) {
+      return new NextResponse("Invalid token", { status: 400 });
+    }
+
+    await prisma.user.update({
+      where: { email: session.user.email },
+      data: { mfaSecret: secret },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("MFA Enable Error:", error);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}

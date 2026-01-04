@@ -1,0 +1,370 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Assignment {
+  id                   String    @id @default(cuid())
+  projectId            String
+  userId               String
+  role                 String?
+  startDate            DateTime
+  endDate              DateTime?
+  allocationPercentage Int       @default(100)
+  User                 User      @relation(fields: [userId], references: [id])
+  Project              Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorEmail String?
+  action     String
+  resource   String
+  resourceId String?
+  before     String?
+  after      String?
+  ip         String?
+  userAgent  String?
+  meta       String?
+  createdAt  DateTime @default(now())
+
+  @@index([resource, resourceId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+model Contract {
+  id        String    @id @default(cuid())
+  title     String
+  status    String    @default("draft")
+  tenantId  String
+  startDate DateTime
+  endDate   DateTime?
+  value     Float     @default(0)
+  content   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Tenant    Tenant    @relation(fields: [tenantId], references: [id])
+}
+
+model Deployment {
+  id            String      @id @default(cuid())
+  environmentId String
+  version       String
+  status        String
+  trigger       String?
+  createdAt     DateTime    @default(now())
+  Environment   Environment @relation(fields: [environmentId], references: [id])
+}
+
+model Environment {
+  id         String       @id @default(cuid())
+  name       String
+  tenantId   String?
+  url        String?
+  createdAt  DateTime     @default(now())
+  Deployment Deployment[]
+  Tenant     Tenant?      @relation(fields: [tenantId], references: [id])
+}
+
+model Incident {
+  id          String      @id @default(cuid())
+  title       String
+  severity    String
+  status      String      @default("open")
+  serviceId   String?
+  commanderId String?
+  summary     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  User        User?       @relation(fields: [commanderId], references: [id])
+  Service     Service?    @relation(fields: [serviceId], references: [id])
+  Postmortem  Postmortem?
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+  number      String        @unique
+  tenantId    String
+  status      String        @default("draft")
+  issueDate   DateTime
+  dueDate     DateTime
+  totalAmount Float
+  currency    String        @default("USD")
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Tenant      Tenant        @relation(fields: [tenantId], references: [id])
+  InvoiceItem InvoiceItem[]
+  TimeEntry   TimeEntry[]
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Float
+  unitPrice   Float
+  amount      Float
+  Invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model JitAccessRequest {
+  id          String    @id @default(cuid())
+  userId      String
+  roleId      String?
+  reason      String
+  durationMin Int
+  status      String    @default("pending")
+  approvedBy  String?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  User        User      @relation(fields: [userId], references: [id])
+
+  @@index([expiresAt])
+  @@index([status])
+}
+
+model Lead {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  message    String?
+  source     String?
+  status     String   @default("new")
+  budget     String?
+  role       String?
+  website    String?
+  assignedTo String?
+  tenantId   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  Tenant     Tenant?  @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([status])
+}
+
+model MediaAsset {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  url        String
+  mime       String
+  size       Int
+  uploadedBy String?
+  tenantId   String?
+  createdAt  DateTime @default(now())
+}
+
+model Postmortem {
+  id            String          @id @default(cuid())
+  incidentId    String          @unique
+  rootCause     String?
+  impact        String?
+  remediation   String?
+  content       String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  Incident      Incident        @relation(fields: [incidentId], references: [id])
+  PostmortemTag PostmortemTag[]
+}
+
+model PostmortemTag {
+  id           String     @id @default(cuid())
+  name         String
+  postmortemId String
+  Postmortem   Postmortem @relation(fields: [postmortemId], references: [id], onDelete: Cascade)
+
+  @@index([name])
+}
+
+model Project {
+  id         String       @id @default(cuid())
+  name       String
+  tenantId   String
+  status     String       @default("active")
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Assignment Assignment[]
+  Tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  TimeEntry  TimeEntry[]
+}
+
+model Proposal {
+  id               String             @id @default(cuid())
+  title            String
+  status           String             @default("draft")
+  totalAmount      Float              @default(0)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  ProposalApproval ProposalApproval[]
+  ProposalItem     ProposalItem[]
+}
+
+model ProposalApproval {
+  id         String   @id @default(cuid())
+  proposalId String
+  approverId String
+  status     String
+  comment    String?
+  createdAt  DateTime @default(now())
+  User       User     @relation(fields: [approverId], references: [id])
+  Proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+}
+
+model ProposalComponent {
+  id             String         @id @default(cuid())
+  name           String
+  description    String?
+  estimatedHours Float
+  hourlyRate     Float
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  ProposalItem   ProposalItem[]
+}
+
+model ProposalItem {
+  id                String             @id @default(cuid())
+  proposalId        String
+  componentId       String?
+  customName        String?
+  hours             Float
+  rate              Float
+  amount            Float
+  ProposalComponent ProposalComponent? @relation(fields: [componentId], references: [id])
+  Proposal          Proposal           @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+}
+
+model RateLimit {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
+}
+
+model Role {
+  id             String           @id @default(cuid())
+  name           String           @unique
+  permissions    String
+  RoleAssignment RoleAssignment[]
+}
+
+model RoleAssignment {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+  Role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+model Service {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  ownerId     String?
+  repoUrl     String?
+  lifecycle   String     @default("production")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Incident    Incident[]
+  User        User?      @relation(fields: [ownerId], references: [id])
+}
+
+model Tenant {
+  id              String            @id @default(cuid())
+  name            String
+  slug            String            @unique
+  createdAt       DateTime          @default(now())
+  Contract        Contract[]
+  Environment     Environment[]
+  Invoice         Invoice[]
+  Lead            Lead[]
+  Project         Project[]
+  WebhookEndpoint WebhookEndpoint[]
+}
+
+model TimeEntry {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  date        DateTime
+  hours       Float
+  description String?
+  billable    Boolean  @default(true)
+  invoiceId   String?
+  createdAt   DateTime @default(now())
+  Invoice     Invoice? @relation(fields: [invoiceId], references: [id])
+  User        User     @relation(fields: [userId], references: [id])
+  Project     Project  @relation(fields: [projectId], references: [id])
+}
+
+model User {
+  id               String             @id @default(cuid())
+  email            String             @unique
+  name             String?
+  passwordHash     String?
+  mfaSecret        String?
+  tenantId         String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  Assignment       Assignment[]
+  Incident         Incident[]
+  JitAccessRequest JitAccessRequest[]
+  ProposalApproval ProposalApproval[]
+  RoleAssignment   RoleAssignment[]
+  Service          Service[]
+  TimeEntry        TimeEntry[]
+  Content          Content[]
+}
+
+model Content {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  type        String   @default("post")
+  status      String   @default("draft")
+  content     String?
+  excerpt     String?
+  authorId    String
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  User        User     @relation(fields: [authorId], references: [id])
+
+  @@index([status])
+  @@index([type])
+  @@index([authorId])
+}
+
+model WebhookDelivery {
+  id              String          @id @default(cuid())
+  endpointId      String
+  event           String
+  payload         String
+  status          String
+  statusCode      Int?
+  attempts        Int             @default(1)
+  error           String?
+  createdAt       DateTime        @default(now())
+  WebhookEndpoint WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+}
+
+model WebhookEndpoint {
+  id              String            @id @default(cuid())
+  tenantId        String
+  url             String
+  secret          String?
+  events          String
+  active          Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  WebhookDelivery WebhookDelivery[]
+  Tenant          Tenant            @relation(fields: [tenantId], references: [id])
+}
