@@ -9,55 +9,90 @@
     --font-inter: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-    /* Core palette — Light: Premium Corporate */
-    --background: #FAFBFC; /* Pristine White */
-    --foreground: #0F1419; /* Rich Black (Fortune 500 standard) */
-    --border: #EAECF0; /* Professional Gray */
-    --card: #FFFFFF; /* Pure White Card */
-    --card-foreground: #111827; /* Sophisticated Dark */
+    /* Core palette — Light: Paper & Precision */
+    --background: #FFFFFF; /* Pure White */
+    --foreground: #09090B; /* Zinc 950 */
+    --border: #E4E4E7; /* Zinc 200 */
+    --card: #FFFFFF;
+    --card-foreground: #09090B;
 
-    /* Corporate Amber Primary (AWS/Shopify aesthetic) */
-    --primary: #D97706; /* Premium Amber-Orange */
+    /* Carbon Glass Accent (Electric Blue) */
+    --primary: #2563EB; /* Blue 600 - Readable on white */
     --primary-foreground: #FFFFFF;
 
-    /* Secondary colors for hierarchy */
-    --secondary: #6B7280; /* Professional Gray */
-    --secondary-foreground: #FFFFFF;
-    --muted: #9CA3AF; /* Muted Gray */
-    --muted-foreground: #1F2937; /* Muted Text */
+    /* Secondary colors */
+    --secondary: #F4F4F5; /* Zinc 100 */
+    --secondary-foreground: #18181B; /* Zinc 900 */
+    --muted: #F4F4F5; /* Zinc 100 */
+    --muted-foreground: #71717A; /* Zinc 500 */
 
-    /* Helpers (RGB forms used for subtle glows and overlays) */
-    --primary-rgb: 217 119 6; /* 217,119,6 */
-    --grid-rgb: 234 236 240; /* #EAECF0 */
-    --background-rgb: 250 251 252; /* #FAFBFC */
-    --foreground-rgb: 15 20 25; /* #0F1419 */
-    --border-rgb: 234 236 240; /* #EAECF0 */
-    --card-rgb: 255 255 255; /* #FFFFFF */
+    --accent: #F4F4F5;
+    --accent-foreground: #18181B;
 
-    /* Focus and rings default to primary */
-    --ring: var(--primary);
+    --destructive: #EF4444;
+    --destructive-foreground: #FAFAFA;
+
+    --ring: #2563EB;
+
+    /* Helper RGBs */
+    --primary-rgb: 37 99 235;
+    --grid-rgb: 9 9 11; /* Dark grid on light for contrast */
+    --background-rgb: 255 255 255;
+    --foreground-rgb: 9 9 11;
+    --border-rgb: 228 228 231;
+    --card-rgb: 255 255 255;
 
     /* Layout tokens */
-    --radius: 0.75rem;
+    --radius: 0.5rem;
     --grid-size: 40px;
-    --grid-opacity-light: 0.05; /* Even more subtle */
-    --grid-opacity-dark: 0.03;
+    --grid-opacity-light: 0.03;
+    --grid-opacity-dark: 0.04;
+
+    /* Surface Elevation Colors */
+    --surface-50: #FAFAFA;
+    --surface-100: #F4F4F5;
+    --surface-200: #E4E4E7;
   }
 
-  /* Dark mode (The Command Center) */
+  /* Dark mode: Carbon Glass */
   .dark {
-    --background: #0F1417; /* Deep Obsidian (slightly lighter for premium feel) */
-    --foreground: #F2F4F7; /* Warm White */
-    --card: #1A1F2E; /* Sophisticated Carbon */
-    --card-foreground: #F2F4F7;
-    --border: #2D3748; /* Professional Dark Border */
-    --grid-rgb: 255 255 255; /* white for subtle grid */
+    --background: #050505; /* Near Black */
+    --foreground: #FAFAFA; /* Zinc 50 */
 
-    /* RGB counterparts for alpha utilities */
-    --background-rgb: 15 20 23; /* #0F1417 */
-    --foreground-rgb: 242 244 247; /* #F2F4F7 */
-    --border-rgb: 45 55 72; /* #2D3748 */
-    --card-rgb: 26 31 46; /* #1A1F2E */
+    --card: #0A0A0A; /* Slightly elevated */
+    --card-foreground: #FAFAFA;
+
+    --border: #27272A; /* Zinc 800 */
+
+    --primary: #3B82F6; /* Blue 500 - Electric */
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #27272A; /* Zinc 800 */
+    --secondary-foreground: #FAFAFA;
+
+    --muted: #27272A;
+    --muted-foreground: #A1A1AA; /* Zinc 400 */
+
+    --accent: #27272A;
+    --accent-foreground: #FAFAFA;
+
+    --destructive: #7F1D1D;
+    --destructive-foreground: #FAFAFA;
+
+    --ring: #3B82F6;
+
+    /* RGB counterparts */
+    --primary-rgb: 59 130 246;
+    --grid-rgb: 255 255 255;
+    --background-rgb: 5 5 5;
+    --foreground-rgb: 250 250 250;
+    --border-rgb: 39 39 42;
+    --card-rgb: 10 10 10;
+
+    /* Surface Elevation Colors */
+    --surface-50: #0A0A0A;
+    --surface-100: #171717;
+    --surface-200: #262626;
   }
 
   /* System Layer: living grid + faint signal glows */
@@ -70,20 +105,19 @@
     background-image:
       linear-gradient(transparent 1px, rgba(var(--grid-rgb), var(--grid-opacity-light)) 1px),
       linear-gradient(90deg, transparent 1px, rgba(var(--grid-rgb), var(--grid-opacity-light)) 1px),
-      radial-gradient(circle at 20% 15%, rgba(var(--primary-rgb), 0.06), transparent 30%),
-      radial-gradient(circle at 80% 85%, rgba(var(--primary-rgb), 0.03), transparent 30%);
+      radial-gradient(circle at 20% 15%, rgba(var(--primary-rgb), 0.04), transparent 40%),
+      radial-gradient(circle at 80% 85%, rgba(var(--primary-rgb), 0.02), transparent 40%);
     background-size: var(--grid-size) var(--grid-size), var(--grid-size) var(--grid-size), cover, cover;
     background-position: 0 0, 0 0, 0 0, 0 0;
     mix-blend-mode: normal;
-    opacity: 1;
   }
 
   .dark .system-layer {
     background-image:
       linear-gradient(transparent 1px, rgba(var(--grid-rgb), var(--grid-opacity-dark)) 1px),
       linear-gradient(90deg, transparent 1px, rgba(var(--grid-rgb), var(--grid-opacity-dark)) 1px),
-      radial-gradient(circle at 20% 15%, rgba(var(--primary-rgb), 0.04), transparent 30%),
-      radial-gradient(circle at 80% 85%, rgba(var(--primary-rgb), 0.02), transparent 30%);
+      radial-gradient(circle at 20% 15%, rgba(var(--primary-rgb), 0.08), transparent 40%),
+      radial-gradient(circle at 80% 85%, rgba(var(--primary-rgb), 0.04), transparent 40%);
   }
 
   /* Precision utilities and component tokens */
@@ -91,45 +125,50 @@
     @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50;
   }
   .btn-precision:focus-visible {
-    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1), 0 0 0 1.5px var(--primary);
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
   }
 
   .card-precision {
-    @apply rounded-lg border bg-card text-card-foreground;
+    @apply rounded-xl border bg-card text-card-foreground;
     box-shadow: 
-      0 1px 3px rgba(var(--foreground-rgb), 0.08),
-      0 4px 12px rgba(var(--foreground-rgb), 0.06);
-    border-width: 1px;
+      0 0 0 1px rgba(0,0,0,0.03),
+      0 2px 8px -2px rgba(0,0,0,0.04);
     border-color: var(--border);
   }
+
   .dark .card-precision {
+    background: rgba(10, 10, 10, 0.6);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-left: 1px solid rgba(255, 255, 255, 0.03);
+    border-right: 1px solid rgba(255, 255, 255, 0.03);
     box-shadow: 
-      0 1px 3px rgba(0, 0, 0, 0.3),
-      0 4px 12px rgba(0, 0, 0, 0.2),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
+      0 0 0 1px rgba(0,0,0,0.2),
+      0 4px 20px -4px rgba(0,0,0,0.4),
+      inset 0 1px 0 0 rgba(255,255,255,0.05);
   }
 
   .input-precision {
-    @apply rounded-md border px-3 py-2 text-sm bg-background border-border focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-150;
+    @apply rounded-md border px-3 py-2 text-sm bg-transparent border-border file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-150;
   }
   .input-precision:focus-visible {
-    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1), 0 0 0 1.5px var(--primary);
+    @apply ring-1 ring-ring border-ring;
   }
 
-  /* Refined sheen for hero & covers (corporate) */
+  /* Refined sheen for hero & covers (Carbon Glass) */
   .signal-sheen {
     @apply relative overflow-hidden isolate transition-all duration-500;
   }
   .signal-sheen::before {
     content: "";
     @apply absolute inset-0 -z-10 opacity-0 transition-opacity duration-500;
-    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--primary-rgb), 0.12), transparent 40%);
+    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--primary-rgb), 0.15), transparent 40%);
   }
   .signal-sheen::after {
     content: "";
     @apply absolute inset-0 -z-10 opacity-0 transition-opacity duration-500;
-    background: linear-gradient(120deg, transparent 30%, rgba(var(--primary-rgb), 0.08) 45%, rgba(var(--primary-rgb), 0.12) 50%, rgba(var(--primary-rgb), 0.08) 55%, transparent 70%);
+    background: linear-gradient(120deg, transparent 30%, rgba(var(--primary-rgb), 0.1) 45%, rgba(var(--primary-rgb), 0.15) 50%, rgba(var(--primary-rgb), 0.1) 55%, transparent 70%);
     background-size: 200% 200%;
     background-position: 100% 0;
   }
@@ -140,15 +179,5 @@
 
   .text-balance {
     text-wrap: balance;
-  }
-
-  /* Reduced motion policy */
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
   }
 }

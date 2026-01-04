@@ -16,7 +16,7 @@ function FeaturedWorkCard({ project }: { project: (typeof siteConfig.featuredWor
       <motion.div
         ref={ref}
         layoutId={`cover-${project.slug}`}
-        className="relative overflow-hidden rounded-2xl aspect-[4/3] mb-6 glass-card [transform-style:preserve-3d] [--tilt-x:0deg] [--tilt-y:0deg] [--card-scale:1] [--card-lift:0px] [--spot-x:50%] [--spot-y:50%] group-hover:[--card-scale:1.02] group-hover:[--card-lift:-8px] transition-all duration-500 signal-sheen shadow-lg-premium"
+        className="relative overflow-hidden rounded-2xl aspect-[4/3] mb-6 card-precision [transform-style:preserve-3d] [--tilt-x:0deg] [--tilt-y:0deg] [--card-scale:1] [--card-lift:0px] [--spot-x:50%] [--spot-y:50%] group-hover:[--card-scale:1.02] group-hover:[--card-lift:-8px] transition-all duration-500 signal-sheen"
         style={{
           transform:
             "perspective(900px) translateY(var(--card-lift)) scale(var(--card-scale)) rotateX(var(--tilt-x)) rotateY(var(--tilt-y))",
@@ -41,26 +41,26 @@ function FeaturedWorkCard({ project }: { project: (typeof siteConfig.featuredWor
           />
         </div>
         <div className="absolute inset-0 p-6 flex flex-col justify-between">
-          <div className="self-end p-2 bg-[rgba(var(--foreground-rgb),0.4)] backdrop-blur-md rounded-full border border-border/20 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-            <ArrowRight className="text-card-foreground h-5 w-5" />
+          <div className="self-end p-2 bg-background/40 backdrop-blur-md rounded-full border border-border/20 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+            <ArrowRight className="text-foreground h-5 w-5" />
           </div>
           <div className="space-y-3">
-            <motion.h3 layoutId={`title-${project.slug}`} className="text-2xl font-bold text-card-foreground tracking-tight drop-shadow-md">
+            <motion.h3 layoutId={`title-${project.slug}`} className="text-2xl font-bold text-foreground tracking-tight drop-shadow-md">
               {project.title}
             </motion.h3>
-            <div className="rounded-xl bg-[rgba(var(--foreground-rgb),0.5)] border border-border/10 backdrop-blur-md px-4 py-3 text-xs text-card-foreground/90 space-y-2 shadow-lg">
+            <div className="rounded-xl bg-background/50 border border-border/10 backdrop-blur-md px-4 py-3 text-xs text-foreground/90 space-y-2 shadow-lg">
               <div className="flex items-center justify-between gap-3">
-                <span className="uppercase tracking-[0.2em] text-card-foreground/60 font-medium">Outcome</span>
+                <span className="uppercase tracking-[0.2em] text-muted-foreground font-medium">Outcome</span>
                 <span className="text-right font-medium">{project.outcome}</span>
               </div>
-              <div className="h-px bg-white/10 w-full" />
+              <div className="h-px bg-border/20 w-full" />
               <div className="flex items-center justify-between gap-3">
-                <span className="uppercase tracking-[0.2em] text-card-foreground/60 font-medium">Constraint</span>
+                <span className="uppercase tracking-[0.2em] text-muted-foreground font-medium">Constraint</span>
                 <span className="text-right line-clamp-1 font-medium">{project.constraints}</span>
               </div>
-              <div className="h-px bg-white/10 w-full" />
+              <div className="h-px bg-border/20 w-full" />
               <div className="flex items-center justify-between gap-3">
-                <span className="uppercase tracking-[0.2em] text-card-foreground/60 font-medium">Role</span>
+                <span className="uppercase tracking-[0.2em] text-muted-foreground font-medium">Role</span>
                 <span className="font-medium">{project.role}</span>
               </div>
             </div>

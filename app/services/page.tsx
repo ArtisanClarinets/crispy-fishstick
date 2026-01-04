@@ -91,7 +91,7 @@ export default function ServicesPage() {
             return (
               <div
                 key={service.title}
-                className="group glass-card surface-rim rounded-3xl p-8 sm:p-10 hover:border-foreground/20 transition-all duration-300 hover:shadow-lg"
+                className="group card-precision rounded-3xl p-8 sm:p-10 hover:border-primary/20 transition-all duration-300 hover:shadow-lg-premium"
               >
                 <div className="mb-6">
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-secondary group-hover:bg-foreground/5 transition-colors">

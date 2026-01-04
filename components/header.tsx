@@ -40,18 +40,18 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-500",
+        "fixed top-0 w-full z-50 transition-all duration-500 border-b border-transparent",
         isScrolled
-          ? "bg-background/60 backdrop-blur-xl border-b border-border/5 shadow-sm supports-[backdrop-filter]:bg-background/60"
+          ? "bg-background/80 backdrop-blur-md border-border/40 shadow-sm"
           : "bg-transparent"
       )}
     >
-      <div className="container flex h-20 items-center justify-between">
+      <div className="container flex h-16 items-center justify-between">
         <VTLink
             href="/"
             className="text-lg font-bold tracking-tight transition-opacity hover:opacity-80 flex items-center gap-2"
         >
-          <div className="w-3 h-3 rounded-full bg-primary animate-pulse-slow" />
+          <div className="w-2 h-2 rounded-full bg-primary animate-pulse-slow shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)]" />
           {siteConfig.company}
         </VTLink>
 
@@ -61,14 +61,14 @@ export function Header() {
             <VTLink
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors link-precision"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {link.label}
             </VTLink>
           ))}
           {/* Desktop toggle — use data-testid so tests can target this specific instance */}
           <ThemeToggle data-testid="theme-toggle-desktop" />
-          <Button asChild variant="default" className="rounded-full px-6 signal-sheen">
+          <Button asChild variant="default" className="rounded-full px-5 h-9 text-sm signal-sheen shadow-lg shadow-primary/20">
             <VTLink href={siteConfig.cta.primary.href}>
               {siteConfig.cta.primary.text}
             </VTLink>

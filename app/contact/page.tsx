@@ -151,7 +151,7 @@ export default function ContactPage() {
             </p>
          </div>
 
-        <Card className="border-border/50 shadow-2xl shadow-primary/5">
+        <Card className="card-precision border-border/50 shadow-2xl shadow-primary/5">
           <CardHeader className="space-y-1 pb-8 border-b border-border/50">
              <div className="flex gap-2 mb-4">
                 {[1, 2, 3].map((i) => (
