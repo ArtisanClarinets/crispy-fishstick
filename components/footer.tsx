@@ -30,7 +30,7 @@ export function Footer() {
       <div className="container py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="md:col-span-2 space-y-6">
-            <h3 className="text-xl font-bold tracking-tight">Copper & Code</h3>
+            <h3 className="text-xl font-bold tracking-tight">Vantus Systems</h3>
             <p className="text-muted-foreground max-w-sm leading-relaxed text-sm">
               Engineering rigorous, high-trust digital systems.
               Built on principles of clarity, reliability, and performance.

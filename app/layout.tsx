@@ -16,8 +16,8 @@ import { ErrorBoundary } from "@/components/error-boundary";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://thompsonsystems.com"),
   title: {
-    default: "Copper & Code | Digital Alchemy",
-    template: "%s | Copper & Code",
+    default: "Vantus Systems | Digital Alchemy",
+    template: "%s | Vantus Systems",
   },
   description:
     "A specialized engineering lab demonstrating production-grade quality, rigorous systems, and refined digital craftsmanship.",
@@ -29,21 +29,21 @@ export const metadata: Metadata = {
     "TypeScript",
     "High-Performance",
     "Design Engineering",
-    "Copper & Code",
+    "Vantus Systems",
   ],
   authors: [{ name: "Dylan Thompson" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://copperandcode.com",
-    title: "Copper & Code",
+    url: "https://vantussystems.com",
+    title: "Vantus Systems",
     description:
       "Digital Alchemy & Engineering Precision. Production-grade quality from day one.",
-    siteName: "Copper & Code",
+    siteName: "Vantus Systems",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Copper & Code",
+    title: "Vantus Systems",
   },
   robots: {
     index: true,

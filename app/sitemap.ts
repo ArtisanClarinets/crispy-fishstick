@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/trust',
     '/contact',
     '/lab/revenue-leak',
+    '/lab/server-config',
   ];
 
   const workRoutes = siteConfig.featuredWork.map((project) => `/work/${project.slug}`);

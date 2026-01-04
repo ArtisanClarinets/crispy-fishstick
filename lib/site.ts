@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "Dylan Thompson",
-  company: "Copper & Code",
+  company: "Vantus Systems",
   tagline: "Digital Alchemy & Engineering Precision",
   description:
     "A specialized engineering lab demonstrating production-grade quality, rigorous systems, and refined digital craftsmanship.",
-  email: "hello@copperandcode.com",
+  email: "hello@vantussystems.com",
   links: {
     github: null,
     linkedin: null,

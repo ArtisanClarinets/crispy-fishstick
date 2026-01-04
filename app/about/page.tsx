@@ -7,7 +7,7 @@ import { SplitText } from "@/components/react-bits/SplitText";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "The philosophy and background behind Copper & Code.",
+  description: "The philosophy and background behind Vantus Systems.",
 };
 
 export default function AboutPage() {
