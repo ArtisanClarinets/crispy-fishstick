@@ -178,7 +178,7 @@ export function ConsoleHud() {
 
             {/* Bottom Bar */}
             <div
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-4 py-1.5 rounded-full bg-background/50 backdrop-blur border border-white/5 shadow-sm whitespace-nowrap"
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-4 py-1.5 rounded-full bg-background/50 backdrop-blur border border-border/5 shadow-sm whitespace-nowrap"
             >
               <span>BUILD: {audit.buildOk ? "VERIFIED" : "UNVERIFIED"}</span>
               <span className="text-border">|</span>

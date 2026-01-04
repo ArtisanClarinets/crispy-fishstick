@@ -178,7 +178,7 @@ export function ExecutionProtocol({ steps }: ExecutionProtocolProps) {
                        {/* Artifact Pill */}
                         <div className="flex flex-wrap gap-2">
                            {step.artifacts.map((art, i) => (
-                              <div key={i} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/50 border border-white/5 text-xs font-mono text-secondary-foreground whitespace-nowrap">
+                              <div key={i} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/50 border border-border/5 text-xs font-mono text-secondary-foreground whitespace-nowrap">
                                  {art.kind === "DOC" && <FileText className="w-3.5 h-3.5 opacity-70" />}
                                  {art.kind === "LOG" && <FileJson className="w-3.5 h-3.5 opacity-70" />}
                                  {art.kind === "HASH" && <Hash className="w-3.5 h-3.5 opacity-70" />}
@@ -190,7 +190,7 @@ export function ExecutionProtocol({ steps }: ExecutionProtocolProps) {
                     </div>
 
                     {/* Console/Terminal Output */}
-                    <div className="bg-black/90 rounded-md p-4 font-mono text-xs md:text-sm text-emerald-400 border border-white/5 shadow-inner">
+                    <div className="bg-[rgba(var(--foreground-rgb),0.9)] rounded-md p-4 font-mono text-xs md:text-sm text-emerald-400 border border-border/5 shadow-inner">
                        <ul className="space-y-2">
                           {step.commands.map((cmd, i) => (
                              <li key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-1">
@@ -223,7 +223,7 @@ export function ExecutionProtocol({ steps }: ExecutionProtocolProps) {
                     <div
                         id={`meta-${step.id}`}
                         className={cn(
-                           "grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-dashed border-white/10 transition-all duration-500 overflow-hidden",
+                           "grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-dashed border-border/10 transition-all duration-500 overflow-hidden",
                            isInspected ? "opacity-100 max-h-40" : "opacity-0 max-h-0 pt-0 border-t-0 mt-0 md:opacity-0 md:max-h-0 md:group-hover:opacity-100 md:group-hover:max-h-40 md:group-hover:pt-6 md:group-hover:border-t md:group-hover:mt-6"
                         )}
                     >

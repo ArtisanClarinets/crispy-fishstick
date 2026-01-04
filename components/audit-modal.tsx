@@ -143,7 +143,7 @@ export function AuditModal() {
       if (!val) setTimeout(reset, 300) // Reset after close animation
     }}>
       <DialogTrigger asChild>
-        <Button size="lg" className="rounded-full px-8 h-14 text-lg animate-pulse hover:animate-none shadow-lg shadow-primary/20 copper-sheen">
+        <Button size="lg" className="rounded-full px-8 h-14 text-lg animate-pulse hover:animate-none shadow-lg shadow-primary/20 signal-sheen">
           Get a 60-second audit
         </Button>
       </DialogTrigger>

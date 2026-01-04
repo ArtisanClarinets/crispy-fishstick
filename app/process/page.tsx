@@ -152,7 +152,7 @@ export default function ProcessPage() {
         <ExecutionProtocol steps={protocolSteps} />
 
         {/* CTA */}
-        <div className="mt-32 md:mt-48 text-center border-t border-white/5 pt-20">
+        <div className="mt-32 md:mt-48 text-center border-t border-border/5 pt-20">
           <h2 className="text-2xl font-bold mb-4 tracking-tight">
             Ready to initialize?
           </h2>

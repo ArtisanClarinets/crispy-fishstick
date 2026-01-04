@@ -12,7 +12,7 @@ export function ShopifySyncDiagram() {
           Live Flow
         </div>
       </div>
-      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-background via-background/80 to-secondary/30">
+      <div className="relative overflow-hidden rounded-xl border border-border/10 bg-gradient-to-br from-background via-background/80 to-secondary/30">
         <svg viewBox="0 0 760 260" className="w-full h-auto text-sm font-mono">
           <defs>
             <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
