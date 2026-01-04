@@ -65,7 +65,7 @@ export function CoverArt({ slug, className, imageSrc, priority = false, sizes }:
             <stop offset="100%" stopColor={`hsl(${spec.palette.accentHue} 80% 70% / ${spec.accentIntensity})`} />
           </linearGradient>
           <radialGradient id={`plate-${safeId}`} cx="50%" cy="35%" r="60%">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.12)" />
+            <stop offset="0%" stopColor="rgba(var(--card-rgb),0.12)" />
             <stop offset="100%" stopColor="rgba(255,255,255,0)" />
           </radialGradient>
           <linearGradient id={`rim-${safeId}`} x1="0" y1="0" x2="1" y2="1">
@@ -126,18 +126,18 @@ export function CoverArt({ slug, className, imageSrc, priority = false, sizes }:
       </svg>
 
       {/* Accent rim + grain */}
-      <div className="absolute inset-6 rounded-[28px] border border-white/10 shadow-[inset_0_0_40px_rgba(255,255,255,0.08)] pointer-events-none" />
+      <div className="absolute inset-6 rounded-[28px] border border-border/10 shadow-[inset_0_0_40px_rgba(var(--card-rgb),0.08)] pointer-events-none" />
       <div
         className="absolute inset-0 pointer-events-none opacity-70"
         style={{
           background:
-            "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.2), transparent 60%)",
+            "radial-gradient(circle at 50% 40%, rgba(var(--card-rgb),0.2), transparent 60%)",
         }}
       />
       <div
         className="absolute inset-0 pointer-events-none opacity-70 mix-blend-screen"
         style={{
-          background: `radial-gradient(circle at ${50 + spec.highlightOffset}% ${38}%, rgba(255,255,255,0.5), transparent 45%)`,
+          background: `radial-gradient(circle at ${50 + spec.highlightOffset}% ${38}%, rgba(var(--card-rgb),0.5), transparent 45%)`,
         }}
       />
       <div

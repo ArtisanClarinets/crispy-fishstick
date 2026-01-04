@@ -37,7 +37,7 @@ export function WorkDetailHero({
         <CoverArt slug={slug} imageSrc={coverImage} priority sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-6 border border-white/10 rounded-[32px]" />
+          <div className="absolute inset-6 border border-border/10 rounded-[32px]" />
           <div className="absolute inset-6 rounded-[32px] bg-gradient-to-b from-white/10 via-transparent to-transparent" />
           <div className="absolute top-10 left-10 h-3 w-16 bg-white/60 blur-sm opacity-40" />
           <div className="absolute top-12 right-16 h-2 w-10 bg-white/50 blur-sm opacity-40" />
@@ -62,7 +62,7 @@ export function WorkDetailHero({
           >
             {title}
           </motion.h1>
-          <span aria-hidden="true" className="absolute left-0 top-0 -z-10 text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white/10 blur-sm">
+          <span aria-hidden="true" className="absolute left-0 top-0 -z-10 text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-card-foreground/10 blur-sm">
             {title}
           </span>
         </div>
@@ -74,7 +74,7 @@ export function WorkDetailHero({
         </Reveal>
 
         <Reveal delay={0.15}>
-          <div className="mt-6 inline-flex flex-wrap gap-3 rounded-2xl bg-background/70 border border-white/10 backdrop-blur-md px-5 py-4 text-sm text-foreground/90">
+          <div className="mt-6 inline-flex flex-wrap gap-3 rounded-2xl bg-background/70 border border-border/10 backdrop-blur-md px-5 py-4 text-sm text-foreground/90">
             {role ? (
               <div className="flex items-center gap-2">
                 <span className="uppercase tracking-[0.28em] text-muted-foreground text-xs">Role</span>

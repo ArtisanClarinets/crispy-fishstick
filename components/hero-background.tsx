@@ -25,7 +25,7 @@ export function HeroBackground() {
       <div 
         className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full blur-[100px] opacity-20 dark:opacity-10 animate-aurora-1"
         style={{
-          background: "radial-gradient(circle, hsl(var(--brand-copper)) 0%, transparent 70%)",
+          background: `radial-gradient(circle, rgba(var(--primary-rgb), 0.12) 0%, transparent 70%)`,
         }}
       />
 
@@ -33,7 +33,7 @@ export function HeroBackground() {
       <div 
         className="absolute top-[10%] right-[0%] w-[60vw] h-[60vw] rounded-full blur-[120px] opacity-10 dark:opacity-20 animate-aurora-2 mix-blend-color-dodge"
         style={{
-          background: "radial-gradient(circle, hsl(var(--brand-patina)) 0%, transparent 70%)",
+          background: `radial-gradient(circle, rgba(var(--primary-rgb), 0.06) 0%, transparent 70%)`,
         }}
       />
 
@@ -49,7 +49,7 @@ export function HeroBackground() {
       <div 
         className="absolute top-[40%] left-[40%] w-[40vw] h-[40vw] rounded-full blur-[80px] opacity-20 dark:opacity-10 animate-pulse-slow mix-blend-screen"
         style={{
-          background: "radial-gradient(circle, hsl(var(--brand-copper-hi)) 0%, transparent 70%)",
+          background: `radial-gradient(circle, rgba(var(--primary-rgb), 0.2) 0%, transparent 70%)`,
         }}
       />
     </div>

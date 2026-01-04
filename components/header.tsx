@@ -41,7 +41,7 @@ export function Header() {
       className={cn(
         "fixed top-0 w-full z-50 transition-all duration-500",
         isScrolled
-          ? "bg-background/60 backdrop-blur-xl border-b border-white/5 shadow-sm supports-[backdrop-filter]:bg-background/60"
+          ? "bg-background/60 backdrop-blur-xl border-b border-border/5 shadow-sm supports-[backdrop-filter]:bg-background/60"
           : "bg-transparent"
       )}
     >
@@ -67,7 +67,7 @@ export function Header() {
           ))}
           {/* Desktop toggle — use data-testid so tests can target this specific instance */}
           <ThemeToggle data-testid="theme-toggle-desktop" />
-          <Button asChild variant="default" className="rounded-full px-6 copper-sheen">
+          <Button asChild variant="default" className="rounded-full px-6 signal-sheen">
             <VTLink href={siteConfig.cta.primary.href}>
               {siteConfig.cta.primary.text}
             </VTLink>

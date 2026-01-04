@@ -12,7 +12,7 @@
   - Added `--brand-copper`, `--brand-patina`, `--brand-brass` palette.
   - Re-mapped shadcn semantic tokens (`primary`, `secondary`, `accent`) to the new palette.
 - **Interaction Design**:
-  - Implemented `.copper-sheen` CSS utility for metallic hover effects.
+  - Implemented `.signal-sheen` CSS utility for signal hover effects (Vantus).
   - Applied hover-only 3D tilt interactions to featured work cards.
   - Added reduced motion support via `@media (prefers-reduced-motion: reduce)`.
 - **System Layer**: Updated route-specific ambient tones (Copper for Home, Patina for Work, Graphite for Contact).

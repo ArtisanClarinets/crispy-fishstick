@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Vantus Theme — Single Source of Truth */
+@layer base {
+  :root {
+    /* Fonts */
+    --font-inter: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+    /* Core palette — Light: Premium Corporate */
+    --background: #FAFBFC; /* Pristine White */
+    --foreground: #0F1419; /* Rich Black (Fortune 500 standard) */
+    --border: #EAECF0; /* Professional Gray */
+    --card: #FFFFFF; /* Pure White Card */
+    --card-foreground: #111827; /* Sophisticated Dark */
+
+    /* Corporate Amber Primary (AWS/Shopify aesthetic) */
+    --primary: #D97706; /* Premium Amber-Orange */
+    --primary-foreground: #FFFFFF;
+
+    /* Secondary colors for hierarchy */
+    --secondary: #6B7280; /* Professional Gray */
+    --secondary-foreground: #FFFFFF;
+    --muted: #9CA3AF; /* Muted Gray */
+    --muted-foreground: #1F2937; /* Muted Text */
+
+    /* Helpers (RGB forms used for subtle glows and overlays) */
+    --primary-rgb: 217 119 6; /* 217,119,6 */
+    --grid-rgb: 234 236 240; /* #EAECF0 */
+    --background-rgb: 250 251 252; /* #FAFBFC */
+    --foreground-rgb: 15 20 25; /* #0F1419 */
+    --border-rgb: 234 236 240; /* #EAECF0 */
+    --card-rgb: 255 255 255; /* #FFFFFF */
+
+    /* Focus and rings default to primary */
+    --ring: var(--primary);
+
+    /* Layout tokens */
+    --radius: 0.75rem;
+    --grid-size: 40px;
+    --grid-opacity-light: 0.05; /* Even more subtle */
+    --grid-opacity-dark: 0.03;
+  }
+
+  /* Dark mode (The Command Center) */
+  .dark {
+    --background: #0F1417; /* Deep Obsidian (slightly lighter for premium feel) */
+    --foreground: #F2F4F7; /* Warm White */
+    --card: #1A1F2E; /* Sophisticated Carbon */
+    --card-foreground: #F2F4F7;
+    --border: #2D3748; /* Professional Dark Border */
+    --grid-rgb: 255 255 255; /* white for subtle grid */
+
+    /* RGB counterparts for alpha utilities */
+    --background-rgb: 15 20 23; /* #0F1417 */
+    --foreground-rgb: 242 244 247; /* #F2F4F7 */
+    --border-rgb: 45 55 72; /* #2D3748 */
+    --card-rgb: 26 31 46; /* #1A1F2E */
+  }
+
+  /* System Layer: living grid + faint signal glows */
+  .system-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+
+    background-image:
+      linear-gradient(transparent 1px, rgba(var(--grid-rgb), var(--grid-opacity-light)) 1px),
+      linear-gradient(90deg, transparent 1px, rgba(var(--grid-rgb), var(--grid-opacity-light)) 1px),
+      radial-gradient(circle at 20% 15%, rgba(var(--primary-rgb), 0.06), transparent 30%),
+      radial-gradient(circle at 80% 85%, rgba(var(--primary-rgb), 0.03), transparent 30%);
+    background-size: var(--grid-size) var(--grid-size), var(--grid-size) var(--grid-size), cover, cover;
+    background-position: 0 0, 0 0, 0 0, 0 0;
+    mix-blend-mode: normal;
+    opacity: 1;
+  }
+
+  .dark .system-layer {
+    background-image:
+      linear-gradient(transparent 1px, rgba(var(--grid-rgb), var(--grid-opacity-dark)) 1px),
+      linear-gradient(90deg, transparent 1px, rgba(var(--grid-rgb), var(--grid-opacity-dark)) 1px),
+      radial-gradient(circle at 20% 15%, rgba(var(--primary-rgb), 0.04), transparent 30%),
+      radial-gradient(circle at 80% 85%, rgba(var(--primary-rgb), 0.02), transparent 30%);
+  }
+
+  /* Precision utilities and component tokens */
+  .btn-precision {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-precision:focus-visible {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1), 0 0 0 1.5px var(--primary);
+  }
+
+  .card-precision {
+    @apply rounded-lg border bg-card text-card-foreground;
+    box-shadow: 
+      0 1px 3px rgba(var(--foreground-rgb), 0.08),
+      0 4px 12px rgba(var(--foreground-rgb), 0.06);
+    border-width: 1px;
+    border-color: var(--border);
+  }
+  .dark .card-precision {
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+  }
+
+  .input-precision {
+    @apply rounded-md border px-3 py-2 text-sm bg-background border-border focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-150;
+  }
+  .input-precision:focus-visible {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1), 0 0 0 1.5px var(--primary);
+  }
+
+  /* Refined sheen for hero & covers (corporate) */
+  .signal-sheen {
+    @apply relative overflow-hidden isolate transition-all duration-500;
+  }
+  .signal-sheen::before {
+    content: "";
+    @apply absolute inset-0 -z-10 opacity-0 transition-opacity duration-500;
+    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--primary-rgb), 0.12), transparent 40%);
+  }
+  .signal-sheen::after {
+    content: "";
+    @apply absolute inset-0 -z-10 opacity-0 transition-opacity duration-500;
+    background: linear-gradient(120deg, transparent 30%, rgba(var(--primary-rgb), 0.08) 45%, rgba(var(--primary-rgb), 0.12) 50%, rgba(var(--primary-rgb), 0.08) 55%, transparent 70%);
+    background-size: 200% 200%;
+    background-position: 100% 0;
+  }
+  .signal-sheen:hover::before,
+  .signal-sheen:hover::after {
+    @apply opacity-100;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Reduced motion policy */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

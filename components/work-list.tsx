@@ -15,7 +15,7 @@ function WorkCard({ project }: { project: (typeof siteConfig.featuredWork)[0] })
     <VTLink href={`/work/${project.slug}`} className="block w-full" disableViewTransition>
       <div
         ref={ref}
-        className="rounded-2xl border border-white/10 bg-card/50 backdrop-blur-sm overflow-hidden card-precision [transform-style:preserve-3d] [--tilt-x:0deg] [--tilt-y:0deg] [--card-scale:1] [--card-lift:0px] [--spot-x:50%] [--spot-y:50%] group-hover:[--card-scale:1.015] group-hover:[--card-lift:-4px] transition-transform duration-500"
+        className="rounded-2xl border border-border/10 bg-card/50 backdrop-blur-sm overflow-hidden card-precision [transform-style:preserve-3d] [--tilt-x:0deg] [--tilt-y:0deg] [--card-scale:1] [--card-lift:0px] [--spot-x:50%] [--spot-y:50%] group-hover:[--card-scale:1.015] group-hover:[--card-lift:-4px] transition-all duration-500 shadow-premium hover:shadow-lg-premium"
         style={{
           transform:
             "perspective(900px) translateY(var(--card-lift)) scale(var(--card-scale)) rotateX(var(--tilt-x)) rotateY(var(--tilt-y))",
