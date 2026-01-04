@@ -36,6 +36,9 @@ export interface CoverSpec {
   }>;
   grainSeed: number;
   accentIntensity: number;
+  highlightOffset: number;
+  distortion: number;
+  shimmerAngle: number;
 }
 
 const SPEC_CACHE = new Map<string, CoverSpec>();
@@ -113,6 +116,9 @@ export function getCoverSpec(slug: string): CoverSpec {
     rings,
     grainSeed: seed,
     accentIntensity: range(rng, 0.35, 0.8),
+    highlightOffset: range(rng, 12, 38),
+    distortion: range(rng, 0.01, 0.035),
+    shimmerAngle: range(rng, -20, 25),
   };
 
   SPEC_CACHE.set(slug, spec);

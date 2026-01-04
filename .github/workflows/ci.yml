@@ -44,6 +44,11 @@ jobs:
 
   lighthouse:
     runs-on: ubuntu-latest
+    needs: [lint, test, e2e]
+    env:
+      PROOF_GATE_LINT: ${{ needs.lint.result }}
+      PROOF_GATE_TEST: ${{ needs.test.result }}
+      PROOF_GATE_E2E: ${{ needs.e2e.result }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

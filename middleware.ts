@@ -13,10 +13,14 @@ export function middleware(request: Request) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
 
+  // Note: 'unsafe-eval' is often required for development (HMR) and some libraries.
+  // We remove 'unsafe-inline' for scripts to strictly enforce nonce usage.
+  const scriptSrc = `script-src 'self' 'nonce-${nonce}' 'unsafe-eval'`;
+
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https:`,
-    "style-src 'self' 'unsafe-inline'",
+    scriptSrc,
+    "style-src 'self' 'unsafe-inline'", // 'unsafe-inline' required for CSS-in-JS/Framer Motion style attributes
     "img-src 'self' data:",
     "font-src 'self' data:",
     "connect-src 'self'",

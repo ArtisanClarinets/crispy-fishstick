@@ -3,10 +3,11 @@ import { siteConfig } from "@/lib/site";
 import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { SplitText } from "@/components/react-bits/SplitText";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "The philosophy and background behind Thompson Systems.",
+  description: "The philosophy and background behind Copper & Code.",
 };
 
 export default function AboutPage() {
@@ -14,7 +15,7 @@ export default function AboutPage() {
     <div className="min-h-screen py-24 container px-4 md:px-6 max-w-4xl mx-auto" data-system-tone="about">
       <Reveal>
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-8">
-           Not a generic agency. <br/>
+           <SplitText text="Not a generic agency." delay={0.1} /> <br/>
            <span className="text-muted-foreground">A dedicated engineering partner.</span>
         </h1>
       </Reveal>

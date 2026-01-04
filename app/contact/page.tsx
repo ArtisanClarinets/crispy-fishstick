@@ -8,8 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/components/ui/use-toast";
+import { SplitText } from "@/components/react-bits/SplitText";
 
 export default function ContactPage() {
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -21,6 +24,7 @@ export default function ContactPage() {
     email: "",
     website: "",
     honeypot: "",
+    startedAt: Date.now(),
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -28,11 +32,53 @@ export default function ContactPage() {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
+  const validateStep = (currentStep: number) => {
+    if (currentStep === 1) {
+      if (!formData.name.trim()) return "Please enter your name.";
+      if (!formData.role.trim()) return "Please enter your role.";
+    }
+    if (currentStep === 2) {
+      if (!formData.message.trim()) return "Please describe your project.";
+    }
+    if (currentStep === 3) {
+      if (!formData.email.trim() || !formData.email.includes("@")) return "Please enter a valid email.";
+    }
+    return null;
+  };
+
+  const handleNext = () => {
+    const error = validateStep(step);
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Missing Information",
+        description: error,
+      });
+      return;
+    }
+    setStep((prev) => prev + 1);
+  };
+
+  const handleBack = () => {
+    setStep((prev) => prev - 1);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const error = validateStep(step);
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Missing Information",
+        description: error,
+      });
+      return;
+    }
+
     if (step < 3) {
-        setStep(step + 1);
-        return;
+      handleNext();
+      return;
     }
 
     if (formData.honeypot) {
@@ -56,9 +102,17 @@ export default function ContactPage() {
       }
 
       setIsSuccess(true);
+      toast({
+        title: "Message Sent",
+        description: "We've received your inquiry and will be in touch shortly.",
+      });
     } catch (error) {
       console.error("Submission error:", error);
-      // Optionally handle error UI here
+      toast({
+        variant: "destructive",
+        title: "Submission Failed",
+        description: "Something went wrong. Please try again or email directly.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -88,10 +142,10 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen py-24 container px-4 flex flex-col items-center justify-center" data-system-tone="contact">
+    <div className="min-h-screen py-24 container px-4 flex flex-col items-center justify-center relative">
       <div className="max-w-2xl w-full">
          <div className="mb-12 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Let&apos;s talk engineering.</h1>
+            <SplitText text="Let's talk engineering." className="text-4xl md:text-5xl font-bold tracking-tight mb-4 justify-center" />
             <p className="text-xl text-muted-foreground">
                Tell me about the problem you&apos;re trying to solve.
             </p>
@@ -231,11 +285,16 @@ export default function ContactPage() {
 
               <div className="mt-8 flex justify-between">
                  {step > 1 && (
-                    <Button type="button" variant="ghost" onClick={() => setStep(step - 1)}>
+                    <Button type="button" variant="ghost" onClick={handleBack}>
                        Back
                     </Button>
                  )}
-                 <Button type="submit" size="lg" className="ml-auto rounded-full px-8" disabled={isSubmitting}>
+                 <Button
+                    type="submit"
+                    size="lg"
+                    className="ml-auto rounded-full px-8 relative z-50"
+                    disabled={isSubmitting}
+                 >
                     {isSubmitting ? (
                        <>Please wait <Loader2 className="ml-2 h-4 w-4 animate-spin" /></>
                     ) : step === 3 ? (

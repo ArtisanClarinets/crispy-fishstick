@@ -2,6 +2,8 @@
 
 import { motion, useAnimation, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { useSession } from "@/components/session-provider";
+import { usePathname } from "next/navigation";
 
 interface RevealProps {
   children: React.ReactNode;
@@ -24,14 +26,17 @@ export const Reveal = ({
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const mainControls = useAnimation();
   const prefersReducedMotion = useReducedMotion();
+  const { hasVisited } = useSession();
+  const pathname = usePathname();
+  const shouldAnimate = !hasVisited(pathname);
 
   useEffect(() => {
-    if (isInView) {
+    if (isInView && shouldAnimate) {
       mainControls.start("visible");
     }
-  }, [isInView, mainControls]);
+  }, [isInView, mainControls, shouldAnimate]);
 
-  if (prefersReducedMotion) {
+  if (prefersReducedMotion || !shouldAnimate) {
     return (
       <div ref={ref} style={{ position: "relative", width }} className={className}>
         {children}

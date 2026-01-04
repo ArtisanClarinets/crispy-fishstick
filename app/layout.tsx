@@ -1,30 +1,26 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { Inter } from "next/font/google";
 import { PageTransition } from "@/components/page-transition";
 import { cn } from "@/lib/utils";
 import { SystemLayer } from "@/components/system-layer";
 import { ConsoleHud } from "@/components/console-hud";
 import { RouteTransitionLayer } from "@/components/route-transition-layer";
 import { AppMotionConfig } from "@/components/motion-config";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
+import { Toaster } from "@/components/ui/toaster";
+import { SessionProvider } from "@/components/session-provider";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://thompsonsystems.com"),
   title: {
-    default: "Thompson Systems | High-Trust Engineering",
-    template: "%s | Thompson Systems",
+    default: "Copper & Code | Digital Alchemy",
+    template: "%s | Copper & Code",
   },
   description:
-    "A specialized engineering studio for founders who demand production-grade quality, rigorous systems, and Apple-caliber interfaces.",
+    "A specialized engineering lab demonstrating production-grade quality, rigorous systems, and refined digital craftsmanship.",
   keywords: [
     "Software Engineering",
     "Systems Architecture",
@@ -33,20 +29,21 @@ export const metadata: Metadata = {
     "TypeScript",
     "High-Performance",
     "Design Engineering",
+    "Copper & Code",
   ],
   authors: [{ name: "Dylan Thompson" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://thompsonsystems.com",
-    title: "Thompson Systems",
+    url: "https://copperandcode.com",
+    title: "Copper & Code",
     description:
-      "Engineering for High-Trust Products. Production-grade quality from day one.",
-    siteName: "Thompson Systems",
+      "Digital Alchemy & Engineering Precision. Production-grade quality from day one.",
+    siteName: "Copper & Code",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Thompson Systems",
+    title: "Copper & Code",
   },
   robots: {
     index: true,
@@ -54,19 +51,22 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
+
+import { headers } from "next/headers";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const nonce = headers().get("x-nonce") ?? undefined;
+  const headersList = headers();
+  const nonce = headersList.get("x-nonce") ?? undefined;
+
+  // console.log("ROOT LAYOUT: x-nonce header value:", nonce);
 
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className={cn(
-        inter.variable,
         "font-sans antialiased min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary"
       )}>
         <ThemeProvider
@@ -77,25 +77,30 @@ export default function RootLayout({
           disableTransitionOnChange
           nonce={nonce}
         >
-          <AppMotionConfig>
-            {/* Background system layer (always present) */}
-            <SystemLayer />
+          <SessionProvider>
+            <AppMotionConfig>
+              {/* Background system layer (always present) */}
+              <SystemLayer />
 
-            {/* Console HUD (system overlay) */}
-            <ConsoleHud />
+              {/* Console HUD (system overlay) */}
+              <ConsoleHud />
 
-            {/* Route Transition Overlay */}
-            <RouteTransitionLayer />
+              {/* Route Transition Overlay */}
+              <RouteTransitionLayer />
 
-            {/* Foreground app chrome */}
-            <div className="relative z-10 min-h-dvh flex flex-col">
-              <Header />
-              <PageTransition>
-                <main className="flex-1 pt-20">{children}</main>
-              </PageTransition>
-              <Footer />
-            </div>
-          </AppMotionConfig>
+              {/* Foreground app chrome */}
+              <div className="relative z-10 min-h-dvh flex flex-col">
+                <Header />
+                <PageTransition>
+                  <ErrorBoundary>
+                    <main className="flex-1 pt-20">{children}</main>
+                  </ErrorBoundary>
+                </PageTransition>
+                <Footer />
+              </div>
+              <Toaster />
+            </AppMotionConfig>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

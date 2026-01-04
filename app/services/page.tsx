@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Code, Layers, ShieldCheck, Database } from "lucide-react";
 import { VTLink } from "@/components/vt-link";
+import { SplitText } from "@/components/react-bits/SplitText";
+import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -68,12 +70,18 @@ export default function ServicesPage() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-20">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-            Technical Services
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
-            I don&apos;t just write code; I engineer systems. Every engagement ships with evidence: audit logs, specs, and measurable outputs.
-          </p>
+          <Reveal>
+            <SplitText
+              text="Technical Services"
+              className="text-4xl md:text-6xl font-bold tracking-tight mb-6"
+              delay={0.1}
+            />
+          </Reveal>
+          <Reveal delay={0.2}>
+            <p className="text-xl text-muted-foreground max-w-2xl">
+              I don&apos;t just write code; I engineer systems. Every engagement ships with evidence: audit logs, specs, and measurable outputs.
+            </p>
+          </Reveal>
         </div>
 
         {/* Services Grid */}

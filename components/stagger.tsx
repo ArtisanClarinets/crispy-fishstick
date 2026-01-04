@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useSession } from "@/components/session-provider";
+import { usePathname } from "next/navigation";
 
 interface StaggerProps {
   children: React.ReactNode;
@@ -8,6 +10,14 @@ interface StaggerProps {
 }
 
 export function Stagger({ children, className }: StaggerProps) {
+  const { hasVisited } = useSession();
+  const pathname = usePathname();
+  const shouldAnimate = !hasVisited(pathname);
+
+  if (!shouldAnimate) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       className={className}

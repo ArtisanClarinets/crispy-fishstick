@@ -1,163 +1,167 @@
 import type { Metadata } from "next";
-import { CheckCircle } from "lucide-react";
 import { VTLink } from "@/components/vt-link";
+import { ExecutionProtocol, ProtocolStep } from "@/components/execution-protocol";
+import { CalibrationHeadline } from "@/components/calibration-headline";
 
 export const metadata: Metadata = {
-  title: "Process",
-  description: "My process for delivering high-trust digital products with measurable proof.",
+  title: "Protocol",
+  description: "A systematic engineering lifecycle. Every phase is gated by audit-grade artifacts.",
 };
 
-const processSteps = [
+const protocolSteps: ProtocolStep[] = [
   {
+    id: "step-01",
     number: "01",
-    title: "Discovery",
+    title: "Discovery & Baseline",
     description:
-      "I start by mapping your goals, constraints, and current risks. This becomes the source of truth for scope and success criteria.",
-    deliverables: [
-      "Project brief + success metrics",
-      "Risk register",
-      "Scope boundaries",
-      "Decision log",
+      "I map your goals, constraints, and surface hidden risks immediately. This establishes the immutable scope and success criteria before a single line of code is written.",
+    commands: [
+      { cmd: "init_risk_register", result: "OK" },
+      { cmd: "define_scope_boundaries", result: "LOCKED" },
+      { cmd: "map_success_metrics", result: "OK" },
+      { cmd: "authorize_decision_log", result: "GEN" },
     ],
-    proof: "Signed brief + scope baseline",
+    artifacts: [
+      { kind: "DOC", label: "SCOPE_BASELINE.pdf", sha: "e3b0c442..." },
+      { kind: "LOG", label: "RISK_REGISTER_v1.csv" },
+    ],
+    meta: { duration: "1-2 Weeks", artifacts: 4, clientInput: "HIGH" },
   },
   {
+    id: "step-02",
+    title: "Strategy & Architecture",
     number: "02",
-    title: "Strategy & Planning",
     description:
-      "I translate requirements into a build plan with measurable checkpoints and proof artifacts.",
-    deliverables: [
-      "Architecture sketch",
-      "Build plan with gates",
-      "Milestone calendar",
-      "Evidence checklist",
+      "Requirements are translated into a deterministic build plan. I engineer the system architecture and define the exact verification gates required for launch.",
+    commands: [
+      { cmd: "gen_architecture_diagram", result: "OK" },
+      { cmd: "compile_build_plan", result: "VERIFIED" },
+      { cmd: "set_milestone_gates", result: "LOCKED" },
     ],
-    proof: "Build Plan module + gate checklist",
+    artifacts: [
+      { kind: "DOC", label: "BUILD_PLAN_GATES.pdf", sha: "8f43g211..." },
+      { kind: "HASH", label: "ARCH_SNAPSHOT", sha: "9a21b44..." },
+    ],
+    meta: { duration: "1 Week", artifacts: 3, clientInput: "MED" },
   },
   {
+    id: "step-03",
+    title: "Design Systems",
     number: "03",
-    title: "Design",
     description:
-      "I design the system and interface together so visuals and engineering match from day one.",
-    deliverables: [
-      "Component spec",
-      "Interaction inventory",
-      "Design tokens",
-      "Accessibility pre-check",
+      "Visuals and engineering are unified. I produce interaction specs and design tokens that ensure the implementation matches the vision pixel-for-pixel.",
+    commands: [
+      { cmd: "export_tokens", result: "OK" },
+      { cmd: "spec_components", result: "OK" },
+      { cmd: "audit_accessibility_pre", result: "VERIFIED" },
     ],
-    proof: "Component spec PDF + token export",
+    artifacts: [
+      { kind: "DOC", label: "COMPONENT_SPEC.pdf" },
+      { kind: "LOG", label: "TOKENS.json", sha: "11223344..." },
+    ],
+    meta: { duration: "2-3 Weeks", artifacts: 5, clientInput: "HIGH" },
   },
   {
+    id: "step-04",
+    title: "Production Development",
     number: "04",
-    title: "Development",
     description:
-      "I build in small, auditable increments with runtime checks and measurable budgets.",
-    deliverables: [
-      "Typed codebase",
-      "Performance budgets",
-      "Instrumentation hooks",
-      "Security header config",
+      "Construction proceeds in auditable increments. The codebase is strictly typed, performance-budgeted, and instrumented for observability from day one.",
+    commands: [
+      { cmd: "compile_release_candidate", result: "OK" },
+      { cmd: "enforce_perf_budget", result: "LOCKED" },
+      { cmd: "inject_instrumentation", result: "OK" },
     ],
-    proof: "Proof Panel runtime scan",
+    artifacts: [
+      { kind: "HASH", label: "COMMIT_SIGNATURE", sha: "7d7d7d7..." },
+      { kind: "LOG", label: "RUNTIME_SCAN_RESULTS.json" },
+    ],
+    meta: { duration: "4-8 Weeks", artifacts: 12, clientInput: "LOW" },
   },
   {
+    id: "step-05",
+    title: "Verification & QA",
     number: "05",
-    title: "Testing & Refinement",
     description:
-      "I validate the build against the evidence checklist and record the results.",
-    deliverables: [
-      "Audit report",
-      "Bug/edge-case ledger",
-      "Accessibility QA",
-      "Release checklist",
+      "The build is validated against the original evidence checklist. We don't guess—we prove that every requirement is met and every edge case is handled.",
+    commands: [
+      { cmd: "run_audit_suite", result: "VERIFIED" },
+      { cmd: "verify_a11y_compliance", result: "OK" },
+      { cmd: "stress_test_infrastructure", result: "OK" },
     ],
-    proof: "Audit report + rerun log",
+    artifacts: [
+      { kind: "DOC", label: "AUDIT_REPORT_FINAL.pdf", sha: "aabbcc11..." },
+      { kind: "LOG", label: "TEST_COVERAGE.xml" },
+    ],
+    meta: { duration: "1-2 Weeks", artifacts: 8, clientInput: "MED" },
   },
   {
+    id: "step-06",
+    title: "Launch Sequence",
     number: "06",
-    title: "Launch & Support",
     description:
-      "I ship with a handoff plan, monitoring, and a documented exit route.",
-    deliverables: [
-      "Launch runbook",
-      "Rollback plan",
-      "Ownership transfer",
-      "Post-launch review",
+      "Deployment is a controlled event, not a panic. I provide a complete handoff package, runbooks, and monitoring to ensure long-term stability.",
+    commands: [
+      { cmd: "exec_launch_runbook", result: "OK" },
+      { cmd: "verify_rollback_safety", result: "LOCKED" },
+      { cmd: "transfer_ownership", result: "OK" },
     ],
-    proof: "Signed launch checklist + handoff docs",
+    artifacts: [
+      { kind: "DOC", label: "HANDOFF_PACKAGE.zip" },
+      { kind: "DOC", label: "LAUNCH_checklist_signed.pdf" },
+    ],
+    meta: { duration: "1 Week", artifacts: 5, clientInput: "LOW" },
+  },
+  {
+    id: "step-07",
+    title: "Evolution",
+    number: "07",
+    description:
+      "Software is living. Post-launch, we use collected metrics to iterate on the product, ensuring it adapts to user needs and market changes.",
+    commands: [
+      { cmd: "monitor_kpis", result: "ACTIVE" },
+      { cmd: "analyze_user_flows", result: "OK" },
+      { cmd: "plan_v2_features", result: "PENDING" },
+    ],
+    artifacts: [
+      { kind: "LOG", label: "ANALYTICS_EXPORT.csv" },
+      { kind: "DOC", label: "Q1_PERFORMANCE_REVIEW.pdf" },
+    ],
+    meta: { duration: "Ongoing", artifacts: 99, clientInput: "MED" },
   },
 ];
 
 export default function ProcessPage() {
   return (
-    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8" data-system-tone="default">
+    <div className="min-h-screen pt-12 pb-24 px-4 sm:px-6 lg:px-8" data-system-tone="work">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">My Process</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A transparent, evidence-first workflow. Every phase ships with artifacts that prove what was done.
-          </p>
+        <div className="mb-20 md:mb-32">
+          <div className="max-w-4xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+               <span className="font-mono text-emerald-500 mr-2">{">>"}</span>
+               <CalibrationHeadline text="EXECUTION_PROTOCOL" />
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
+              Systematic engineering lifecycle. Every phase is gated by audit-grade artifacts.
+            </p>
+          </div>
         </div>
 
-        {/* Process Steps */}
-        <div className="space-y-12">
-          {processSteps.map((step) => (
-            <div
-              key={step.number}
-              className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start"
-            >
-              {/* Number */}
-              <div className="md:col-span-2">
-                <span className="text-6xl font-bold text-muted-foreground/20">
-                  {step.number}
-                </span>
-              </div>
-
-              {/* Content */}
-              <div className="md:col-span-10">
-                <div className="glass-card surface-rim rounded-2xl p-8">
-                  <h2 className="text-2xl font-bold mb-3">{step.title}</h2>
-                  <p className="text-muted-foreground mb-6">
-                    {step.description}
-                  </p>
-
-                  <div>
-                    <h3 className="text-sm font-semibold mb-3 uppercase tracking-wider">
-                      Deliverables
-                    </h3>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {step.deliverables.map((deliverable) => (
-                        <li
-                          key={deliverable}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                          {deliverable}
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="text-xs text-muted-foreground uppercase tracking-[0.2em] mt-4">
-                      Proof: {step.proof}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Protocol Pipeline */}
+        <ExecutionProtocol steps={protocolSteps} />
 
         {/* CTA */}
-        <div className="mt-20 text-center">
-          <h2 className="text-2xl font-bold mb-4">
-            Ready to get started?
+        <div className="mt-32 md:mt-48 text-center border-t border-white/5 pt-20">
+          <h2 className="text-2xl font-bold mb-4 tracking-tight">
+            Ready to initialize?
           </h2>
-          <p className="text-muted-foreground mb-8">
-            Let&apos;s define your scope and build the proof trail from day one.
+          <p className="text-muted-foreground mb-10 max-w-lg mx-auto">
+            Define your scope and build the proof trail from day one.
           </p>
           <VTLink
             href="/contact"
-            className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-colors font-medium"
+            className="btn-precision inline-flex items-center justify-center px-10 py-5 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-colors font-medium text-lg tracking-wide"
           >
             Start a Project
           </VTLink>

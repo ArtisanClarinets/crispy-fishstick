@@ -6,12 +6,12 @@ import { usePathname } from "next/navigation";
 type ToneKey = "home" | "work" | "insights" | "contact" | "about" | "default";
 
 const TONES: Record<ToneKey, { h: number; s: number; l: number; glowA: number }> = {
-  home:    { h: 210, s: 90, l: 60, glowA: 0.10 },
-  work:    { h: 265, s: 85, l: 62, glowA: 0.11 },
-  insights:{ h: 190, s: 80, l: 58, glowA: 0.10 },
-  contact: { h: 140, s: 75, l: 55, glowA: 0.09 },
-  about:   { h:  30, s: 85, l: 60, glowA: 0.09 },
-  default: { h: 220, s: 70, l: 60, glowA: 0.08 },
+  home:    { h: 16,  s: 60, l: 55, glowA: 0.12 }, // Copper
+  work:    { h: 170, s: 65, l: 40, glowA: 0.12 }, // Patina
+  insights:{ h: 35,  s: 60, l: 55, glowA: 0.12 }, // Brass
+  contact: { h: 220, s: 20, l: 20, glowA: 0.15 }, // Graphite
+  about:   { h: 220, s: 20, l: 20, glowA: 0.15 }, // Graphite
+  default: { h: 16,  s: 50, l: 50, glowA: 0.08 },
 };
 
 function routeToTone(pathname: string): ToneKey {

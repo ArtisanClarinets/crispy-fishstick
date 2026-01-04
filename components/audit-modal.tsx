@@ -131,7 +131,7 @@ export function AuditModal() {
 
   const copyResult = () => {
     if (!result) return
-    const text = `Audit Summary:\nLikely Leak: ${result.leak}\nFirst Fix: ${result.fix}\nRecommended: ${result.engagement}\n\nGenerated via Thompson Systems Audit`
+    const text = `Audit Summary:\nLikely Leak: ${result.leak}\nFirst Fix: ${result.fix}\nRecommended: ${result.engagement}\n\nGenerated via Copper & Code Audit`
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -143,7 +143,7 @@ export function AuditModal() {
       if (!val) setTimeout(reset, 300) // Reset after close animation
     }}>
       <DialogTrigger asChild>
-        <Button size="lg" className="rounded-full px-8 h-14 text-lg animate-pulse hover:animate-none shadow-lg shadow-primary/20">
+        <Button size="lg" className="rounded-full px-8 h-14 text-lg animate-pulse hover:animate-none shadow-lg shadow-primary/20 copper-sheen">
           Get a 60-second audit
         </Button>
       </DialogTrigger>

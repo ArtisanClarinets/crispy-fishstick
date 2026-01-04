@@ -25,6 +25,8 @@ export const PROOF_HEADERS: Array<{ name: string; key: string }> = [
   { name: "Strict-Transport-Security", key: "strict-transport-security" },
   { name: "X-Content-Type-Options", key: "x-content-type-options" },
   { name: "Referrer-Policy", key: "referrer-policy" },
+  { name: "X-Frame-Options", key: "x-frame-options" },
+  { name: "Permissions-Policy", key: "permissions-policy" },
 ];
 
 export const PROOF_STORAGE_KEY = "proof-panel-latest";
