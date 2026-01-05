@@ -5,17 +5,30 @@ import { Mode, CaseModeToggle } from "./case-mode-toggle";
 import { CaseArchitectureDiagram } from "./case-architecture-diagram";
 import { CaseKpis } from "./case-kpis";
 import { CaseFailureModes } from "./case-failure-modes";
+import { caseModePresets } from "@/lib/case-modes/presets";
+
+interface CaseModeData {
+  kpis: Record<Mode, { label: string; value: string; desc?: string }[]>;
+  failures: Record<Exclude<Mode, "normal">, string[]>;
+}
 
 interface CaseModePanelProps {
   initialMode?: Mode;
-  data: {
-     kpis: Record<Mode, { label: string; value: string; desc?: string }[]>;
-     failures: Record<Exclude<Mode, "normal">, string[]>;
-  };
+  preset?: string;
+  data?: CaseModeData;
 }
 
-export function CaseModePanel({ initialMode = "normal", data }: CaseModePanelProps) {
-  const [mode, setMode] = useState<Mode>(initialMode);
+export function CaseModePanel({ initialMode, preset, data }: CaseModePanelProps) {
+  // Resolve data from preset if provided
+  const presetConfig = preset && (preset in caseModePresets) ? caseModePresets[preset as keyof typeof caseModePresets] : null;
+  const effectiveData = data || presetConfig?.data;
+  const startMode = initialMode || presetConfig?.initialMode || "normal";
+
+  const [mode, setMode] = useState<Mode>(startMode);
+
+  if (!effectiveData) {
+    return <div className="p-4 border border-destructive/50 bg-destructive/10 text-destructive rounded-lg">Error: Missing Case Mode Data</div>;
+  }
 
   return (
     <div className="my-12 rounded-2xl border border-border bg-card/50 overflow-hidden shadow-sm">
@@ -40,7 +53,7 @@ export function CaseModePanel({ initialMode = "normal", data }: CaseModePanelPro
                {/* Contextual Failure Log Overlay */}
                {mode !== "normal" && (
                    <div className="mt-6">
-                      <CaseFailureModes mode={mode} failures={data.failures[mode as Exclude<Mode, "normal">] || []} />
+                      <CaseFailureModes mode={mode} failures={effectiveData.failures[mode as Exclude<Mode, "normal">] || []} />
                    </div>
                )}
             </div>
@@ -48,7 +61,7 @@ export function CaseModePanel({ initialMode = "normal", data }: CaseModePanelPro
             {/* Right: KPIs */}
             <div className="p-6 bg-secondary/5 space-y-6">
                <div className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Performance Metrics</div>
-               <CaseKpis mode={mode} data={data.kpis} />
+               <CaseKpis mode={mode} data={effectiveData.kpis} />
             </div>
 
         </div>
