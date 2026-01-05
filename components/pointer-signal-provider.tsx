@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { usePointerSignalStore } from '@/stores/usePointerSignalStore';
 
-export function PointerSignalProvider() {
+export function PointerSignalProvider({ children }: { children: ReactNode }) {
   const setPointer = usePointerSignalStore((state) => state.setPointer);
   const setActive = usePointerSignalStore((state) => state.setActive);
   
@@ -52,5 +52,5 @@ export function PointerSignalProvider() {
     };
   }, [setPointer, setActive]);
 
-  return null; // Headless provider
+  return <>{children}</>; // Headless provider — renders wrapped children
 }
