@@ -6,9 +6,9 @@ import { AuditModal } from "@/components/audit-modal";
 import { VTLink } from "@/components/vt-link";
 import { HomeFeaturedWork } from "@/components/home-featured-work";
 import { ProofPanel } from "@/components/proof-panel";
-import { SplitText } from "@/components/react-bits/SplitText";
 import { ScrambleText } from "@/components/scramble-text";
-import { SignalLinesField } from "@/features/home-hero/components/SignalLinesField";
+import { HeroBackground } from "@/components/hero-background";
+import { CalibrationHeadline } from "@/components/calibration-headline";
 
 export default function Home() {
   return (
@@ -19,7 +19,7 @@ export default function Home() {
         data-hud-section="Hero"
         data-system-tone="home"
       >
-        <SignalLinesField />
+        <HeroBackground />
 
         <div className="container relative z-10 px-4 md:px-6 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
@@ -33,13 +33,9 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <h1 className="mb-10">
-                <SplitText
-                  text={siteConfig.tagline}
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight"
-                  delay={0.2}
-                />
-              </h1>
+              <div className="mb-10">
+                <CalibrationHeadline text={siteConfig.tagline} />
+              </div>
             </Reveal>
 
             <Reveal delay={0.2}>

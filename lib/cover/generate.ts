@@ -3,124 +3,142 @@
  * Returns deterministic specs based on slug for consistent rendering.
  */
 
-import { mulberry32, slugToSeed } from "@/lib/cover/seed";
+// Seeded PRNG for deterministic generation
+class SeededRNG {
+  private seed: number;
+
+  constructor(seed: number) {
+    this.seed = seed;
+  }
+
+  next(): number {
+    this.seed = (this.seed * 9301 + 49297) % 233280;
+    return this.seed / 233280;
+  }
+
+  range(min: number, max: number): number {
+    return min + this.next() * (max - min);
+  }
+}
 
 export interface CoverSpec {
   palette: {
     hue: number;
     secHue: number;
-    accentHue: number;
   };
-  mood: "signal" | "calm" | "nocturne";
-  meshStops: Array<{
-    x: number;
-    y: number;
-    hue: number;
-    alpha: number;
-    radius: number;
-  }>;
-  ribbons: Array<{
-    start: { x: number; y: number };
-    control1: { x: number; y: number };
-    control2: { x: number; y: number };
-    end: { x: number; y: number };
-    width: number;
-    opacity: number;
-  }>;
-  rings: Array<{
+  hatch: {
+    spacing: number;
+    angle: number;
+  };
+  blobs: Array<{
     cx: number;
     cy: number;
     r: number;
-    strokeWidth: number;
-    opacity: number;
+    intensity: number;
   }>;
-  grainSeed: number;
-  accentIntensity: number;
-  highlightOffset: number;
-  distortion: number;
-  shimmerAngle: number;
+  topo: Array<{
+    y: number;
+    freq: number;
+    phase: number;
+    amplitude: number;
+    strokeOpacity: number;
+  }>;
+  circuits: {
+    routes: Array<{
+      points: Array<{ x: number; y: number }>;
+      width: number;
+      dash: string;
+    }>;
+    nodes: Array<{
+      cx: number;
+      cy: number;
+      r: number;
+      intensity: number; // Added missing property based on usage
+    }>;
+  };
 }
 
-const SPEC_CACHE = new Map<string, CoverSpec>();
-
-function range(rng: () => number, min: number, max: number) {
-  return min + rng() * (max - min);
-}
-
-function snap(value: number, grid: number) {
-  return Math.round(value / grid) * grid;
-}
-
-function pickMood(rng: () => number): CoverSpec["mood"] {
-  const roll = rng();
-  if (roll > 0.66) return "nocturne";
-  if (roll > 0.33) return "signal";
-  return "calm";
+/**
+ * Hash a string to a seed for deterministic PRNG
+ */
+function hashSlug(slug: string): number {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    const char = slug.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
 }
 
 export function getCoverSpec(slug: string): CoverSpec {
-  const cached = SPEC_CACHE.get(slug);
-  if (cached) {
-    return cached;
-  }
-
-  const seed = slugToSeed(slug);
-  const rng = mulberry32(seed);
+  const rng = new SeededRNG(hashSlug(slug));
 
   // Color palette
-  const hue = Math.round(range(rng, 180, 340));
-  const secHue = Math.round((hue + range(rng, 30, 90)) % 360);
-  const accentHue = Math.round((hue + range(rng, 120, 200)) % 360);
+  const hue = Math.round(rng.range(0, 360));
+  const secHue = Math.round((hue + rng.range(120, 240)) % 360);
 
-  const mood = pickMood(rng);
+  // Hatch pattern
+  const hatchSpacing = rng.range(8, 16);
+  const hatchAngle = rng.range(0, 90);
 
-  // Mesh gradient stops
-  const meshStops = Array.from({ length: 4 }, () => ({
-    x: snap(range(rng, 10, 90), 5),
-    y: snap(range(rng, 8, 88), 4),
-    hue: rng() > 0.6 ? secHue : hue,
-    alpha: range(rng, 0.12, 0.32),
-    radius: range(rng, 35, 60),
+  // Heat blobs
+  const blobCount = Math.floor(rng.range(3, 7));
+  const blobs = Array.from({ length: blobCount }, () => ({
+    cx: rng.range(100, 700),
+    cy: rng.range(100, 500),
+    r: rng.range(50, 200),
+    intensity: rng.range(0.3, 0.8),
   }));
 
-  // Ribbon arcs
-  const ribbonCount = Math.floor(range(rng, 2, 4));
-  const ribbons = Array.from({ length: ribbonCount }, () => ({
-    start: { x: range(rng, 40, 140), y: range(rng, 60, 160) },
-    control1: { x: range(rng, 160, 320), y: range(rng, 20, 220) },
-    control2: { x: range(rng, 360, 520), y: range(rng, 260, 520) },
-    end: { x: range(rng, 620, 760), y: range(rng, 320, 520) },
-    width: range(rng, 1.4, 2.6),
-    opacity: range(rng, 0.25, 0.6),
+  // Topographic layers (sine waves)
+  const topoLayers = Math.floor(rng.range(2, 4));
+  const topo = Array.from({ length: topoLayers }, () => ({
+    y: rng.range(100, 500),
+    freq: rng.range(0.01, 0.05),
+    phase: rng.range(0, Math.PI * 2),
+    amplitude: rng.range(20, 80),
+    strokeOpacity: rng.range(0.4, 0.8),
   }));
 
-  // Rings
-  const ringCount = Math.floor(range(rng, 2, 4));
-  const rings = Array.from({ length: ringCount }, () => ({
-    cx: range(rng, 120, 680),
-    cy: range(rng, 120, 460),
-    r: range(rng, 60, 180),
-    strokeWidth: range(rng, 0.6, 1.6),
-    opacity: range(rng, 0.2, 0.5),
+  // Circuit traces
+  const nodeCount = Math.floor(rng.range(4, 8));
+  const nodes = Array.from({ length: nodeCount }, () => ({
+    cx: rng.range(50, 750),
+    cy: rng.range(50, 550),
+    r: rng.range(2, 6),
+    intensity: 1, // Default intensity
   }));
 
-  const spec = {
+  const routeCount = Math.floor(rng.range(3, 6));
+  const routes = Array.from({ length: routeCount }, () => {
+    const pointCount = Math.floor(rng.range(3, 8));
+    const points = Array.from({ length: pointCount }, () => ({
+      x: rng.range(50, 750),
+      y: rng.range(50, 550),
+    }));
+
+    return {
+      points,
+      width: rng.range(0.5, 2),
+      dash: rng.next() > 0.5 ? "5,5" : "none",
+    };
+  });
+
+  return {
     palette: {
       hue,
       secHue,
-      accentHue,
     },
-    mood,
-    meshStops,
-    ribbons,
-    rings,
-    grainSeed: seed,
-    accentIntensity: range(rng, 0.35, 0.8),
-    highlightOffset: range(rng, 12, 38),
-    distortion: range(rng, 0.01, 0.035),
-    shimmerAngle: range(rng, -20, 25),
+    hatch: {
+      spacing: hatchSpacing,
+      angle: hatchAngle,
+    },
+    blobs,
+    topo,
+    circuits: {
+      routes,
+      nodes,
+    },
   };
-
-  SPEC_CACHE.set(slug, spec);
-  return spec;
 }

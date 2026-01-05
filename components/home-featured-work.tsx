@@ -27,7 +27,6 @@ function FeaturedWorkCard({ project }: { project: (typeof siteConfig.featuredWor
       >
         <CoverArt
           slug={project.slug}
-          imageSrc={project.coverImage}
           className="transition-transform duration-700 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
@@ -50,19 +49,10 @@ function FeaturedWorkCard({ project }: { project: (typeof siteConfig.featuredWor
             </motion.h3>
             <div className="rounded-xl bg-background/50 border border-border/10 backdrop-blur-md px-4 py-3 text-xs text-foreground/90 space-y-2 shadow-lg">
               <div className="flex items-center justify-between gap-3">
-                <span className="uppercase tracking-[0.2em] text-muted-foreground font-medium">Outcome</span>
-                <span className="text-right font-medium">{project.outcome}</span>
-              </div>
-              <div className="h-px bg-border/20 w-full" />
-              <div className="flex items-center justify-between gap-3">
                 <span className="uppercase tracking-[0.2em] text-muted-foreground font-medium">Constraint</span>
                 <span className="text-right line-clamp-1 font-medium">{project.constraints}</span>
               </div>
               <div className="h-px bg-border/20 w-full" />
-              <div className="flex items-center justify-between gap-3">
-                <span className="uppercase tracking-[0.2em] text-muted-foreground font-medium">Role</span>
-                <span className="font-medium">{project.role}</span>
-              </div>
             </div>
           </div>
         </div>
