@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Inter } from "next/font/google";
-import { PageTransition } from "@/components/page-transition";
 import { cn } from "@/lib/utils";
-import { SystemLayer } from "@/components/system-layer";
-import { ConsoleHud } from "@/components/console-hud";
-import { RouteTransitionLayer } from "@/components/route-transition-layer";
-import { AppMotionConfig } from "@/components/motion-config";
 import { headers } from "next/headers";
+import { AuthProvider } from "@/components/auth-provider";
+import { PointerSignalProvider } from "@/components/pointer-signal-provider";
+import { VisitedPathProvider } from "@/components/visited-path-provider";
+import { AppMotionConfig } from "@/components/motion-config";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -71,33 +68,23 @@ export default function RootLayout({
         inter.variable,
         "font-sans antialiased min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary"
       )}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-          nonce={nonce}
-        >
-          <AppMotionConfig>
-            {/* Background system layer (always present) */}
-            <SystemLayer />
-
-            {/* Console HUD (system overlay) */}
-            <ConsoleHud />
-
-            {/* Route Transition Overlay */}
-            <RouteTransitionLayer />
-
-            {/* Foreground app chrome */}
-            <div className="relative z-10 min-h-dvh flex flex-col">
-              <Header />
-              <PageTransition>
-                <main className="flex-1 pt-20">{children}</main>
-              </PageTransition>
-              <Footer />
-            </div>
-          </AppMotionConfig>
-        </ThemeProvider>
+        <AuthProvider>
+            <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+            nonce={nonce}
+            >
+                <AppMotionConfig>
+                    <PointerSignalProvider>
+                        <VisitedPathProvider>
+                            {children}
+                        </VisitedPathProvider>
+                    </PointerSignalProvider>
+                </AppMotionConfig>
+            </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

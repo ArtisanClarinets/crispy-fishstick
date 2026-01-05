@@ -1,37 +1,55 @@
 import { requireAdmin } from "@/lib/admin/guards";
 import { prisma } from "@/lib/prisma";
-import { MediaUploader } from "@/components/admin/media/media-uploader";
-import { MediaItem } from "@/components/admin/media/media-item";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Upload, Image as ImageIcon } from "lucide-react";
+import Link from "next/link";
+import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-export default async function MediaPage() {
+export default async function AdminMediaPage() {
   await requireAdmin({ permissions: ["media.read"] });
 
-  const assets = await prisma.mediaAsset.findMany({
+  const media = await prisma.mediaAsset.findMany({
     orderBy: { createdAt: "desc" },
+    take: 50,
   });
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Media Library</h1>
-          <p className="text-muted-foreground">Manage uploaded images and documents.</p>
-        </div>
-        <MediaUploader />
+        <h1 className="text-2xl font-bold tracking-tight">Media Library</h1>
+        <Button>
+          <Upload className="mr-2 h-4 w-4" />
+          Upload
+        </Button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {assets.map((asset) => (
-          <MediaItem key={asset.id} asset={asset} />
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {media.map((item) => (
+          <Card key={item.id} className="overflow-hidden group">
+            <div className="aspect-square bg-muted relative">
+               {/* Placeholder for actual image rendering */}
+               <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+                 <ImageIcon className="h-8 w-8" />
+               </div>
+            </div>
+            <div className="p-3 text-sm truncate">
+              {item.key}
+            </div>
+          </Card>
         ))}
-        {assets.length === 0 && (
-          <div className="col-span-full text-center py-12 text-muted-foreground border rounded-lg border-dashed">
-            No media files uploaded yet.
-          </div>
-        )}
       </div>
+      
+      {media.length === 0 && (
+        <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <ImageIcon className="h-12 w-12 mb-4 opacity-50" />
+                <p>No media assets found.</p>
+            </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
