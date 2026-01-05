@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
 
+const nextAuthSecret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
+
 declare module "next-auth" {
   interface Session {
     user: {
@@ -25,6 +27,7 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: NextAuthOptions = {
+  secret: nextAuthSecret,
   session: {
     strategy: "jwt",
   },

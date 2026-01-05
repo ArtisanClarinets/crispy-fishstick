@@ -31,6 +31,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
+        console.error("Authentication error:", result.error, result);
         if (result.error === "MFA_REQUIRED") {
           setShowMFA(true);
           toast({

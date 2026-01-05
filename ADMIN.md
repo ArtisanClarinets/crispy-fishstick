@@ -220,9 +220,15 @@ Secrets & Env variables (sample)
 Add `.env.example` with placeholders (DO NOT commit `.env`):
 
 ```
-DATABASE_URL=postgres://user:pass@host:5432/dbname
+# For local development with SQLite
+DATABASE_URL=file:./dev.db
+# DATABASE_URL=postgres://user:pass@host:5432/dbname (Production)
+
 NEXTAUTH_SECRET=super-secret
-NEXTAUTH_URL=https://your-admin-host
+# MUST match the URL where the app is running (e.g. http://localhost:3006)
+NEXTAUTH_URL=http://localhost:3006
+NEXTAUTH_URL_INTERNAL=http://localhost:3006
+
 REDIS_URL=redis://:pass@host:6379
 S3_BUCKET_NAME=your-bucket
 S3_REGION=us-east-1
