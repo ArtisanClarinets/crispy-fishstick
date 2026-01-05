@@ -43,7 +43,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     });
 
     return NextResponse.json(asset);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }

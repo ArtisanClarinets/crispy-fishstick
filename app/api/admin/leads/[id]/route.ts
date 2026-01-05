@@ -32,7 +32,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 
     return NextResponse.json(lead);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }
@@ -86,7 +86,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     });
 
     return NextResponse.json(lead);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

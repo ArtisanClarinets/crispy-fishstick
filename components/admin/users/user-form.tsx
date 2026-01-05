@@ -82,7 +82,7 @@ export function UserForm({ initialData, roles }: UserFormProps) {
       }
       router.refresh();
       router.push("/admin/users");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);

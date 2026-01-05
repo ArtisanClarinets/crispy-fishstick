@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/admin/guards";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Users, Eye, MousePointer } from "lucide-react";
+import { Activity, Users } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

@@ -8,10 +8,45 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 
-export default async function ContractsPage() {
+import { ContractFilters } from "@/components/admin/contracts/contract-filters";
+import { CheckExpiringButton } from "@/components/admin/contracts/check-expiring-button";
+import { addDays } from "date-fns";
+
+export default async function ContractsPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   await requireAdmin({ permissions: ["contracts.read"] });
 
+  const search = typeof searchParams.search === "string" ? searchParams.search : undefined;
+  const status = typeof searchParams.status === "string" ? searchParams.status : undefined;
+  const expiring = typeof searchParams.expiring === "string" ? searchParams.expiring : undefined;
+
+  const where: any = {};
+
+  if (search) {
+    where.OR = [
+      { title: { contains: search } },
+      { Tenant: { name: { contains: search } } },
+    ];
+  }
+
+  if (status && status !== "all") {
+    where.status = status;
+  }
+
+  if (expiring === "true") {
+    const today = new Date();
+    const thirtyDaysFromNow = addDays(today, 30);
+    where.endDate = {
+      gte: today,
+      lte: thirtyDaysFromNow,
+    };
+  }
+
   const contracts = await prisma.contract.findMany({
+    where,
     orderBy: { createdAt: "desc" },
     include: {
       Tenant: true,
@@ -35,13 +70,18 @@ export default async function ContractsPage() {
           <h1 className="text-2xl font-bold tracking-tight">Contracts</h1>
           <p className="text-muted-foreground">Manage client contracts and agreements.</p>
         </div>
-        <Button asChild>
-          <Link href="/admin/contracts/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Contract
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <CheckExpiringButton />
+          <Button asChild>
+            <Link href="/admin/contracts/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Contract
+            </Link>
+          </Button>
+        </div>
       </div>
+
+      <ContractFilters />
 
       <Card>
         <CardHeader>

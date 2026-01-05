@@ -7,11 +7,27 @@ import { Plus, Receipt } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { InvoiceFilters } from "@/components/admin/invoices/invoice-filters";
+import { Prisma } from "@prisma/client";
 
-export default async function InvoicesPage() {
+export default async function InvoicesPage({ searchParams }: { searchParams: { search?: string; status?: string } }) {
   await requireAdmin({ permissions: ["invoices.read"] });
 
+  const where: Prisma.InvoiceWhereInput = {};
+
+  if (searchParams.status && searchParams.status !== "all") {
+    where.status = searchParams.status;
+  }
+
+  if (searchParams.search) {
+    where.OR = [
+      { number: { contains: searchParams.search } },
+      { Tenant: { name: { contains: searchParams.search } } },
+    ];
+  }
+
   const invoices = await prisma.invoice.findMany({
+    where,
     orderBy: { createdAt: "desc" },
     include: {
       Tenant: true,
@@ -32,6 +48,8 @@ export default async function InvoicesPage() {
           </Link>
         </Button>
       </div>
+
+      <InvoiceFilters />
 
       <Card>
         <CardHeader>

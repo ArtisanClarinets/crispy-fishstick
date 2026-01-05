@@ -23,7 +23,7 @@ export async function createAuditLog(params: CreateAuditLogParams) {
         actorId = actorId || user.id;
         actorEmail = actorEmail || user.email;
       }
-    } catch (e) {
+    } catch (_e) {
       // Ignore session errors if we can't get user, proceed with null or provided values
     }
   }

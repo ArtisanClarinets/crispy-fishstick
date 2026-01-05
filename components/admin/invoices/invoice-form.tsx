@@ -91,6 +91,7 @@ export function InvoiceForm({ tenants }: InvoiceFormProps) {
       router.push("/admin/invoices");
       router.refresh();
     } catch (error) {
+      console.error(error);
       toast({
         variant: "destructive",
         title: "Error",

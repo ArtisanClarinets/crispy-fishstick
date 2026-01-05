@@ -45,7 +45,7 @@ export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
       });
       
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Error",
         description: "Failed to update lead status.",

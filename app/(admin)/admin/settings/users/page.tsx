@@ -11,9 +11,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
+import { DeleteUserButton } from "@/components/admin/users/delete-user-button";
 
 export default async function UsersPage() {
-  await requireAdmin({ permissions: ["users.read"] });
+  const currentUser = await requireAdmin({ permissions: ["users.read"] });
 
   const users = await prisma.user.findMany({
     select: {
@@ -52,12 +53,13 @@ export default async function UsersPage() {
                 <TableHead>Email</TableHead>
                 <TableHead>Roles</TableHead>
                 <TableHead>Joined</TableHead>
+                <TableHead className="w-[50px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                     No users found
                   </TableCell>
                 </TableRow>
@@ -77,6 +79,11 @@ export default async function UsersPage() {
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                    </TableCell>
+                    <TableCell>
+                      {currentUser.id !== user.id && (
+                        <DeleteUserButton userId={user.id} userName={user.name || user.email} />
+                      )}
                     </TableCell>
                   </TableRow>
                 ))

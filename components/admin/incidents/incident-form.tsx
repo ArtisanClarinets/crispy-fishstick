@@ -89,7 +89,7 @@ export function IncidentForm({ initialData, services, users }: IncidentFormProps
       }
       router.refresh();
       router.push("/admin/incidents");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);

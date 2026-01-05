@@ -47,7 +47,7 @@ export function MediaItem({ asset }: MediaItemProps) {
       toast.success("File deleted");
       setOpen(false);
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to delete file");
     } finally {
       setDeleting(false);

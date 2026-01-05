@@ -85,7 +85,7 @@ export function ServiceForm({ initialData, users }: ServiceFormProps) {
       }
       router.refresh();
       router.push("/admin/services");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);

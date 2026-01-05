@@ -7,7 +7,10 @@ import { z } from "zod";
 
 const createProposalSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  status: z.enum(["draft", "sent", "approved", "rejected"]).default("draft"),
+  status: z.enum(["draft", "pending_approval", "approved", "rejected", "sent"]).default("draft"),
+  clientEmail: z.string().email().optional().or(z.literal("")),
+  content: z.string().optional(),
+  validUntil: z.string().optional(),
   items: z.array(z.object({
     description: z.string().min(1, "Description is required"),
     hours: z.number().min(0, "Hours must be non-negative"),
@@ -54,6 +57,9 @@ export async function POST(req: Request) {
       data: {
         title: validatedData.title,
         status: validatedData.status,
+        clientEmail: validatedData.clientEmail || null,
+        content: validatedData.content,
+        validUntil: validatedData.validUntil ? new Date(validatedData.validUntil) : null,
         totalAmount,
         ProposalItem: {
           create: validatedData.items.map(item => ({

@@ -78,7 +78,7 @@ export const authOptions: NextAuthOptions = {
             if (!isValidToken) {
               throw new Error("INVALID_MFA_CODE");
             }
-          } catch (error) {
+          } catch (_error) {
             // Handle malformed token or other errors
              throw new Error("INVALID_MFA_CODE");
           }

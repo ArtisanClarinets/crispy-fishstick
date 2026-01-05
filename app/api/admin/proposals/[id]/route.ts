@@ -3,11 +3,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
+import { sendEmail } from "@/lib/email";
 import { z } from "zod";
 
 const updateProposalSchema = z.object({
   title: z.string().min(1, "Title is required").optional(),
-  status: z.enum(["draft", "sent", "approved", "rejected"]).optional(),
+  status: z.enum(["draft", "sent", "approved", "rejected", "pending_approval"]).optional(),
+  validUntil: z.string().optional(),
   items: z.array(z.object({
     id: z.string().optional(),
     description: z.string().min(1, "Description is required"),
@@ -90,9 +92,24 @@ export async function PATCH(
         data: {
           title: validatedData.title,
           status: validatedData.status,
+          validUntil: validatedData.validUntil ? new Date(validatedData.validUntil) : undefined,
           totalAmount,
         },
       });
+
+      // Handle Mock Email Sending
+      if (validatedData.status === "pending_approval" || validatedData.status === "sent") {
+        const clientEmail = existingProposal.clientEmail || "client@example.com";
+        await sendEmail({
+          to: clientEmail,
+          subject: `Proposal: ${existingProposal.title}`,
+          html: `
+            <h1>Proposal Update</h1>
+            <p>Your proposal "${existingProposal.title}" has been updated to status: ${validatedData.status}.</p>
+            <p>Please review and approve.</p>
+          `
+        });
+      }
 
       // 2. Handle items if provided
       if (validatedData.items) {

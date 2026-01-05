@@ -31,7 +31,7 @@ export function SplineBlueprintCanvas({
       // 1. Try setting variables first (preferred contract)
       splineApp.current.setVariable("phase", phase);
       splineApp.current.setVariable("progress", progress);
-    } catch (err) {
+    } catch (_err) {
       // Silent catch - scene might not have variables yet
       // Fallback: could try finding objects by name if needed, 
       // but for now we rely on the variable contract.
@@ -46,7 +46,7 @@ export function SplineBlueprintCanvas({
     try {
       spline.setVariable("phase", phase);
       spline.setVariable("progress", progress);
-    } catch (e) {
+    } catch (_e) {
       // ignore
     }
   }

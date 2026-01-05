@@ -56,7 +56,7 @@ export function UserRolesForm({
       
       toast.success("Roles updated successfully");
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);

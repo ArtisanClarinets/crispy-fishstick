@@ -36,7 +36,7 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
       const qrUrl = await QRCode.toDataURL(data.otpauth);
       setQrCodeUrl(qrUrl);
       setIsSetupOpen(true);
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -72,7 +72,7 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
         description: "Two-factor authentication has been successfully enabled.",
       });
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: "destructive",
         title: "Verification Failed",
@@ -97,7 +97,7 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
         description: "Two-factor authentication has been disabled.",
       });
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: "destructive",
         title: "Error",

@@ -97,7 +97,7 @@ export function ProjectForm({ tenants, initialData }: ProjectFormProps) {
 
       router.push("/admin/projects");
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -128,7 +128,7 @@ export function ProjectForm({ tenants, initialData }: ProjectFormProps) {
 
       router.push("/admin/projects");
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: "destructive",
         title: "Error",

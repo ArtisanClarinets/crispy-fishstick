@@ -1,6 +1,5 @@
 import { getMdxContent, getMdxFiles } from "@/lib/mdx";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { Calendar, User, BarChart, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

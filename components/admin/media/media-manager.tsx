@@ -62,7 +62,7 @@ export function MediaManager() {
         description: "File uploaded successfully",
       });
       fetchAssets();
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: "destructive",
         title: "Error",

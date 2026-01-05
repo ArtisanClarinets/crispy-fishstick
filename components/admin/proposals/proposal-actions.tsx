@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Trash, CheckCircle, XCircle, Send } from "lucide-react";
+import { MoreHorizontal, Trash, CheckCircle, XCircle, Mail, Printer } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ProposalActionsProps {
@@ -21,6 +21,10 @@ export function ProposalActions({ proposalId, currentStatus }: ProposalActionsPr
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   const updateStatus = async (status: string) => {
     setIsLoading(true);
@@ -79,16 +83,23 @@ export function ProposalActions({ proposalId, currentStatus }: ProposalActionsPr
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 print:hidden">
+      <Button variant="outline" size="sm" onClick={handlePrint}>
+        <Printer className="mr-2 h-4 w-4" />
+        Print
+      </Button>
       {currentStatus === "draft" && (
         <Button 
           variant="outline" 
           size="sm"
-          onClick={() => updateStatus("sent")}
+          onClick={() => {
+            updateStatus("pending_approval");
+            toast({ title: "Sent", description: "Proposal sent to client for approval." });
+          }}
           disabled={isLoading}
         >
-          <Send className="mr-2 h-4 w-4" />
-          Mark as Sent
+          <Mail className="mr-2 h-4 w-4" />
+          Send to Client
         </Button>
       )}
       

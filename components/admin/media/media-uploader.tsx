@@ -39,7 +39,7 @@ export function MediaUploader() {
       toast.success("File uploaded successfully");
       router.refresh();
       setOpen(false);
-    } catch (error) {
+    } catch (_error) {
       toast.error("Upload failed");
     } finally {
       setUploading(false);

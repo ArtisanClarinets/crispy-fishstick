@@ -28,7 +28,7 @@ export function ContentActions({ id }: ContentActionsProps) {
 
       toast.success("Content deleted");
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to delete content");
     } finally {
       setDeleting(false);
