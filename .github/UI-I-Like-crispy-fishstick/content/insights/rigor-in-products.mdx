@@ -1,0 +1,38 @@
+---
+title: "Rigor in Public-Facing Products: A checklist that actually ships"
+description: "Why 'good enough' is rarely good enough for production-grade software, and the concrete checklist I use to ensure quality."
+date: "2024-10-15"
+tags: ["Engineering", "Quality"]
+readTime: "6 min read"
+---
+
+Startups often treat "move fast and break things" as a religion. But when you're building systems that handle money, private data, or critical infrastructure, breaking things isn't an option.
+
+Over the last decade, I've refined a definition of "rigor" that doesn't mean "slow." It means "deliberate."
+
+## The Quality Checklist
+
+Here is the non-negotiable checklist I apply to every feature before it hits production:
+
+### 1. The "Loading State" Audit
+Most developers test their UI on localhost with 0ms latency. Users don't live on localhost.
+- [ ] Does the UI flash?
+- [ ] Is there a skeleton loader or a spinner?
+- [ ] Is the layout stable while loading (no Cumulative Layout Shift)?
+
+### 2. The "Error State" Reality Check
+What happens when the API fails?
+- [ ] Do we show a generic "Something went wrong" toast, or a helpful message?
+- [ ] Is there a retry mechanism?
+- [ ] Does the error persist if the user refreshes?
+
+### 3. Accessibility is Usability
+- [ ] Can I use the feature with only a keyboard?
+- [ ] Do all interactive elements have visible focus states?
+- [ ] Are color contrast ratios at least AA compliant?
+
+## Why This Matters
+
+Rigor communicates respect. When a user sees a polished loading state, they trust that you've handled the database transactions with the same care. When they see a broken layout, they assume your security practices are equally sloppy.
+
+Ship with rigor, or don't ship at all.

@@ -1,0 +1,31 @@
+---
+title: "Fintech Dashboard"
+description: "Real-time analytics and reporting for a Series B fintech."
+date: "2024-01-10"
+tags: ["React", "WebSockets", "D3.js"]
+role: "Senior Frontend Engineer"
+timeline: "6 months"
+outcome: "Sub-200ms analytics refresh under 30M events/day"
+constraints: "Regulatory audit trails and SOC2 logging requirements."
+---
+
+# Fintech Dashboard
+
+## Overview
+
+A high-performance trading dashboard built for institutional investors. The challenge was to render real-time market data with minimal latency while maintaining a responsive and accessible user interface.
+
+## The Challenge
+
+-   **Volume:** Handling 50k+ updates per second via WebSocket.
+-   **Performance:** Maintaining 60fps rendering during peak market activity.
+-   **Reliability:** Zero-downtime deployment requirement.
+
+## Solution
+
+We utilized a custom WebGL renderer for the charts to offload processing from the main thread. State management was handled via a custom optimized store to prevent unnecessary React re-renders.
+
+## Results
+
+-   **40%** reduction in data-to-glass latency.
+-   **100%** test coverage on core financial logic.
