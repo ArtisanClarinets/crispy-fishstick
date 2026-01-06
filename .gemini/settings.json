@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@wonderwhy-er/desktop-commander"
+      ]
+    },
+    "mcp": {
+      "command": "open-aware",
+      "args": [
+        "npx",
+        "mcp-remote",
+        "https://open-aware.qodo.ai/mcp"
+      ]
+    }
+  }
+}
