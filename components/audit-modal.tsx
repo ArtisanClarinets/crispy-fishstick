@@ -131,7 +131,7 @@ export function AuditModal() {
 
   const copyResult = () => {
     if (!result) return
-    const text = `Audit Summary:\nLikely Leak: ${result.leak}\nFirst Fix: ${result.fix}\nRecommended: ${result.engagement}\n\nGenerated via Thompson Systems Audit`
+    const text = `Audit Summary:\nLikely Leak: ${result.leak}\nFirst Fix: ${result.fix}\nRecommended: ${result.engagement}\n\nGenerated via Vantus Systems Audit`
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)

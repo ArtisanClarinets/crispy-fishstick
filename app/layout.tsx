@@ -17,8 +17,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Thompson Systems | High-Trust Engineering",
-    template: "%s | Thompson Systems",
+    default: "Vantus Systems | High-Trust Engineering",
+    template: "%s | Vantus Systems",
   },
   description:
     "A specialized engineering studio for founders who demand production-grade quality, rigorous systems, and Apple-caliber interfaces.",
@@ -31,20 +31,20 @@ export const metadata: Metadata = {
     "High-Performance",
     "Design Engineering",
   ],
-  authors: [{ name: "Dylan Thompson" }],
+  authors: [{ name: "Vantus Systems" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://thompsonsystems.com",
-    title: "Thompson Systems",
+    url: "https://vantus.systems",
+    title: "Vantus Systems",
     description:
       "Engineering for High-Trust Products. Production-grade quality from day one.",
-    siteName: "Thompson Systems",
+    siteName: "Vantus Systems",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Thompson Systems",
-    creator: "@dylanthompson-demo",
+    title: "Vantus Systems",
+    creator: "@vantus_systems",
   },
   robots: {
     index: true,

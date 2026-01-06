@@ -1,14 +1,14 @@
 export const siteConfig = {
-  name: "Dylan Thompson",
-  company: "Thompson Systems",
+  name: "Vantus Systems",
+  company: "Vantus Systems",
   tagline: "Engineering for High-Trust Products",
   description:
     "A specialized engineering studio for founders who demand production-grade quality, rigorous systems, and Apple-caliber interfaces.",
-  email: "dylan@thompsonsystems.com",
+  email: "hello@vantus.systems",
   links: {
-    github: "https://github.com/dylanthompson-demo",
-    linkedin: "https://linkedin.com/in/dylanthompson-demo",
-    twitter: "https://twitter.com/dylanthompson-demo",
+    github: "https://github.com/vantus-systems",
+    linkedin: "https://linkedin.com/company/vantus-systems",
+    twitter: "https://twitter.com/vantus_systems",
   },
   cta: {
     primary: {

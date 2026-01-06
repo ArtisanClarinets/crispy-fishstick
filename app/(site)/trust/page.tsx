@@ -2,7 +2,7 @@ import { Shield, CheckCircle, AlertTriangle, Lock, FileText } from "lucide-react
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Trust Center | Thompson Systems",
+  title: "Trust Center | Vantus Systems",
   description: "How we protect your IP, ensure predictability, and define success. No black boxes.",
 }
 

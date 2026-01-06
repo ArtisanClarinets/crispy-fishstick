@@ -28,7 +28,6 @@ export default function WorkPage() {
             <Link href={`/work/${project.slug}`} className="block w-full">
               <div className="rounded-2xl border border-white/10 bg-card/50 backdrop-blur-sm overflow-hidden card-precision">
                 <motion.div
-                  layoutId={`cover-${project.slug}`}
                   className="relative aspect-[16/10] w-full overflow-hidden bg-secondary"
                 >
                   <CoverArt slug={project.slug} className="transition-transform duration-700 group-hover:scale-105" />
@@ -46,7 +45,6 @@ export default function WorkPage() {
 
               <Link href={`/work/${project.slug}`}>
                 <motion.h2
-                  layoutId={`title-${project.slug}`}
                   className="text-3xl md:text-4xl font-bold tracking-tight group-hover:text-primary transition-colors inline-block"
                 >
                   {project.title}
