@@ -14,10 +14,7 @@ export default async function AdminLayout({
   const session = await getServerSession(authOptions);
   const isAuthenticated = Boolean(session?.user?.email);
 
-  console.log(`[AdminLayout] session present: ${isAuthenticated}`);
-
   if (!isAuthenticated) {
-    console.log(`[AdminLayout] Redirecting to /admin/login because not authenticated`);
     redirect("/admin/login");
   }
 
