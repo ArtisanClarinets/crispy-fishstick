@@ -24,6 +24,7 @@ declare module "next-auth" {
     };
   }
 
+  // Augment AuthOptions to include trustHost (supported in v4 but missing in some type definitions)
   interface AuthOptions {
     trustHost?: boolean;
   }

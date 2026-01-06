@@ -25,6 +25,10 @@ describe('Authentication Logic', () => {
     vi.clearAllMocks();
   });
 
+  it('should have trustHost enabled', () => {
+    expect(authOptions.trustHost).toBe(true);
+  });
+
   it('should return user for valid credentials', async () => {
     const password = 'password123';
     const hashedPassword = await bcrypt.hash(password, 10);
