@@ -41,7 +41,7 @@ declare module "next-auth/jwt" {
 export const authOptions: NextAuthOptions = {
   secret: nextAuthSecret,
   useSecureCookies: process.env.NODE_ENV === "production",
-  trustHost: true,
+  // trustHost: true, // Not supported in NextAuthOptions type for this version, but can be set via env var TRUST_HOST=true
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days

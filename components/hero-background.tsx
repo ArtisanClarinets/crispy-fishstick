@@ -2,6 +2,7 @@
 
 import { motion, useMotionTemplate, useMotionValue, useScroll, useTransform, useAnimationFrame } from "framer-motion";
 import React, { MouseEvent, useState } from "react";
+import Waves from "@/components/react-bits/Waves";
 
 type Trace = { id: string; label: string; d: string; speed: number; delay: number };
 
@@ -81,15 +82,32 @@ export function HeroBackground() {
       className="absolute inset-0 -z-10 overflow-hidden bg-background"
       onMouseMove={handleMouseMove}
     >
-      {/* Base Precision Grid */}
+      {/* Dynamic Waves Background - Added for Cohesion */}
+      <div className="absolute inset-0 z-0 opacity-40 mix-blend-screen">
+        <Waves
+          lineColor="hsl(var(--primary) / 0.2)"
+          backgroundColor="transparent"
+          waveSpeedX={0.02}
+          waveSpeedY={0.01}
+          waveAmpX={40}
+          waveAmpY={20}
+          friction={0.9}
+          tension={0.01}
+          maxCursorMove={120}
+          xGap={12}
+          yGap={36}
+        />
+      </div>
+
+      {/* Base Precision Grid - Reduced opacity for better blend */}
       <motion.div
         style={{ y: gridY }}
         className="
           absolute inset-0
-          bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)]
+          bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)]
           bg-[size:44px_44px]
           [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,#000_65%,transparent_100%)]
-          opacity-35
+          opacity-30
         "
       />
 
@@ -110,10 +128,10 @@ export function HeroBackground() {
         transition={{ duration: 0.35 }}
       />
 
-      {/* Ambient system pulse (subtle) */}
+      {/* Ambient system pulse (subtle) - Reduced intensity due to Waves */}
       <motion.div 
         style={{ y: ambientY }}
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[420px] rounded-full bg-primary/5 blur-[130px] mix-blend-screen animate-pulse [animation-duration:4200ms]" 
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[420px] rounded-full bg-primary/5 blur-[130px] mix-blend-screen animate-pulse [animation-duration:6000ms] opacity-50"
       />
 
       {/* Trace overlay */}
