@@ -17,7 +17,8 @@ export async function middleware(request: NextRequest) {
 
   // Note: 'unsafe-eval' is often required for development (HMR) and some libraries.
   // We remove 'unsafe-inline' for scripts to strictly enforce nonce usage.
-  const scriptSrc = `script-src 'self' 'nonce-${nonce}' 'unsafe-eval'`;
+  const isDev = process.env.NODE_ENV === "development";
+  const scriptSrc = `script-src 'self' 'nonce-${nonce}' ${isDev ? "'unsafe-eval'" : ""}`;
 
   const csp = [
     "default-src 'self'",

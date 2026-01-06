@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
+const UPLOAD_DIR = path.join(process.cwd(), "uploads"); // Private directory (not public)
 
 // Ensure upload directory exists
 if (!fs.existsSync(UPLOAD_DIR)) {

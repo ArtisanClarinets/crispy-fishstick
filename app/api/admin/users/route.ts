@@ -1,14 +1,17 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
 import * as z from "zod";
 import bcrypt from "bcryptjs";
+import { SAFE_USER_WITH_ROLES_SELECT } from "@/lib/security/safe-user";
+import { jsonNoStore } from "@/lib/security/response";
+import { assertSameOrigin } from "@/lib/security/origin";
+import { validatePassword } from "@/lib/security/password";
 
 const createUserSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().optional(),
   roleIds: z.array(z.string()).optional(), // Array of Role IDs
 });
 
@@ -20,30 +23,37 @@ export async function GET() {
 
     const users = await prisma.user.findMany({
       orderBy: { createdAt: "desc" },
-      include: {
-        RoleAssignment: {
-          include: {
-            Role: true,
-          },
-        },
-      },
+      select: SAFE_USER_WITH_ROLES_SELECT,
     });
 
-    return NextResponse.json(users);
+    return jsonNoStore(users);
   } catch (_error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return jsonNoStore({ error: "Unauthorized" }, { status: 401 });
   }
 }
 
 export async function POST(req: Request) {
   try {
+    // Phase 6: CSRF/Origin Enforcement
+    // @ts-ignore - req type mismatch between next/server and built-in Request, but it works at runtime
+    assertSameOrigin(req);
+
     const user = await requireAdmin({ permissions: ["users.write"] });
     const body = await req.json();
 
     const validatedData = createUserSchema.parse(body);
     const { roleIds, password, ...userData } = validatedData;
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    let passwordHash: string | undefined;
+
+    if (password) {
+      // Phase 7: Strict password policy
+      const passwordError = validatePassword(password);
+      if (passwordError) {
+        return jsonNoStore({ error: passwordError }, { status: 400 });
+      }
+      passwordHash = await bcrypt.hash(password, 10);
+    }
 
     const newUser = await prisma.user.create({
       data: {
@@ -55,9 +65,7 @@ export async function POST(req: Request) {
           })),
         } : undefined,
       },
-      include: {
-        RoleAssignment: { include: { Role: true } },
-      },
+      select: SAFE_USER_WITH_ROLES_SELECT,
     });
 
     await createAuditLog({
@@ -69,11 +77,15 @@ export async function POST(req: Request) {
       after: newUser,
     });
 
-    return NextResponse.json(newUser, { status: 201 });
+    return jsonNoStore(newUser, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
+      return jsonNoStore({ error: error.errors }, { status: 400 });
     }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    // Check for Origin/Referer error
+    if (error instanceof Error && (error.message.includes("Origin") || error.message.includes("Referer"))) {
+        return jsonNoStore({ error: error.message }, { status: 403 });
+    }
+    return jsonNoStore({ error: "Internal Server Error" }, { status: 500 });
   }
 }

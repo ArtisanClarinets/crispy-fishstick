@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "./guards";
 import { headers } from "next/headers";
+import { redactForAudit } from "@/lib/security/redact";
 
 export interface CreateAuditLogParams {
   action: string;
@@ -34,6 +35,9 @@ export async function createAuditLog(params: CreateAuditLogParams) {
   const userAgent = headersList.get("user-agent") || "unknown";
 
   try {
+    const safeBefore = params.before ? redactForAudit(params.before) : null;
+    const safeAfter = params.after ? redactForAudit(params.after) : null;
+
     await prisma.auditLog.create({
       data: {
         action: params.action,
@@ -43,8 +47,8 @@ export async function createAuditLog(params: CreateAuditLogParams) {
         actorEmail,
         ip: ip.split(',')[0].trim(), // Take first IP if multiple
         userAgent,
-        before: params.before ? JSON.stringify(params.before) : null,
-        after: params.after ? JSON.stringify(params.after) : null,
+        before: safeBefore ? JSON.stringify(safeBefore) : null,
+        after: safeAfter ? JSON.stringify(safeAfter) : null,
       },
     });
   } catch (error) {

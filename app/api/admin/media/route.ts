@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
+import { validateFile } from "@/lib/security/upload";
 
 export const dynamic = "force-dynamic";
 
@@ -31,11 +32,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
+    try {
+        validateFile(file);
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     // Ensure upload directory exists
-    const uploadDir = join(process.cwd(), "public/uploads");
+    const uploadDir = join(process.cwd(), "uploads"); // Private storage
     await mkdir(uploadDir, { recursive: true });
 
     // Generate unique filename
@@ -50,7 +57,7 @@ export async function POST(req: Request) {
     const asset = await prisma.mediaAsset.create({
       data: {
         key: filename,
-        url: `/uploads/${filename}`,
+        url: `/api/uploads/${filename}`, // Serve via API
         mime: file.type,
         size: file.size,
         uploadedBy: user.email,

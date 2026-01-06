@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { authenticator } from "otplib";
 import { z } from "zod";
 import { rateLimit } from "@/lib/rate-limit";
+import { encryptSecret } from "@/lib/security/mfa";
 
 export const dynamic = "force-dynamic";
 
@@ -40,9 +41,11 @@ export async function POST(req: Request) {
       return new NextResponse("Invalid token", { status: 400 });
     }
 
+    const encryptedSecret = await encryptSecret(secret);
+
     await prisma.user.update({
       where: { email: session.user.email },
-      data: { mfaSecret: secret },
+      data: { mfaSecret: encryptedSecret },
     });
 
     return NextResponse.json({ success: true });

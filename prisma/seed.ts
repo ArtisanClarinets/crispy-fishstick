@@ -4,6 +4,13 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  if (!process.env.ADMIN_BOOTSTRAP_EMAIL || !process.env.ADMIN_BOOTSTRAP_PASSWORD) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Missing required environment variables for seeding in production: ADMIN_BOOTSTRAP_EMAIL, ADMIN_BOOTSTRAP_PASSWORD");
+    }
+    console.warn("WARNING: Using default insecure credentials for seeding. Do NOT use this in production.");
+  }
+
   const email = process.env.ADMIN_BOOTSTRAP_EMAIL || "admin@vantus.com";
   const password = process.env.ADMIN_BOOTSTRAP_PASSWORD || "admin";
 

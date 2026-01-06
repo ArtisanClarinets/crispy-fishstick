@@ -21,6 +21,16 @@ Goals & Acceptance Criteria
 - Customer Portal integration is seamless: publish actions and lead assignments are consumable by the Customer Portal through tenant-scoped APIs/webhooks.
 - Tests (unit, integration, e2e) cover critical admin flows; CI blocks merges on failure.
 
+Security & Operations
+---------------------
+- **Secret Management**: MFA secrets are encrypted at rest using Sodium (XSalsa20-Poly1305). `MFA_ENCRYPTION_KEY` must be set in production.
+- **File Uploads**: Files are stored in a private directory (`/uploads`) outside the public web root. They are served via `/api/uploads/*` with strict type/size validation and forced content-disposition.
+- **Cron Jobs**: Protected by `CRON_SECRET` header.
+- **Audit Logs**: All sensitive data (passwords, secrets, tokens) is redacted before logging.
+- **CSP**: Strict CSP enforced in middleware; `unsafe-eval` disabled in production.
+- **Database**: SQLite used for development/prototype; recommend PostgreSQL for production scale.
+- **Rate Limiting**: Implemented via database tracking for login and high-risk endpoints.
+
 High-level Architecture
 -----------------------
 - Frontend: Next.js App Router (`app/admin/*`) + components in `components/admin/*` using site theme tokens and `app/vantus-theme.css`.

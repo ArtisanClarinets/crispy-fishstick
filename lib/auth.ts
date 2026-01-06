@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
+import { decryptSecret } from "@/lib/security/mfa";
 
 const nextAuthSecret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
 
@@ -74,7 +75,14 @@ export const authOptions: NextAuthOptions = {
           }
           
           try {
-            const isValidToken = authenticator.check(credentials.code, user.mfaSecret);
+            // Decrypt the stored secret before verification
+            const decryptedSecret = await decryptSecret(user.mfaSecret);
+            if (!decryptedSecret) {
+                console.error("Failed to decrypt MFA secret for user:", user.id);
+                throw new Error("MFA_ERROR");
+            }
+
+            const isValidToken = authenticator.check(credentials.code, decryptedSecret);
             if (!isValidToken) {
               throw new Error("INVALID_MFA_CODE");
             }

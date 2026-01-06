@@ -18,15 +18,19 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     // For this enterprise codebase, we'll log the email to the console to simulate sending
     // and potentially could log to a database table for audit purposes.
     
-    console.log(`
-      --- [MOCK EMAIL SENT] ---
-      From: ${validatedOptions.from || "system@crispy-fishstick.com"}
-      To: ${validatedOptions.to}
-      Subject: ${validatedOptions.subject}
-      
-      ${validatedOptions.html.replace(/<[^>]*>?/gm, '')} // Strip HTML for console log readability
-      -------------------------
-    `);
+    if (process.env.NODE_ENV === "development") {
+      console.log(`
+        --- [MOCK EMAIL SENT] ---
+        From: ${validatedOptions.from || "system@crispy-fishstick.com"}
+        To: ${validatedOptions.to}
+        Subject: ${validatedOptions.subject}
+        
+        ${validatedOptions.html.replace(/<[^>]*>?/gm, '')} // Strip HTML for console log readability
+        -------------------------
+      `);
+    } else {
+       console.log(`[Email Sent] To: ${validatedOptions.to}, Subject: ${validatedOptions.subject}`);
+    }
 
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));

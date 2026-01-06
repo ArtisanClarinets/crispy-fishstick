@@ -19,21 +19,36 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { SafeUserWithRolesDto } from "@/lib/security/safe-user";
 
 const userSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email"),
-  password: z.string().optional(),
   roleIds: z.array(z.string()),
 });
 
 type UserFormValues = z.infer<typeof userSchema>;
 
 interface UserFormProps {
-  initialData?: any;
+  /**
+   * The initial user data for editing.
+   * MUST be a SafeUserWithRolesDto to ensure no sensitive data (like passwordHash) is passed.
+   */
+  initialData?: SafeUserWithRolesDto;
+  /**
+   * List of available roles for assignment.
+   */
   roles: { id: string; name: string }[];
 }
 
+/**
+ * Form for creating or editing a user.
+ * 
+ * Security Updates (Phase 7):
+ * - Uses SafeUserWithRolesDto for type safety and data protection.
+ * - Password field removed to prevent insecure password management.
+ * - Roles selection preserved.
+ */
 export function UserForm({ initialData, roles }: UserFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -43,8 +58,7 @@ export function UserForm({ initialData, roles }: UserFormProps) {
     defaultValues: {
       name: initialData?.name || "",
       email: initialData?.email || "",
-      password: "",
-      roleIds: initialData?.RoleAssignment?.map((r: any) => r.roleId) || [],
+      roleIds: initialData?.RoleAssignment?.map((r) => r.roleId) || [],
     },
   });
 
@@ -52,16 +66,7 @@ export function UserForm({ initialData, roles }: UserFormProps) {
     try {
       setLoading(true);
       
-      // Filter out empty password if updating
-      const payload: any = { ...data };
-      if (initialData && !payload.password) {
-        delete payload.password;
-      }
-      if (!initialData && !payload.password) {
-        form.setError("password", { message: "Password is required for new users" });
-        setLoading(false);
-        return;
-      }
+      const payload = { ...data };
 
       if (initialData) {
         const res = await fetch(`/api/admin/users/${initialData.id}`, {
@@ -123,20 +128,6 @@ export function UserForm({ initialData, roles }: UserFormProps) {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{initialData ? "New Password (Optional)" : "Password"}</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
               <FormField
                 control={form.control}
                 name="roleIds"

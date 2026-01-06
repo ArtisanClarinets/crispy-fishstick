@@ -53,15 +53,15 @@ describe('Admin Guards', () => {
         email: 'admin@example.com',
         name: 'Admin User',
         tenantId: null,
-        roles: [
+        RoleAssignment: [
           {
-            role: {
+            Role: {
               name: 'Admin',
               permissions: JSON.stringify(['leads.view', 'leads.edit']),
             },
           },
         ],
-        jitRequests: [],
+        JitAccessRequest: [],
       };
 
       (prisma.user.findUnique as any).mockResolvedValue(mockUser);
@@ -77,20 +77,20 @@ describe('Admin Guards', () => {
     it('should include JIT permissions', async () => {
         (getServerSession as any).mockResolvedValue({ user: { email: 'jit@example.com' } });
         
-        const mockUser = {
-          id: 'user-jit',
-          email: 'jit@example.com',
-          name: 'JIT User',
-          tenantId: null,
-          roles: [],
-          jitRequests: [
-              {
-                  roleId: 'role-jit',
-                  status: 'approved',
-                  expiresAt: new Date(Date.now() + 10000), // future
-              }
-          ],
-        };
+      const mockUser = {
+        id: 'user-jit',
+        email: 'jit@example.com',
+        name: 'JIT User',
+        tenantId: null,
+        RoleAssignment: [],
+        JitAccessRequest: [
+            {
+                roleId: 'role-jit',
+                status: 'approved',
+                expiresAt: new Date(Date.now() + 10000), // future
+            }
+        ],
+      };
   
         (prisma.user.findUnique as any).mockResolvedValue(mockUser);
         
@@ -122,8 +122,8 @@ describe('Admin Guards', () => {
         email: 'user@example.com',
         name: 'Regular User',
         tenantId: null,
-        roles: [],
-        jitRequests: [],
+        RoleAssignment: [],
+        JitAccessRequest: [],
       };
       
       (prisma.user.findUnique as any).mockResolvedValue(mockUser);
@@ -139,15 +139,15 @@ describe('Admin Guards', () => {
         email: 'admin@example.com',
         name: 'Admin User',
         tenantId: null,
-        roles: [
-             {
-            role: {
+        RoleAssignment: [
+          {
+            Role: {
               name: 'Admin',
               permissions: JSON.stringify(['admin.super']),
             },
           },
         ],
-        jitRequests: [],
+        JitAccessRequest: [],
       };
       
       (prisma.user.findUnique as any).mockResolvedValue(mockUser);

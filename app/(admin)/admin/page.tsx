@@ -1,10 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, FileText, Activity, Briefcase, ShieldAlert } from "lucide-react";
+import { requireAdmin } from "@/lib/admin/guards";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
+  await requireAdmin({ permissions: ["admin.access"] });
+
   const [
     leadsCount,
     activeProjectsCount,

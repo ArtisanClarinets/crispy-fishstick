@@ -2,19 +2,14 @@ import { requireAdmin } from "@/lib/admin/guards";
 import { prisma } from "@/lib/prisma";
 import { UserForm } from "@/components/admin/users/user-form";
 import { notFound } from "next/navigation";
+import { SAFE_USER_WITH_ROLES_SELECT } from "@/lib/security/safe-user";
 
 export default async function EditUserPage({ params }: { params: { id: string } }) {
   await requireAdmin({ permissions: ["users.write"] });
 
   const user = await prisma.user.findUnique({
     where: { id: params.id },
-    include: {
-      RoleAssignment: {
-        include: {
-          Role: true,
-        },
-      },
-    },
+    select: SAFE_USER_WITH_ROLES_SELECT,
   });
 
   if (!user) {

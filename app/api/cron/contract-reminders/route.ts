@@ -7,8 +7,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET(_req: Request) {
   try {
-    // Secure this endpoint (e.g., with a secret key header)
-    // For demo purposes, we'll allow it but log access
+    // Secure this endpoint with CRON_SECRET header
+    const authHeader = _req.headers.get("authorization");
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+    
     console.log("Running contract expiration check...");
 
     const today = new Date();

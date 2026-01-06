@@ -26,6 +26,14 @@ Thompson Systems is a specialized engineering studio for founders who demand pro
 - **Animation:** [Framer Motion](https://www.framer.com/motion/)
 - **UI Primitives:** [Radix UI](https://www.radix-ui.com/) (via shadcn/ui patterns)
 - **Icons:** [Lucide React](https://lucide.dev/)
+- **Security:**
+  - Sodium / XSalsa20-Poly1305 Encryption for secrets (MFA)
+  - Strict Content Security Policy (CSP)
+  - Rate Limiting (Database backed)
+  - Safe Data Serialization (DTOs)
+  - Private File Uploads with Type Validation
+  - Role-Based Access Control (RBAC) with JIT Access
+  - Audit Logging with Redaction
 - **Testing:**
   - Unit: [Vitest](https://vitest.dev/)
   - E2E: [Playwright](https://playwright.dev/)

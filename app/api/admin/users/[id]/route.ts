@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
+import { SAFE_USER_WITH_ROLES_SELECT } from "@/lib/security/safe-user";
+import { jsonNoStore } from "@/lib/security/response";
 import * as z from "zod";
+import { assertSameOrigin } from "@/lib/security/origin";
 
 const updateUserSchema = z.object({
   name: z.string().optional(),
@@ -18,27 +20,25 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
     const user = await prisma.user.findUnique({
       where: { id: params.id },
-      include: {
-        RoleAssignment: {
-          include: {
-            Role: true,
-          },
-        },
-      },
+      select: SAFE_USER_WITH_ROLES_SELECT,
     });
 
     if (!user) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return jsonNoStore({ error: "Not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    return jsonNoStore(user);
   } catch (_error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return jsonNoStore({ error: "Unauthorized" }, { status: 401 });
   }
 }
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
+    // Phase 6: CSRF/Origin Enforcement
+    // @ts-ignore
+    assertSameOrigin(req);
+
     const actor = await requireAdmin({ permissions: ["users.write"] });
     const body = await req.json();
 
@@ -47,32 +47,27 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
     // Handle role updates if provided
     if (roleIds) {
-      // First delete existing assignments
-      await prisma.roleAssignment.deleteMany({
-        where: { userId: params.id },
-      });
-      
-      // Then create new ones
-      // We do this transactionally ideally, but for now simple sequential ops
-      // Or better, use update with deleteMany and create
-      await prisma.user.update({
-        where: { id: params.id },
-        data: {
-          RoleAssignment: {
-            create: roleIds.map((roleId) => ({
-              Role: { connect: { id: roleId } },
-            })),
-          },
-        },
+      // Phase 7: Role changes must be transactional
+      await prisma.$transaction(async (tx) => {
+        await tx.roleAssignment.deleteMany({
+          where: { userId: params.id },
+        });
+        
+        for (const roleId of roleIds) {
+            await tx.roleAssignment.create({
+                data: {
+                    userId: params.id,
+                    roleId: roleId
+                }
+            });
+        }
       });
     }
 
     const updatedUser = await prisma.user.update({
       where: { id: params.id },
       data: userData,
-      include: {
-        RoleAssignment: { include: { Role: true } },
-      },
+      select: SAFE_USER_WITH_ROLES_SELECT,
     });
 
     await createAuditLog({
@@ -84,26 +79,42 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       after: updatedUser,
     });
 
-    return NextResponse.json(updatedUser);
+    return jsonNoStore(updatedUser);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
+      return jsonNoStore({ error: error.errors }, { status: 400 });
     }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    if (error instanceof Error && (error.message.includes("Origin") || error.message.includes("Referer"))) {
+        return jsonNoStore({ error: error.message }, { status: 403 });
+    }
+    return jsonNoStore({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  void request;
   try {
-    const actor = await requireAdmin({ permissions: ["users.write"] });
+    // Phase 6: CSRF/Origin Enforcement
+    // @ts-ignore
+    assertSameOrigin(request);
 
+    const actor = await requireAdmin({ permissions: ["users.write"] });
+    
     // Prevent deleting yourself
     if (actor.id === params.id) {
-      return NextResponse.json({ error: "Cannot delete yourself" }, { status: 400 });
+      return jsonNoStore({ error: "Cannot delete yourself" }, { status: 400 });
     }
 
-    const deletedUser = await prisma.user.delete({
+    // Get user state before deletion for audit
+    const userToDelete = await prisma.user.findUnique({
+        where: { id: params.id },
+        select: { id: true, email: true } 
+    });
+
+    if (!userToDelete) {
+        return jsonNoStore({ error: "Not found" }, { status: 404 });
+    }
+
+    await prisma.user.delete({
       where: { id: params.id },
     });
 
@@ -113,11 +124,14 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       resourceId: params.id,
       actorId: actor.id,
       actorEmail: actor.email,
-      before: deletedUser,
+      before: userToDelete,
     });
 
-    return NextResponse.json(deletedUser);
-  } catch (_error) {
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return jsonNoStore({ success: true });
+  } catch (error) {
+    if (error instanceof Error && (error.message.includes("Origin") || error.message.includes("Referer"))) {
+        return jsonNoStore({ error: error.message }, { status: 403 });
+    }
+    return jsonNoStore({ error: "Internal Server Error" }, { status: 500 });
   }
 }

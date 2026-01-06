@@ -7,6 +7,7 @@ import { Plus, Users as _Users } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
+import { SAFE_USER_WITH_ROLES_SELECT } from "@/lib/security/safe-user";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     take: 100,
+    select: SAFE_USER_WITH_ROLES_SELECT,
   });
 
   return (
@@ -43,7 +45,7 @@ export default async function AdminUsersPage() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
+                <TableHead>Roles</TableHead>
                 <TableHead>Joined</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -54,7 +56,17 @@ export default async function AdminUsersPage() {
                   <TableCell className="font-medium">{user.name || "N/A"}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">User</Badge>
+                    {user.RoleAssignment.length > 0 ? (
+                      <div className="flex gap-1 flex-wrap">
+                        {user.RoleAssignment.map((ra) => (
+                          <Badge key={ra.roleId} variant="outline">
+                            {ra.Role.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <Badge variant="secondary">No Role</Badge>
+                    )}
                   </TableCell>
                   <TableCell>{formatDate(user.createdAt)}</TableCell>
                   <TableCell className="text-right">
