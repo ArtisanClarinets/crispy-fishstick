@@ -3,17 +3,39 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
+import { assertSameOrigin } from "@/lib/security/origin";
 import { z } from "zod";
 
 const updateRolesSchema = z.object({
   roleIds: z.array(z.string()),
 });
 
+// Safe select to avoid returning passwordHash and mfaSecret
+const SAFE_USER_WITH_ROLES_SELECT = {
+  id: true,
+  email: true,
+  name: true,
+  createdAt: true,
+  updatedAt: true,
+  RoleAssignment: {
+    include: {
+      Role: true,
+    },
+  },
+};
+
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
+    // CSRF protection
+    try {
+      assertSameOrigin(req);
+    } catch (_error) {
+      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
+    }
+
     const adminUser = await requireAdmin({ permissions: ["users.write"] });
     const body = await req.json();
     const validatedData = updateRolesSchema.parse(body);
@@ -24,7 +46,7 @@ export async function PATCH(
     });
 
     if (!targetUser) {
-      return new NextResponse("Not Found", { status: 404 });
+      return new NextResponse("Not Found", { status: 404, headers: { "Cache-Control": "no-store" } });
     }
 
     // Use transaction to update roles
@@ -47,7 +69,7 @@ export async function PATCH(
 
     const updatedUser = await prisma.user.findUnique({
       where: { id: params.id },
-      include: { RoleAssignment: true },
+      select: SAFE_USER_WITH_ROLES_SELECT,
     });
 
     await createAuditLog({
@@ -60,18 +82,26 @@ export async function PATCH(
       after: updatedUser,
     });
 
-    return NextResponse.json(updatedUser);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ errors: error.errors }, { status: 400 });
+    return NextResponse.json(updatedUser, {
+      headers: { "Cache-Control": "no-store" },
+    });
+  } catch (_error) {
+    if (_error instanceof z.ZodError) {
+      return NextResponse.json(
+        { errors: _error.errors },
+        { status: 400, headers: { "Cache-Control": "no-store" } }
+      );
     }
-    if (error instanceof Error && error.message === "Unauthorized") {
-        return new NextResponse("Unauthorized", { status: 401 });
+    if (_error instanceof Error && _error.message === "Unauthorized") {
+      return new NextResponse("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store" } });
     }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
+    if (_error instanceof Error && _error.message === "Forbidden") {
+      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
     }
-    console.error("Failed to update user roles:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("Failed to update user roles:", _error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }

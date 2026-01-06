@@ -4,12 +4,19 @@ import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
 import { unlink } from "fs/promises";
 import { join } from "path";
+import { assertSameOrigin } from "@/lib/security/origin";
 
 export const dynamic = "force-dynamic";
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  void req;
   try {
+    // CSRF protection
+    try {
+      assertSameOrigin(req);
+    } catch (_error) {
+      return NextResponse.json({ error: "Invalid Origin" }, { status: 403 });
+    }
+
     const user = await requireAdmin({ permissions: ["media.write"] });
 
     const asset = await prisma.mediaAsset.findUnique({
@@ -17,12 +24,15 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     });
 
     if (!asset) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Not found" },
+        { status: 404, headers: { "Cache-Control": "no-store" } }
+      );
     }
 
-    // Delete file
+    // Delete file using asset.key (not URL)
     try {
-      const filepath = join(process.cwd(), "public", asset.url); // url is like /uploads/filename
+      const filepath = join(process.cwd(), "uploads", asset.key);
       await unlink(filepath);
     } catch (err) {
       console.error("Failed to delete file:", err);
@@ -42,8 +52,32 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
       before: asset,
     });
 
-    return NextResponse.json(asset);
+    return NextResponse.json(asset, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (_error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (_error instanceof Error && _error.message === "Invalid Origin") {
+      return NextResponse.json(
+        { error: "Invalid Origin" },
+        { status: 403, headers: { "Cache-Control": "no-store" } }
+      );
+    }
+    if (_error instanceof Error && _error.message === "Unauthorized") {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401, headers: { "Cache-Control": "no-store" } }
+      );
+    }
+    if (_error instanceof Error && _error.message === "Forbidden") {
+      return NextResponse.json(
+        { error: "Forbidden" },
+        { status: 403, headers: { "Cache-Control": "no-store" } }
+      );
+    }
+    console.error("Failed to delete media:", _error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }

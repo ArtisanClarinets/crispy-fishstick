@@ -23,7 +23,7 @@ Goals & Acceptance Criteria
 
 Security & Operations
 ---------------------
-- **Secret Management**: MFA secrets are encrypted at rest using Sodium (XSalsa20-Poly1305). `MFA_ENCRYPTION_KEY` must be set in production.
+- **Secret Management**: MFA secrets are encrypted at rest using AES-256-GCM. `MFA_ENCRYPTION_KEY` must be set in production.
 - **File Uploads**: Files are stored in a private directory (`/uploads`) outside the public web root. They are served via `/api/uploads/*` with strict type/size validation and forced content-disposition.
 - **Cron Jobs**: Protected by `CRON_SECRET` header.
 - **Audit Logs**: All sensitive data (passwords, secrets, tokens) is redacted before logging.

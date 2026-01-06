@@ -25,7 +25,7 @@ This release focuses on addressing all critical security vulnerabilities identif
   - *Ref: SECURITY_REVIEW.md Item #6*
 
 #### Added
-- **MFA Encryption**: Implemented Sodium-based (XSalsa20-Poly1305) encryption for MFA secrets at rest (`lib/security/mfa.ts`).
+- **MFA Encryption**: Implemented AES-256-GCM encryption for MFA secrets at rest (`lib/security/mfa.ts`).
 - **Audit Log Redaction**: Added recursive redaction for audit logs to strip sensitive keys (password, token, secret) before storage and retrieval (`lib/security/redact.ts`).
 - **Safe DTOs**: Created strict TypeScript interfaces and Prisma select helpers for User objects (`lib/types/user.ts`, `lib/security/safe-user.ts`).
 - **Origin Enforcement**: Added `assertSameOrigin` checks for admin mutation endpoints to prevent CSRF (`lib/security/origin.ts`).

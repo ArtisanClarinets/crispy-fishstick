@@ -1,0 +1,12 @@
+console.log('\x1b[36m%s\x1b[0m', '=======================================================');
+console.log('\x1b[36m%s\x1b[0m', '  🚀 Crispy Fishstick Installation Complete!');
+console.log('\x1b[36m%s\x1b[0m', '=======================================================');
+console.log('');
+console.log('  To configure your environment for production/dev:');
+console.log('  👉 \x1b[33mnpm run setup\x1b[0m');
+console.log('');
+console.log('  Then start the application:');
+console.log('  👉 \x1b[33mnpm run dev\x1b[0m (Development)');
+console.log('  👉 \x1b[33mnpm run build && npm start\x1b[0m (Production)');
+console.log('');
+console.log('\x1b[36m%s\x1b[0m', '=======================================================');

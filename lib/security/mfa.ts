@@ -1,10 +1,26 @@
 import { randomBytes, createCipheriv, createDecipheriv, createHash } from "crypto";
 
 const ALGORITHM = "aes-256-gcm";
-const SECRET_KEY = process.env.MFA_ENCRYPTION_KEY || process.env.NEXTAUTH_SECRET || "default-insecure-key-change-in-prod";
+
+// Get encryption key from env; fail in production if not set
+function getMFAEncryptionKey(): string {
+  const key = process.env.MFA_ENCRYPTION_KEY || process.env.NEXTAUTH_SECRET;
+  
+  if (process.env.NODE_ENV === "production" && !key) {
+    throw new Error(
+      "MFA_ENCRYPTION_KEY or NEXTAUTH_SECRET is required in production. Please set MFA_ENCRYPTION_KEY in your environment variables."
+    );
+  }
+  
+  if (!key) {
+    console.warn("WARNING: No MFA encryption key configured. MFA will not work reliably.");
+  }
+  
+  return key || "default-insecure-key-change-in-dev";
+}
 
 // Ensure key is 32 bytes
-const key = createHash("sha256").update(String(SECRET_KEY)).digest();
+const key = createHash("sha256").update(String(getMFAEncryptionKey())).digest();
 
 export async function encryptSecret(text: string): Promise<string> {
   const iv = randomBytes(12); // 96-bit IV for GCM

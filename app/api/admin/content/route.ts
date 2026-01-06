@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
+import { assertSameOrigin } from "@/lib/security/origin";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 
@@ -38,15 +39,27 @@ export async function GET(req: Request) {
       },
     });
 
-    return NextResponse.json(items);
+    return NextResponse.json(items, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     console.error("Content fetch error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }
 
 export async function POST(req: Request) {
   try {
+    // CSRF protection
+    try {
+      assertSameOrigin(req);
+    } catch (_error) {
+      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
+    }
+
     const user = await requireAdmin({ permissions: ["content.write"] });
     const body = await req.json();
     const validated = contentSchema.parse(body);
@@ -58,7 +71,7 @@ export async function POST(req: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Slug already exists" },
-        { status: 400 }
+        { status: 400, headers: { "Cache-Control": "no-store" } }
       );
     }
 
@@ -81,12 +94,21 @@ export async function POST(req: Request) {
       after: item,
     });
 
-    return NextResponse.json(item, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
+    return NextResponse.json(item, {
+      status: 201,
+      headers: { "Cache-Control": "no-store" },
+    });
+  } catch (_error) {
+    if (_error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: _error.errors },
+        { status: 400, headers: { "Cache-Control": "no-store" } }
+      );
     }
-    console.error("Content create error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("Content create error:", _error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }

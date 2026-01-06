@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [code, setCode] = useState('');
   const [showMFA, setShowMFA] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [_error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -28,6 +29,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
     try {
       const result = await signIn('credentials', {

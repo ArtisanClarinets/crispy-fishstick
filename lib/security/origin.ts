@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-export function assertSameOrigin(req: NextRequest) {
+export function assertSameOrigin(req: NextRequest | Request) {
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");
   

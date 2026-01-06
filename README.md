@@ -27,7 +27,7 @@ Thompson Systems is a specialized engineering studio for founders who demand pro
 - **UI Primitives:** [Radix UI](https://www.radix-ui.com/) (via shadcn/ui patterns)
 - **Icons:** [Lucide React](https://lucide.dev/)
 - **Security:**
-  - Sodium / XSalsa20-Poly1305 Encryption for secrets (MFA)
+  - AES-256-GCM Encryption for secrets (MFA)
   - Strict Content Security Policy (CSP)
   - Rate Limiting (Database backed)
   - Safe Data Serialization (DTOs)

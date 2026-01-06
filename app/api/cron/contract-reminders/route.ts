@@ -5,12 +5,19 @@ import { addDays } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_req: Request) {
+export async function GET(req: Request) {
   try {
     // Secure this endpoint with CRON_SECRET header
-    const authHeader = _req.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    // Require CRON_SECRET in production; fail closed if missing
+    const cronSecret = process.env.CRON_SECRET;
+    if (process.env.NODE_ENV === "production" && !cronSecret) {
+      console.error("CRON_SECRET is not set. Cron endpoint disabled.");
+      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
+    }
+
+    const authHeader = req.headers.get("authorization");
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+      return new NextResponse("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store" } });
     }
     
     console.log("Running contract expiration check...");
@@ -34,8 +41,11 @@ export async function GET(_req: Request) {
     const results = [];
 
     for (const contract of expiringContracts) {
+      // Get tenant contact email; derive from tenant or use environment fallback
+      const toEmail = contract.Tenant?.contactEmail || process.env.ADMIN_EMAIL || "admin@example.com";
+      
       const emailSent = await sendEmail({
-        to: "admin@example.com", // In a real app, this would be contract.Tenant.contactEmail
+        to: toEmail,
         subject: `Contract Expiration Warning: ${contract.title}`,
         html: `
           <h1>Contract Expiration Warning</h1>
@@ -52,11 +62,14 @@ export async function GET(_req: Request) {
       });
     }
 
-    return NextResponse.json({
-      success: true,
-      processed: results.length,
-      details: results,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        processed: results.length,
+        details: results,
+      },
+      { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (error) {
     console.error("Failed to check contract expirations:", error);
     return NextResponse.json(

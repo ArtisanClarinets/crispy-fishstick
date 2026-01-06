@@ -5,6 +5,7 @@ import { createAuditLog } from "@/lib/admin/audit";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { validateFile } from "@/lib/security/upload";
+import { assertSameOrigin } from "@/lib/security/origin";
 
 export const dynamic = "force-dynamic";
 
@@ -16,14 +17,26 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(assets);
+    return NextResponse.json(assets, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (_error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }
 
 export async function POST(req: Request) {
   try {
+    // CSRF protection
+    try {
+      assertSameOrigin(req);
+    } catch (_error) {
+      return NextResponse.json({ error: "Invalid Origin" }, { status: 403 });
+    }
+
     const user = await requireAdmin({ permissions: ["media.write"] });
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -73,9 +86,15 @@ export async function POST(req: Request) {
       after: asset,
     });
 
-    return NextResponse.json(asset, { status: 201 });
-  } catch (error) {
-    console.error("Upload error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(asset, {
+      status: 201,
+      headers: { "Cache-Control": "no-store" },
+    });
+  } catch (_error) {
+    console.error("Upload error:", _error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }

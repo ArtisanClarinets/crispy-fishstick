@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
+import { assertSameOrigin } from "@/lib/security/origin";
 import * as z from "zod";
 
 const createLeadSchema = z.object({
@@ -24,14 +25,26 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(leads);
+    return NextResponse.json(leads, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (_error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }
 
 export async function POST(req: Request) {
   try {
+    // CSRF protection
+    try {
+      assertSameOrigin(req);
+    } catch (_error) {
+      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
+    }
+
     const user = await requireAdmin({ permissions: ["leads.write"] });
     const body = await req.json();
 
@@ -50,11 +63,20 @@ export async function POST(req: Request) {
       after: lead,
     });
 
-    return NextResponse.json(lead, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
+    return NextResponse.json(lead, {
+      status: 201,
+      headers: { "Cache-Control": "no-store" },
+    });
+  } catch (_error) {
+    if (_error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: _error.errors },
+        { status: 400, headers: { "Cache-Control": "no-store" } }
+      );
     }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }

@@ -37,14 +37,22 @@ export async function middleware(request: NextRequest) {
   // AUTHENTICATION LOGIC
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    const secret = process.env.NEXTAUTH_SECRET;
+    if (!secret) {
+      console.error("NEXTAUTH_SECRET is not set. Admin routes will not authenticate.");
+      const url = new URL("/admin/login", request.url);
+      url.searchParams.set("callbackUrl", encodeURIComponent(pathname + request.nextUrl.search));
+      return NextResponse.redirect(url);
+    }
+    
     const token = await getToken({ 
       req: request, 
-      secret: process.env.NEXTAUTH_SECRET 
+      secret 
     });
 
     if (!token) {
       const url = new URL("/admin/login", request.url);
-      url.searchParams.set("callbackUrl", encodeURI(request.url));
+      url.searchParams.set("callbackUrl", encodeURIComponent(pathname + request.nextUrl.search));
       return NextResponse.redirect(url);
     }
   }

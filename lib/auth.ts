@@ -5,7 +5,13 @@ import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
 import { decryptSecret } from "@/lib/security/mfa";
 
-const nextAuthSecret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
+// Enforce NEXTAUTH_SECRET in production; fail fast if missing
+const nextAuthSecret = process.env.NEXTAUTH_SECRET;
+if (process.env.NODE_ENV === "production" && !nextAuthSecret) {
+  throw new Error(
+    "NEXTAUTH_SECRET is required in production. Please set it in your environment variables."
+  );
+}
 
 declare module "next-auth" {
   interface Session {
@@ -31,6 +37,7 @@ export const authOptions: NextAuthOptions = {
   secret: nextAuthSecret,
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: "/admin/login",
@@ -106,10 +113,8 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // @ts-ignore
-        token.roles = user.roles;
-        // @ts-ignore
-        token.tenantId = user.tenantId;
+        token.roles = (user as any).roles || [];
+        token.tenantId = (user as any).tenantId;
       }
       return token;
     },

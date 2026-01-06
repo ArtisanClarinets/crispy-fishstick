@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
+import { assertSameOrigin } from "@/lib/security/origin";
 import { z } from "zod";
 
 const createContractSchema = z.object({
@@ -17,6 +18,13 @@ const createContractSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    // CSRF protection
+    try {
+      assertSameOrigin(req);
+    } catch (_error) {
+      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
+    }
+
     const user = await requireAdmin({ permissions: ["contracts.write"] });
     const body = await req.json();
     const validatedData = createContractSchema.parse(body);
@@ -34,19 +42,28 @@ export async function POST(req: Request) {
       after: contract,
     });
 
-    return NextResponse.json(contract, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ errors: error.errors }, { status: 400 });
+    return NextResponse.json(contract, {
+      status: 201,
+      headers: { "Cache-Control": "no-store" },
+    });
+  } catch (_error) {
+    if (_error instanceof z.ZodError) {
+      return NextResponse.json(
+        { errors: _error.errors },
+        { status: 400, headers: { "Cache-Control": "no-store" } }
+      );
     }
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401 });
+    if (_error instanceof Error && _error.message === "Unauthorized") {
+      return new NextResponse("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store" } });
     }
-    if (error instanceof Error && error.message === "Forbidden") {
-      return new NextResponse("Forbidden", { status: 403 });
+    if (_error instanceof Error && _error.message === "Forbidden") {
+      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
     }
-    console.error("Failed to create contract:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("Failed to create contract:", _error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }
 
@@ -61,14 +78,19 @@ export async function GET() {
       },
     });
     
-    return NextResponse.json(contracts);
+    return NextResponse.json(contracts, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store" } });
     }
     if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
+      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
     }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }
