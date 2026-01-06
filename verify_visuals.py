@@ -4,11 +4,11 @@ def verify_styling():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
+        page.set_default_timeout(60000)
 
         # Navigate to homepage
         try:
-            page.goto("http://localhost:3000")
-            page.wait_for_load_state("networkidle")
+            page.goto("http://localhost:3000", wait_until="load")
 
             # Take screenshot of Hero Section
             page.screenshot(path="verification/home_hero.png")
@@ -21,14 +21,12 @@ def verify_styling():
             print("Captured home_work.png")
 
             # Navigate to Services
-            page.goto("http://localhost:3000/services")
-            page.wait_for_load_state("networkidle")
+            page.goto("http://localhost:3000/services", wait_until="load")
             page.screenshot(path="verification/services.png")
             print("Captured services.png")
 
             # Navigate to Contact
-            page.goto("http://localhost:3000/contact")
-            page.wait_for_load_state("networkidle")
+            page.goto("http://localhost:3000/contact", wait_until="load")
             page.screenshot(path="verification/contact.png")
             print("Captured contact.png")
 

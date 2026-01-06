@@ -133,7 +133,7 @@
 
   /* Card: Lift + Specular Sweep */
   .card-precision {
-    @apply relative transition-all duration-300 ease-premium;
+    @apply relative transition-all duration-300 ease-premium overflow-hidden;
   }
   .card-precision:hover {
     transform: translateY(-4px);
