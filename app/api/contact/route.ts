@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/security/request";
 
 const contactFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -17,14 +18,6 @@ const contactFormSchema = z.object({
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 6;
 const MIN_SUBMIT_TIME_MS = 1500;
-
-function getClientIp(req: Request) {
-  const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0]?.trim() ?? "unknown";
-  }
-  return req.headers.get("x-real-ip") ?? "unknown";
-}
 
 export async function POST(req: Request) {
   try {

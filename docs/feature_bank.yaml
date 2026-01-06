@@ -1,0 +1,1307 @@
+version: "1.0"
+created_for: "Small business web-app/custom software onboarding & feature menu generation"
+notes:
+  - "This is a structured conversion of the two checklists: (1) Overlooked website features; (2) Recursive discovery map."
+  - "Add, remove, or re-tag items over time; keep IDs stable once used in proposals/contracts."
+  - "Use tags to filter by: frontend/backend/admin/ops/compliance/analytics/mobile/a11y/seo."
+
+# ----------------------------
+# PART A: FEATURE BANK
+# ----------------------------
+feature_bank:
+  domains:
+    - id: "micro_interactions"
+      name: "Micro-interactions & Polish"
+      intent: "Make the product feel premium and predictable through small UI details."
+      features:
+        - id: "toast_messages"
+          name: "Toasts (success/error/info)"
+          summary: "Non-blocking feedback for user actions with clear, human copy."
+          examples: ["Saved", "Link copied", "Payment failed"]
+          user_value: ["confidence", "clarity", "reduced frustration"]
+          tags: ["frontend", "copy", "ux"]
+          default_priority: "P1"
+          questions:
+            - "Which actions need confirmation (save, delete, send, submit, copy)?"
+            - "Should errors be inline, toast-only, or both?"
+          acceptance_criteria:
+            - "Toasts appear within 300ms after action completes."
+            - "Error toasts include a next step (retry/contact/support link) when applicable."
+
+        - id: "inline_validation_plus_summary"
+          name: "Inline validation + form-level error summary"
+          summary: "Field-level errors plus a clear top summary for multiple failures."
+          user_value: ["faster form completion", "less confusion"]
+          tags: ["frontend", "ux", "a11y"]
+          default_priority: "P1"
+          questions:
+            - "Which fields are required, and what are valid formats?"
+            - "Should we validate on blur, on submit, or both?"
+          acceptance_criteria:
+            - "Invalid fields are highlighted with readable messages."
+            - "Form summary links to each invalid field."
+
+        - id: "component_loading_states"
+          name: "Component-matched loading states"
+          summary: "Buttons show spinners; pages show skeletons; tables show loading rows."
+          user_value: ["perceived speed", "reduced abandonment"]
+          tags: ["frontend", "ux", "performance"]
+          default_priority: "P1"
+
+        - id: "optimistic_ui"
+          name: "Optimistic UI"
+          summary: "UI updates immediately; gracefully reverts on failure."
+          user_value: ["speed", "modern UX feel"]
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P2"
+          dependencies: ["toast_messages"]
+
+        - id: "undo_destructive_actions"
+          name: "Undo for destructive actions"
+          summary: "Recursive safety for deletes/archives with quick undo."
+          examples: ["Item deleted — Undo"]
+          user_value: ["trust", "fewer disasters"]
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P1"
+          dependencies: ["toast_messages"]
+
+        - id: "non_blocking_confirmations"
+          name: "Non-blocking confirmations"
+          summary: "Prefer toast + undo over constant confirmation modals."
+          user_value: ["flow", "less interruption"]
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "empty_states"
+          name: "Helpful empty states with CTAs"
+          summary: "Explain what to do next when no data exists yet."
+          user_value: ["onboarding", "clarity"]
+          tags: ["frontend", "copy", "ux"]
+          default_priority: "P1"
+
+        - id: "zero_results_states"
+          name: "Zero-results states with suggestions"
+          summary: "Offer clear guidance when filters/search return nothing."
+          user_value: ["reduced drop-off"]
+          tags: ["frontend", "ux", "copy"]
+          default_priority: "P1"
+
+        - id: "consistent_hover_focus_states"
+          name: "Consistent hover/focus states"
+          summary: "Visual consistency across interactive elements."
+          user_value: ["predictability", "professional feel"]
+          tags: ["frontend", "ux", "a11y"]
+          default_priority: "P1"
+
+        - id: "copy_to_clipboard"
+          name: "Copy-to-clipboard buttons"
+          summary: "One-click copy for IDs, addresses, codes, links."
+          user_value: ["speed", "reduced errors"]
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "autosave_drafts"
+          name: "Auto-save drafts + last saved timestamp"
+          summary: "Prevent loss of work; show last saved time."
+          user_value: ["trust", "reduced frustration"]
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P2"
+
+        - id: "saving_state_indicators"
+          name: "Saving… → Saved indicators"
+          summary: "Clear state transitions for settings/profile edits."
+          user_value: ["confidence"]
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "multi_step_progress"
+          name: "Multi-step progress indicators"
+          summary: "Step count, progress bar, or breadcrumbs in flows."
+          user_value: ["completion", "reduced anxiety"]
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "prevent_double_submit"
+          name: "Prevent double-submit"
+          summary: "Disable on submit, show spinner, ensure idempotency where needed."
+          user_value: ["fewer duplicate actions", "clean data"]
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P1"
+
+        - id: "smart_defaults_and_restore_state"
+          name: "Smart defaults + restore prior state"
+          summary: "Remember filters/sorts; restore on return."
+          user_value: ["speed", "power user support"]
+          tags: ["frontend", "ux"]
+          default_priority: "P3"
+
+        - id: "smooth_scroll_anchor_highlight"
+          name: "Smooth scroll + anchor highlighting"
+          summary: "For long pages/docs; improves navigation clarity."
+          user_value: ["discoverability"]
+          tags: ["frontend", "ux"]
+          default_priority: "P3"
+
+        - id: "subtle_meaningful_animation"
+          name: "Subtle, meaningful animations"
+          summary: "Animations clarify cause/effect; avoid decoration-only."
+          user_value: ["clarity"]
+          tags: ["frontend", "ux"]
+          default_priority: "P3"
+
+        - id: "reduced_motion_support"
+          name: "Reduced motion support"
+          summary: "Respect OS-level reduced motion preferences."
+          user_value: ["accessibility", "comfort"]
+          tags: ["frontend", "a11y"]
+          default_priority: "P2"
+
+    - id: "feedback_messaging"
+      name: "Feedback & System Messaging"
+      intent: "Prevent user confusion with clear, actionable system feedback."
+      features:
+        - id: "clear_error_messages"
+          name: "Clear error messages"
+          summary: "What happened, why it happened, and what to do next."
+          tags: ["frontend", "copy", "ux"]
+          default_priority: "P1"
+
+        - id: "retry_actions"
+          name: "Retry actions"
+          summary: "Allow retries for transient failures (network, uploads, saves)."
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P1"
+
+        - id: "offline_detection"
+          name: "Offline detection + sync messaging"
+          summary: "Detect offline; communicate sync behavior."
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "global_error_boundary"
+          name: "Global error boundary page"
+          summary: "Graceful fallback when something breaks (refresh, contact, report)."
+          tags: ["frontend", "ops"]
+          default_priority: "P1"
+
+        - id: "service_degradation_messaging"
+          name: "Service degradation messaging"
+          summary: "Status page or at least graceful downtime messaging."
+          tags: ["ops", "frontend"]
+          default_priority: "P2"
+
+        - id: "session_timeout_messaging"
+          name: "Session timeout messaging"
+          summary: "Explain sign-out and guide re-authentication."
+          tags: ["frontend", "backend", "security"]
+          default_priority: "P1"
+
+        - id: "rate_limit_feedback"
+          name: "Rate limit / throttling feedback"
+          summary: "Explain limits and recovery instead of silent failures."
+          tags: ["backend", "frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "unsaved_changes_warning"
+          name: "Unsaved changes warning"
+          summary: "Warn on navigation only when there are unsaved changes."
+          tags: ["frontend", "ux"]
+          default_priority: "P1"
+
+    - id: "notifications"
+      name: "Notifications System"
+      intent: "Move from ephemeral alerts to a real notification product."
+      features:
+        - id: "notification_center"
+          name: "Notification center / inbox"
+          summary: "Persistent inbox for notifications, not just toasts."
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P2"
+
+        - id: "read_unread_state"
+          name: "Read/unread state"
+          summary: "Track read state; allow mark-as-read."
+          tags: ["backend", "frontend"]
+          default_priority: "P2"
+
+        - id: "digest_vs_realtime_prefs"
+          name: "Digest vs real-time preferences"
+          summary: "Let users choose immediate vs digest delivery."
+          tags: ["backend", "ux"]
+          default_priority: "P3"
+
+        - id: "granular_notification_settings"
+          name: "Granular notification settings"
+          summary: "Per-type toggles (billing, scheduling, system, marketing)."
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P3"
+
+        - id: "do_not_disturb"
+          name: "Do Not Disturb windows"
+          summary: "Quiet hours for non-critical pings."
+          tags: ["backend", "ux"]
+          default_priority: "P3"
+
+        - id: "actionable_notifications"
+          name: "Actionable notifications"
+          summary: "Approve/deny, view item, undo directly from notification."
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P3"
+
+        - id: "deep_linking"
+          name: "Deep linking to exact context"
+          summary: "Notification links open the right record/screen."
+          tags: ["frontend", "backend"]
+          default_priority: "P2"
+
+        - id: "safe_fallbacks_for_deleted_or_forbidden"
+          name: "Safe fallbacks for deleted/permission-changed targets"
+          summary: "If item is missing or access changed, show a helpful fallback."
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P2"
+
+    - id: "navigation"
+      name: "Navigation & Orientation"
+      intent: "Ensure users always know where they are and how to get back."
+      features:
+        - id: "sticky_header_mobile_safe"
+          name: "Sticky header that respects mobile space"
+          tags: ["frontend", "ux", "mobile"]
+          default_priority: "P2"
+
+        - id: "breadcrumbs"
+          name: "Breadcrumbs for deep sections"
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "keyboard_accessible_menus"
+          name: "Keyboard-accessible menus"
+          tags: ["frontend", "a11y", "ux"]
+          default_priority: "P1"
+
+        - id: "history_respecting_back_behavior"
+          name: "Back behavior that respects history"
+          summary: "Modal closes vs navigating away; preserve context."
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "active_nav_states"
+          name: "Active nav states"
+          tags: ["frontend", "ux"]
+          default_priority: "P1"
+
+        - id: "skip_to_content"
+          name: "Skip-to-content link"
+          tags: ["frontend", "a11y"]
+          default_priority: "P1"
+
+        - id: "useful_footer"
+          name: "Footer that helps"
+          summary: "Support, contact, policies, socials, sitemap."
+          tags: ["frontend", "copy", "seo"]
+          default_priority: "P2"
+
+        - id: "consistent_home_behavior"
+          name: "Consistent Home behavior"
+          summary: "Logo click expectations, avoid surprising routing."
+          tags: ["frontend", "ux"]
+          default_priority: "P3"
+
+        - id: "contextual_navigation_preserve_state"
+          name: "Contextual navigation preserving state"
+          summary: "Back to results retains filters/sort."
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+    - id: "search_discovery"
+      name: "Search & Discovery"
+      intent: "Make it easy to find things even with imperfect inputs."
+      features:
+        - id: "autocomplete_suggestions"
+          name: "Search suggestions / autocomplete"
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P2"
+
+        - id: "typo_tolerance_synonyms"
+          name: "Typo tolerance + synonyms"
+          tags: ["backend", "ux"]
+          default_priority: "P3"
+
+        - id: "highlight_matches"
+          name: "Highlight matches in results"
+          tags: ["frontend", "ux"]
+          default_priority: "P3"
+
+        - id: "filters_sort_clear_reset"
+          name: "Filters + sorting + clear reset"
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "saved_recent_searches"
+          name: "Saved searches / recent searches"
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P3"
+
+        - id: "empty_search_guidance"
+          name: "Empty search guidance"
+          tags: ["frontend", "copy", "ux"]
+          default_priority: "P2"
+
+        - id: "search_index_freshness"
+          name: "Search indexing updates promptly"
+          tags: ["backend", "ops"]
+          default_priority: "P2"
+
+        - id: "accessible_results_navigation"
+          name: "Accessible results navigation"
+          tags: ["frontend", "a11y"]
+          default_priority: "P1"
+
+    - id: "forms"
+      name: "Forms & Input UX"
+      intent: "Increase conversion and reduce user errors/friction."
+      features:
+        - id: "autocomplete_attributes"
+          name: "Autofill support (autocomplete attributes)"
+          tags: ["frontend", "ux"]
+          default_priority: "P1"
+
+        - id: "input_masks_not_fighting_user"
+          name: "Input masks that don’t fight the user"
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "human_friendly_validation_copy"
+          name: "Human-friendly validation"
+          tags: ["frontend", "copy", "ux"]
+          default_priority: "P1"
+
+        - id: "password_ux_show_hide_strength"
+          name: "Password UX (show/hide, strength guidance)"
+          tags: ["frontend", "ux", "security"]
+          default_priority: "P2"
+
+        - id: "caps_lock_warning"
+          name: "Caps lock warning"
+          tags: ["frontend", "ux"]
+          default_priority: "P3"
+
+        - id: "enter_to_submit_correct_target"
+          name: "Enter-to-submit behaves correctly"
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "save_and_resume_later"
+          name: "Save & resume later for long forms"
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P3"
+
+        - id: "file_upload_ux"
+          name: "File upload UX (drag/drop, progress, retry)"
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P2"
+
+        - id: "address_autocomplete_optional"
+          name: "Address autocomplete (if relevant)"
+          tags: ["frontend", "ux"]
+          default_priority: "P3"
+
+        - id: "form_accessibility_basics"
+          name: "Form accessibility basics"
+          summary: "Labels, fieldset/legend, error association, focus to first error."
+          tags: ["frontend", "a11y"]
+          default_priority: "P1"
+
+        - id: "draft_storage_prevent_data_loss"
+          name: "Draft storage to prevent data loss"
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P2"
+
+    - id: "accessibility"
+      name: "Accessibility Essentials"
+      intent: "Make the product usable for keyboard/screen reader users and reduce friction."
+      features:
+        - id: "visible_focus_ring"
+          name: "Visible focus ring"
+          tags: ["frontend", "a11y"]
+          default_priority: "P1"
+
+        - id: "logical_tab_order"
+          name: "Logical tab order"
+          tags: ["frontend", "a11y"]
+          default_priority: "P1"
+
+        - id: "proper_heading_structure"
+          name: "Proper heading structure (H1/H2...)"
+          tags: ["frontend", "a11y", "seo"]
+          default_priority: "P1"
+
+        - id: "aria_used_correctly"
+          name: "ARIA only when necessary (correct usage)"
+          tags: ["frontend", "a11y"]
+          default_priority: "P1"
+
+        - id: "color_contrast_checks"
+          name: "Color contrast checks"
+          tags: ["frontend", "a11y", "design"]
+          default_priority: "P1"
+
+        - id: "alt_text_patterns"
+          name: "Alt text patterns (decorative vs meaningful)"
+          tags: ["frontend", "a11y", "content"]
+          default_priority: "P1"
+
+        - id: "captions_transcripts"
+          name: "Captions/transcripts for media"
+          tags: ["a11y", "content"]
+          default_priority: "P2"
+
+        - id: "accessible_modals"
+          name: "Accessible modals"
+          summary: "Trap focus, restore focus, ESC closes, background inert."
+          tags: ["frontend", "a11y"]
+          default_priority: "P1"
+
+        - id: "live_region_announcements"
+          name: "Screen reader announcements (live regions)"
+          tags: ["frontend", "a11y"]
+          default_priority: "P2"
+
+        - id: "touch_target_sizing"
+          name: "Touch target sizing"
+          tags: ["frontend", "mobile", "a11y"]
+          default_priority: "P1"
+
+        - id: "no_hover_only_interactions"
+          name: "No hover-only interactions"
+          tags: ["frontend", "mobile", "a11y"]
+          default_priority: "P1"
+
+    - id: "mobile_responsive"
+      name: "Mobile & Responsive Edge Cases"
+      intent: "Make the site feel native on phones and avoid common mobile browser traps."
+      features:
+        - id: "safe_area_padding"
+          name: "Safe area padding"
+          tags: ["frontend", "mobile"]
+          default_priority: "P2"
+
+        - id: "sticky_cta_used_carefully"
+          name: "Sticky CTA on mobile (used carefully)"
+          tags: ["frontend", "mobile", "ux"]
+          default_priority: "P3"
+
+        - id: "mobile_100vh_issues"
+          name: "100vh issues handling"
+          summary: "Account for address bar resizing."
+          tags: ["frontend", "mobile"]
+          default_priority: "P2"
+
+        - id: "ios_input_zoom_prevention"
+          name: "iOS input zoom prevention"
+          tags: ["frontend", "mobile"]
+          default_priority: "P3"
+
+        - id: "inputmode_numeric_keyboard"
+          name: "Numeric keyboards via inputmode"
+          tags: ["frontend", "mobile", "ux"]
+          default_priority: "P2"
+
+        - id: "tap_delay_double_tap_protection"
+          name: "Tap delay / accidental double taps handling"
+          tags: ["frontend", "mobile", "ux"]
+          default_priority: "P2"
+
+        - id: "thumb_friendly_spacing"
+          name: "Thumb-friendly spacing for primary actions"
+          tags: ["frontend", "mobile", "ux"]
+          default_priority: "P2"
+
+    - id: "performance"
+      name: "Performance & Perceived Performance"
+      intent: "Improve speed, stability, and conversion through better loading behavior."
+      features:
+        - id: "image_optimization"
+          name: "Image optimization (srcset, modern formats, lazy load)"
+          tags: ["frontend", "performance", "seo"]
+          default_priority: "P1"
+
+        - id: "font_loading_strategy"
+          name: "Font loading strategy to avoid layout shift"
+          tags: ["frontend", "performance"]
+          default_priority: "P2"
+
+        - id: "skeletons_over_spinners"
+          name: "Skeletons over spinners for content-heavy pages"
+          tags: ["frontend", "ux", "performance"]
+          default_priority: "P2"
+
+        - id: "preload_critical_assets"
+          name: "Preload critical assets (when justified)"
+          tags: ["frontend", "performance"]
+          default_priority: "P3"
+
+        - id: "reduce_js_payload_code_splitting"
+          name: "Reduce JS payload / code splitting"
+          tags: ["frontend", "performance"]
+          default_priority: "P2"
+
+        - id: "caching_headers_and_cdn"
+          name: "Caching headers + CDN"
+          tags: ["ops", "performance"]
+          default_priority: "P2"
+
+        - id: "avoid_layout_shift"
+          name: "Avoid layout shift"
+          tags: ["frontend", "performance"]
+          default_priority: "P1"
+
+        - id: "graceful_degradation_slow_devices"
+          name: "Graceful degradation on slow devices"
+          tags: ["frontend", "ux", "performance"]
+          default_priority: "P3"
+
+        - id: "client_side_error_and_perf_monitoring"
+          name: "Client-side error + performance monitoring"
+          tags: ["ops", "analytics", "performance"]
+          default_priority: "P2"
+
+    - id: "seo_sharing"
+      name: "SEO & Sharing Metadata"
+      intent: "Ensure pages are discoverable, share well, and behave correctly for crawlers."
+      features:
+        - id: "unique_titles_and_descriptions"
+          name: "Unique titles/meta descriptions per page"
+          tags: ["seo", "content"]
+          default_priority: "P1"
+
+        - id: "open_graph_twitter_cards"
+          name: "Open Graph/Twitter cards"
+          tags: ["seo", "content"]
+          default_priority: "P2"
+
+        - id: "canonical_urls"
+          name: "Canonical URLs"
+          tags: ["seo"]
+          default_priority: "P2"
+
+        - id: "sitemap_and_robots"
+          name: "Sitemap.xml + robots.txt"
+          tags: ["seo", "ops"]
+          default_priority: "P2"
+
+        - id: "clean_404_with_recovery"
+          name: "Clean 404 page with recovery"
+          tags: ["frontend", "seo", "ux"]
+          default_priority: "P1"
+
+        - id: "redirects_www_trailing_legacy"
+          name: "Redirect strategy (www, trailing slashes, legacy URLs)"
+          tags: ["seo", "ops"]
+          default_priority: "P2"
+
+        - id: "structured_data_schema"
+          name: "Structured data (Schema.org) where relevant"
+          tags: ["seo"]
+          default_priority: "P3"
+
+        - id: "favicon_and_app_icons"
+          name: "Favicon + app icons (all sizes)"
+          tags: ["frontend", "branding"]
+          default_priority: "P2"
+
+    - id: "security_privacy_trust"
+      name: "Security, Privacy, Trust"
+      intent: "Reduce risk and increase user trust with baseline security and transparency."
+      features:
+        - id: "https_and_hsts"
+          name: "HTTPS everywhere + HSTS"
+          tags: ["security", "ops"]
+          default_priority: "P1"
+
+        - id: "secure_auth_flows"
+          name: "Secure auth flows (reset, verification, magic links)"
+          tags: ["security", "backend", "frontend"]
+          default_priority: "P1"
+
+        - id: "two_factor_auth_planned"
+          name: "2FA support (or planned)"
+          tags: ["security", "backend"]
+          default_priority: "P3"
+
+        - id: "session_management_devices_logout_all"
+          name: "Session management (device list, logout everywhere)"
+          tags: ["security", "backend", "frontend"]
+          default_priority: "P2"
+
+        - id: "csrf_secure_cookies_csp"
+          name: "CSRF protection, secure cookies, CSP baseline"
+          tags: ["security", "backend", "ops"]
+          default_priority: "P1"
+
+        - id: "rate_limit_auth_endpoints"
+          name: "Rate limiting on login/reset"
+          tags: ["security", "backend"]
+          default_priority: "P1"
+
+        - id: "audit_logs_admin_actions"
+          name: "Audit logs for important actions"
+          tags: ["security", "ops", "admin"]
+          default_priority: "P2"
+
+        - id: "pii_redaction_in_logs"
+          name: "PII redaction in logs"
+          tags: ["security", "ops"]
+          default_priority: "P2"
+
+        - id: "privacy_terms_in_footer"
+          name: "Privacy policy / terms discoverable"
+          tags: ["legal", "content", "frontend"]
+          default_priority: "P1"
+
+        - id: "cookie_consent_preferences"
+          name: "Cookie consent + preference management (where required)"
+          tags: ["legal", "frontend", "ops"]
+          default_priority: "P2"
+
+        - id: "data_export_delete_account"
+          name: "Data export / delete account (jurisdiction dependent)"
+          tags: ["legal", "backend", "frontend"]
+          default_priority: "P3"
+
+    - id: "account_settings"
+      name: "Account & Settings"
+      intent: "Reduce support tickets and improve user control."
+      features:
+        - id: "profile_edit_cancel_revert"
+          name: "Profile editing with cancel/revert"
+          tags: ["frontend", "ux"]
+          default_priority: "P2"
+
+        - id: "email_change_confirmations"
+          name: "Email change flow (confirm old/new)"
+          tags: ["security", "backend", "frontend"]
+          default_priority: "P2"
+
+        - id: "password_change_invalidate_sessions"
+          name: "Password change with invalidate-other-sessions option"
+          tags: ["security", "backend", "frontend"]
+          default_priority: "P2"
+
+        - id: "notification_preferences"
+          name: "Notification preferences"
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P2"
+
+        - id: "language_locale"
+          name: "Language & locale"
+          tags: ["i18n", "frontend"]
+          default_priority: "P3"
+
+        - id: "timezone_settings_consistency"
+          name: "Timezone settings + consistent display"
+          tags: ["i18n", "frontend", "backend"]
+          default_priority: "P2"
+
+        - id: "billing_history_receipts"
+          name: "Billing history + invoices/receipts"
+          tags: ["backend", "frontend", "billing"]
+          default_priority: "P2"
+
+        - id: "plan_limits_messaging"
+          name: "Plan limits messaging"
+          summary: "Explain limits and upgrade path."
+          tags: ["frontend", "ux", "billing"]
+          default_priority: "P3"
+
+        - id: "roles_permissions_explainers"
+          name: "Role/permissions UI explainers"
+          tags: ["frontend", "ux", "admin"]
+          default_priority: "P2"
+
+    - id: "content_ops"
+      name: "Content Management & Operational Control"
+      intent: "Give the business control without developer intervention; prevent scope regret."
+      features:
+        - id: "draft_publish_workflow"
+          name: "Draft/publish workflow"
+          tags: ["admin", "backend", "frontend"]
+          default_priority: "P2"
+
+        - id: "shareable_preview_links"
+          name: "Preview links (shareable preview)"
+          tags: ["admin", "frontend", "backend"]
+          default_priority: "P2"
+
+        - id: "versioning_and_rollback"
+          name: "Versioning + rollback"
+          tags: ["admin", "backend", "ops"]
+          default_priority: "P2"
+
+        - id: "scheduled_publishing"
+          name: "Scheduled publishing (start/end)"
+          tags: ["admin", "backend"]
+          default_priority: "P3"
+
+        - id: "change_history_who_what_when"
+          name: "Change history (who/what/when)"
+          tags: ["admin", "ops", "security"]
+          default_priority: "P2"
+
+        - id: "admin_validation_rules"
+          name: "Admin validation rules"
+          summary: "Prevent broken public pages."
+          tags: ["admin", "backend", "ux"]
+          default_priority: "P1"
+
+        - id: "bulk_editing_tools"
+          name: "Bulk editing tools"
+          tags: ["admin", "frontend", "backend"]
+          default_priority: "P3"
+
+        - id: "feature_flags_rollouts"
+          name: "Feature flags / staged rollouts"
+          tags: ["ops", "backend"]
+          default_priority: "P3"
+
+        - id: "maintenance_mode"
+          name: "Maintenance mode"
+          tags: ["ops", "frontend"]
+          default_priority: "P2"
+
+        - id: "status_banners"
+          name: "Status banners (holiday hours, known issues)"
+          tags: ["admin", "frontend", "copy"]
+          default_priority: "P2"
+
+    - id: "analytics_instrumentation"
+      name: "Analytics & Instrumentation"
+      intent: "Make decisions with data; detect errors and performance problems early."
+      features:
+        - id: "event_tracking_plan"
+          name: "Event tracking plan"
+          summary: "Define events upfront, not ad-hoc."
+          tags: ["analytics", "ops"]
+          default_priority: "P2"
+
+        - id: "conversion_funnels"
+          name: "Conversion funnels"
+          tags: ["analytics", "growth"]
+          default_priority: "P2"
+
+        - id: "error_tracking_full_stack"
+          name: "Error tracking (frontend + backend)"
+          tags: ["ops", "analytics"]
+          default_priority: "P2"
+
+        - id: "performance_monitoring_rum"
+          name: "Performance monitoring / Core Web Vitals / RUM"
+          tags: ["performance", "analytics", "ops"]
+          default_priority: "P2"
+
+        - id: "ab_testing_hooks"
+          name: "A/B testing hooks"
+          tags: ["analytics", "growth"]
+          default_priority: "P3"
+
+        - id: "utm_attribution_support"
+          name: "Attribution-friendly tagging (UTMs)"
+          tags: ["analytics", "growth"]
+          default_priority: "P3"
+
+        - id: "consent_aware_analytics"
+          name: "Consent-aware analytics"
+          tags: ["analytics", "legal", "ops"]
+          default_priority: "P2"
+
+    - id: "i18n_edge_cases"
+      name: "Internationalization & Formatting Edge Cases"
+      intent: "Prevent growth pain and weird formatting bugs."
+      features:
+        - id: "date_number_currency_formatting"
+          name: "Date/number/currency formatting"
+          tags: ["i18n", "frontend", "backend"]
+          default_priority: "P2"
+
+        - id: "pluralization"
+          name: "Pluralization"
+          tags: ["i18n", "frontend"]
+          default_priority: "P3"
+
+        - id: "rtl_layout_readiness"
+          name: "RTL readiness"
+          tags: ["i18n", "frontend"]
+          default_priority: "P3"
+
+        - id: "long_text_resilience"
+          name: "Long text resilience"
+          tags: ["frontend", "ux", "i18n"]
+          default_priority: "P2"
+
+        - id: "timezone_safe_scheduling_dst"
+          name: "Timezone-safe scheduling (DST edge cases)"
+          tags: ["backend", "i18n"]
+          default_priority: "P2"
+
+        - id: "unicode_safe_input"
+          name: "Unicode-safe input"
+          tags: ["backend", "frontend"]
+          default_priority: "P2"
+
+    - id: "edge_pages"
+      name: "Edge Cases & Boring Pages"
+      intent: "Handle rarely-designed pages that users still hit."
+      features:
+        - id: "404_500_pages_with_recovery"
+          name: "404/500 pages with recovery paths"
+          tags: ["frontend", "ux", "seo"]
+          default_priority: "P1"
+
+        - id: "403_access_denied_cta"
+          name: "403/access denied with CTA"
+          tags: ["frontend", "security", "ux"]
+          default_priority: "P2"
+
+        - id: "first_run_empty_experience"
+          name: "First-run empty dashboard/cart experience"
+          tags: ["frontend", "ux", "onboarding"]
+          default_priority: "P1"
+
+        - id: "email_templates_quality"
+          name: "Email templates that render well"
+          tags: ["ops", "content", "branding"]
+          default_priority: "P2"
+
+        - id: "print_styles"
+          name: "Print styles for invoices/receipts"
+          tags: ["frontend", "billing"]
+          default_priority: "P3"
+
+        - id: "share_links_logged_out_behavior"
+          name: "Share links for logged-out users (or clear explanation)"
+          tags: ["frontend", "security", "ux"]
+          default_priority: "P2"
+
+    - id: "quality_of_life"
+      name: "Quality-of-life Enhancements"
+      intent: "Add delight and speed for frequent users."
+      features:
+        - id: "keyboard_shortcuts"
+          name: "Keyboard shortcuts"
+          tags: ["frontend", "ux"]
+          default_priority: "P3"
+
+        - id: "command_palette"
+          name: "Command palette"
+          tags: ["frontend", "ux"]
+          default_priority: "P3"
+
+        - id: "recently_viewed"
+          name: "Recently viewed"
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P3"
+
+        - id: "favorites_pins"
+          name: "Favorites/pins"
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P3"
+
+        - id: "bulk_actions"
+          name: "Bulk actions"
+          tags: ["frontend", "backend", "ux"]
+          default_priority: "P2"
+
+        - id: "export_csv_pdf"
+          name: "Export CSV/PDF"
+          tags: ["backend", "frontend", "ops"]
+          default_priority: "P2"
+
+        - id: "inline_help_tooltips"
+          name: "Inline help tooltips"
+          tags: ["frontend", "ux", "copy"]
+          default_priority: "P3"
+
+        - id: "contextual_onboarding"
+          name: "Contextual onboarding nudges"
+          tags: ["frontend", "ux", "onboarding"]
+          default_priority: "P2"
+
+        - id: "whats_new_changelog"
+          name: "In-app 'What's new' changelog"
+          tags: ["frontend", "ops", "ux"]
+          default_priority: "P3"
+
+  prioritization_guidance:
+    high_impact_order:
+      - "feedback_messaging"
+      - "forms"
+      - "micro_interactions"
+      - "accessibility"
+      - "performance"
+      - "seo_sharing"
+      - "content_ops"
+    rule_of_thumb:
+      - "If an action can fail, it needs an error state + recovery path."
+      - "If an action changes data, it needs confirmation + undo (when safe)."
+      - "If users must repeat a task daily/weekly, add QoL features (bulk actions, defaults, recent)."
+
+# ----------------------------
+# PART B: RECURSIVE DISCOVERY MAP
+# ----------------------------
+discovery_framework:
+  recursion_rule:
+    name: "The Recursion Loop"
+    use_when: "Any time the client describes a task, report, interaction, or request."
+    questions:
+      - id: "who"
+        prompt: "Who does it? Who approves it? Who needs visibility?"
+      - id: "trigger"
+        prompt: "What starts it? (time, event, request, payment, status)"
+      - id: "steps"
+        prompt: "What happens next, in order?"
+      - id: "inputs"
+        prompt: "What info is required?"
+      - id: "outputs"
+        prompt: "What gets produced? (invoice, email, record, shipment, schedule)"
+      - id: "decisions"
+        prompt: "What choices happen? (yes/no, branching rules)"
+      - id: "exceptions"
+        prompt: "What goes wrong? Edge cases? Uncommon scenarios?"
+      - id: "volume_timing"
+        prompt: "How often? How many? Deadlines? Peak seasons?"
+      - id: "rules"
+        prompt: "Policies, pricing, eligibility, thresholds?"
+      - id: "proof"
+        prompt: "How do you know it’s done correctly? (audit trail, checklist)"
+      - id: "success"
+        prompt: "What does 'good' look like?"
+
+  master_map:
+    - id: "01_business_outcomes"
+      name: "Business outcomes"
+      capture:
+        - "Primary goals"
+        - "Success metrics"
+        - "Priority ranking (top 3)"
+        - "Must-not-fail areas"
+        - "Definition of done for Phase 1 (in vs out)"
+      prompts:
+        - "If we succeed, what changes in your day-to-day?"
+        - "What’s the most expensive mistake you make today?"
+      outputs:
+        - "Outcome list"
+        - "Phase 1 scope statement"
+      feature_domain_hints: ["feedback_messaging", "content_ops", "analytics_instrumentation"]
+
+    - id: "02_stakeholders_users_access"
+      name: "Stakeholders, users, access"
+      capture:
+        - "User types"
+        - "Roles & responsibilities"
+        - "Permission boundaries"
+        - "Account structure"
+        - "External parties"
+      prompts:
+        - "If you hired someone tomorrow, what should they not be able to touch?"
+      outputs:
+        - "Role matrix"
+        - "Permissions assumptions"
+      feature_domain_hints: ["account_settings", "security_privacy_trust", "content_ops"]
+
+    - id: "03_current_reality_process_inventory"
+      name: "Current reality (process inventory)"
+      capture:
+        - "Tools used now"
+        - "Work sources"
+        - "Where info gets lost"
+        - "Bottlenecks"
+        - "Rework loops"
+      prompts:
+        - "Walk me through the last time this happened."
+        - "Where do mistakes usually originate?"
+      outputs:
+        - "Current-state workflow map"
+        - "Pain points list"
+      feature_domain_hints: ["forms", "micro_interactions", "quality_of_life"]
+
+    - id: "04_future_workflows_jobs"
+      name: "Future workflows (jobs the app must support)"
+      capture:
+        - "Customer journey workflows"
+        - "Internal operations workflows"
+        - "Money workflows"
+        - "States/statuses for each workflow"
+      prompts:
+        - "What happens if they don’t respond?"
+        - "What’s the most common special case?"
+      outputs:
+        - "Future-state workflow map"
+        - "Workflow list with states"
+      feature_domain_hints: ["notifications", "feedback_messaging", "forms", "search_discovery"]
+
+    - id: "05_data_model"
+      name: "Data model (lists of things you track)"
+      capture:
+        - "Core records/entities"
+        - "Fields (required vs optional)"
+        - "Validation rules"
+        - "Relationships"
+        - "Lifecycle/statuses"
+        - "Ownership/editing rules"
+        - "Retention/deletion rules"
+      prompts:
+        - "What do you need to know about this to do the job?"
+        - "What’s the minimum info to create it?"
+      outputs:
+        - "Entity list + field list"
+        - "Status lifecycle definitions"
+      feature_domain_hints: ["forms", "search_discovery", "content_ops", "security_privacy_trust"]
+
+    - id: "06_business_rules_logic"
+      name: "Business rules & logic"
+      capture:
+        - "Pricing rules"
+        - "Eligibility rules"
+        - "Approval rules"
+        - "Time rules"
+        - "Refund rules"
+        - "Data rules (duplicates/merges)"
+        - "Automation rules"
+      prompts:
+        - "When do you make exceptions—and why?"
+        - "What rule do you enforce even if it costs you a sale?"
+      outputs:
+        - "Rules catalog"
+        - "Exception handling list"
+      feature_domain_hints: ["feedback_messaging", "security_privacy_trust", "content_ops"]
+
+    - id: "07_communication_system"
+      name: "Communication system"
+      capture:
+        - "Channels"
+        - "Message types"
+        - "Recipients"
+        - "Frequency rules"
+        - "Templates and tone"
+        - "Reply handling"
+        - "Audit trail expectations"
+      prompts:
+        - "What messages do you send manually today that you hate sending?"
+        - "What messages prevent support calls?"
+      outputs:
+        - "Comms matrix (type x channel x recipient)"
+        - "Template inventory"
+      feature_domain_hints: ["notifications", "feedback_messaging", "edge_pages"]
+
+    - id: "08_integrations"
+      name: "Integrations"
+      capture:
+        - "Accounting/payments/CRM/email marketing/calendars"
+        - "Form embeds"
+        - "Shipping/fulfillment (if applicable)"
+        - "Sign-in methods"
+        - "Import/export needs"
+        - "Sync direction + conflict rules"
+      prompts:
+        - "What do you never want to enter twice?"
+        - "What system is the source of truth?"
+      outputs:
+        - "Integration list + ownership"
+        - "Data sync rules"
+      feature_domain_hints: ["security_privacy_trust", "account_settings", "content_ops"]
+
+    - id: "09_reporting_owner_visibility"
+      name: "Reporting & owner visibility"
+      capture:
+        - "Daily/weekly KPIs"
+        - "Operational reports"
+        - "Financial summaries"
+        - "Customer reports"
+        - "Audit reports"
+        - "Export needs"
+      prompts:
+        - "What do you check every morning?"
+        - "What number would change your decisions weekly?"
+      outputs:
+        - "Dashboard spec"
+        - "Report inventory"
+      feature_domain_hints: ["analytics_instrumentation", "quality_of_life", "search_discovery"]
+
+    - id: "10_ux_expectations"
+      name: "UX expectations"
+      capture:
+        - "Desired feel"
+        - "Most important screen"
+        - "Mobile-first vs desktop-first"
+        - "Accessibility needs"
+        - "Tone"
+        - "Error tolerance (undo/drafts)"
+      prompts:
+        - "When you’re stressed and busy, what needs to be impossible to screw up?"
+      outputs:
+        - "UX principles"
+        - "Design constraints"
+      feature_domain_hints: ["micro_interactions", "forms", "accessibility", "mobile_responsive"]
+
+    - id: "11_content_assets"
+      name: "Content & assets"
+      capture:
+        - "Brand assets"
+        - "Copy needs"
+        - "Images/video"
+        - "Legal pages"
+        - "Email/SMS content"
+        - "Admin-maintained content"
+      prompts:
+        - "What will you update over time without calling a developer?"
+      outputs:
+        - "Content checklist"
+        - "Admin-editable content list"
+      feature_domain_hints: ["content_ops", "seo_sharing", "edge_pages"]
+
+    - id: "12_nonfunctional"
+      name: "Non-functional requirements"
+      capture:
+        - "Reliability expectations"
+        - "Performance expectations"
+        - "Security/privacy needs"
+        - "Compliance constraints (if relevant)"
+      prompts:
+        - "What data would be a disaster if leaked?"
+        - "Who should never be able to export your customer list?"
+      outputs:
+        - "NFR list"
+        - "Risk constraints"
+      feature_domain_hints: ["security_privacy_trust", "performance", "analytics_instrumentation"]
+
+    - id: "13_admin_maintenance_future_you"
+      name: "Admin, maintenance, and future you"
+      capture:
+        - "Admin panel scope"
+        - "Versioning/rollback"
+        - "User management"
+        - "Backups/restore expectations"
+        - "Support workflow"
+        - "Monitoring"
+      prompts:
+        - "What will change monthly in your business?"
+        - "What do you need to fix at 9pm without calling anyone?"
+      outputs:
+        - "Admin requirements"
+        - "Support/ops plan"
+      feature_domain_hints: ["content_ops", "security_privacy_trust", "analytics_instrumentation"]
+
+    - id: "14_migration_launch"
+      name: "Migration & launch plan"
+      capture:
+        - "Data to import"
+        - "Cleanup responsibilities"
+        - "Cutover strategy"
+        - "Training plan"
+        - "Go-live checklist"
+        - "Post-launch support/warranty"
+      prompts:
+        - "What would make launch feel safe?"
+        - "What can we leave for phase 2 without pain?"
+      outputs:
+        - "Launch checklist"
+        - "Migration plan"
+      feature_domain_hints: ["edge_pages", "content_ops", "account_settings"]
+
+    - id: "15_constraints_decisions"
+      name: "Constraints & decision framework"
+      capture:
+        - "Budget range"
+        - "Timeline/deadlines"
+        - "Scope boundaries"
+        - "Change control"
+        - "Decision-makers"
+        - "Risk register"
+      prompts:
+        - "If we’re wrong, where can we be wrong safely?"
+        - "What’s your drop-dead deadline and why?"
+      outputs:
+        - "Project constraints"
+        - "Change control notes"
+      feature_domain_hints: ["content_ops", "feedback_messaging"]
+
+  workshop_plan:
+    sessions:
+      - id: "ws1"
+        name: "Business & Goals"
+        duration_minutes: "30-45"
+        outputs: ["Goals + success metrics", "Phase 1 definition of done"]
+      - id: "ws2"
+        name: "Process Walkthrough"
+        duration_minutes: "60-90"
+        outputs: ["Current-state + future-state workflows", "Pain points + exceptions"]
+      - id: "ws3"
+        name: "Data & Rules"
+        duration_minutes: "45-60"
+        outputs: ["Entity list + rules catalog", "Validation + edge cases"]
+      - id: "ws4"
+        name: "Reports & Admin"
+        duration_minutes: "45"
+        outputs: ["Dashboard/report inventory", "Admin control needs"]
+      - id: "ws5"
+        name: "Launch Plan"
+        duration_minutes: "30"
+        outputs: ["Migration + launch checklist", "Training + support plan"]
+
+# ----------------------------
+# PART C: LLM BUILDER PROMPT PACK
+# ----------------------------
+llm_prompt_pack:
+  goal: "Generate a tailored client-facing feature menu + project plan from discovery answers using the feature bank."
+  inputs_expected:
+    - "client_profile: industry, size, locations, revenue model, constraints"
+    - "discovery_answers: structured notes from workshops"
+    - "feature_bank: this document"
+  output_schema:
+    - "client_summary"
+    - "workflows (top 5-10) with states + exceptions"
+    - "recommended_feature_menu grouped by domains"
+    - "prioritized_roadmap (Phase 1/Phase 2/Phase 3)"
+    - "open_questions (must answer to finalize scope)"
+    - "assumptions_and_exclusions"
+    - "risks_and_mitigations"
+
+  system_instructions_template: |
+    You are an expert product discovery and requirements assistant for small businesses.
+    You must:
+    1) Use the provided feature_bank domains and features as the ONLY source for selectable items (unless explicitly asked to propose new ones).
+    2) Map client pain points and workflows to relevant features.
+    3) Ask follow-up questions only when needed to reduce scope ambiguity.
+    4) Produce a client-friendly feature menu and a build-ready roadmap.
+    5) Use simple language; avoid jargon.
+
+  user_prompt_template: |
+    Use the provided YAML feature_bank and discovery_framework.
+    Here is the client profile:
+    {{client_profile}}
+
+    Here are the discovery answers/notes:
+    {{discovery_answers}}
+
+    Produce:
+    - Client Summary (plain language)
+    - Workflow Map (bulleted, with statuses + common exceptions)
+    - Recommended Feature Menu:
+      - Group by domain
+      - Include feature IDs and names
+      - Include a 1-sentence "why it matters" for each selected feature
+    - Prioritized Roadmap:
+      - Phase 1: must-have (P1 heavy)
+      - Phase 2: improvements (P2)
+      - Phase 3: nice-to-have (P3)
+    - Open Questions (what you still need)
+    - Assumptions/Exclusions (to prevent scope creep)
+    - Risks/Mitigations
+
+  selection_rules:
+    - "If the client has any form submission or checkout: include forms:P1 items + feedback_messaging:P1 items."
+    - "If the client relies on scheduling, reminders, or status changes: include notifications domain items."
+    - "If the product is internal/admin-heavy: include content_ops and quality_of_life (bulk actions, saved defaults)."
+    - "If the client needs growth/marketing: include seo_sharing items + analytics_instrumentation basics."
+    - "Always include accessibility:P1 basics and edge_pages:P1 basics in Phase 1 unless explicitly waived."
+

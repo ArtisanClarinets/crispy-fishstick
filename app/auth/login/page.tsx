@@ -54,6 +54,12 @@ export default function LoginPage() {
             title: "Invalid Code",
             description: "The 2FA code provided is invalid.",
           });
+        } else if (result.error === "DB_SCHEMA_NOT_READY") {
+          toast({
+            variant: "destructive",
+            title: "Service Unavailable",
+            description: "Database schema not ready; run prisma migrate deploy",
+          });
         } else {
           toast({
             variant: "destructive",
