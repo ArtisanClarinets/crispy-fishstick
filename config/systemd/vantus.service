@@ -1,0 +1,52 @@
+[Unit]
+Description=Vantus Systems (Next.js) web application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# Run as a low-privilege user. For a hardened setup, create a dedicated user (recommended):
+#   sudo useradd --system --home /var/www/crispy-fishstick --shell /usr/sbin/nologin vantus
+# and then set User=vantus / Group=vantus
+User=www-data
+Group=www-data
+
+WorkingDirectory=/var/www/crispy-fishstick
+
+# App environment
+Environment=NODE_ENV=production
+Environment=PORT=3000
+# Ensure common binaries (node/npm) are discoverable
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# Load secrets/config (do not commit this file's contents)
+EnvironmentFile=-/var/www/crispy-fishstick/.env
+
+# Start the Next.js server (expects `npm install` + `npm run build` already completed)
+ExecStart=/usr/bin/env npm run start -- --port 3000
+
+# Reliability
+Restart=on-failure
+RestartSec=3
+TimeoutStartSec=90
+TimeoutStopSec=20
+KillSignal=SIGINT
+
+# Logging
+SyslogIdentifier=vantus
+
+# Security hardening (safe defaults; tighten further as you validate behavior)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+
+# If you use SQLite, the app needs write access to the DB file. Keep the DB under the repo
+# (e.g. prisma/dev.db) and allow writes there.
+ReadWritePaths=/var/www/crispy-fishstick
+
+# Resource limits
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
