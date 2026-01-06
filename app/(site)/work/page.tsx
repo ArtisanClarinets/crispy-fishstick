@@ -5,7 +5,6 @@ import { siteConfig } from "@/lib/site";
 import { Reveal } from "@/components/reveal";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { Stagger, StaggerItem } from "@/components/stagger";
 import { CoverArt } from "@/components/cover-art";
 
 export default function WorkPage() {
@@ -22,9 +21,9 @@ export default function WorkPage() {
         </Reveal>
       </div>
 
-      <Stagger className="grid grid-cols-1 gap-12 md:gap-24">
+      <div className="grid grid-cols-1 gap-12 md:gap-24">
         {siteConfig.featuredWork.map((project, i) => (
-          <StaggerItem key={project.slug} className="group grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+          <div key={project.slug} className="group grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Image Column */}
             <Link href={`/work/${project.slug}`} className="block w-full">
               <div className="rounded-2xl border border-white/10 bg-card/50 backdrop-blur-sm overflow-hidden card-precision">
@@ -71,9 +70,9 @@ export default function WorkPage() {
                 Read Case Study <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
-          </StaggerItem>
+          </div>
         ))}
-      </Stagger>
+      </div>
     </div>
   );
 }
