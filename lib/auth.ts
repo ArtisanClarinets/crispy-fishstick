@@ -23,6 +23,10 @@ declare module "next-auth" {
       tenantId?: string | null;
     };
   }
+
+  interface AuthOptions {
+    trustHost?: boolean;
+  }
 }
 
 declare module "next-auth/jwt" {
