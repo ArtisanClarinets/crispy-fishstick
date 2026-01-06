@@ -1,0 +1,95 @@
+
+> crispy-fishstick@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+   automatically enabled Fast Refresh for 1 custom loader
+ ✓ Ready in 1996ms
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1004ms (171 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 12.1s (1671 modules)
+ ✓ Compiled in 2.5s (816 modules)
+ GET / 200 in 14614ms
+ ○ Compiling /services ...
+ ✓ Compiled /services in 9s (1655 modules)
+ GET /services 200 in 9477ms
+ ○ Compiling /api/proof/headers ...
+ ✓ Compiled /contact in 1417ms (1093 modules)
+ ✓ Compiled in 473ms (811 modules)
+ GET /api/proof/headers 200 in 2268ms
+ GET /api/proof/headers 200 in 2270ms
+ GET /api/auth/session 200 in 2581ms
+ GET /contact 200 in 2088ms
+[next-auth][warn][NEXTAUTH_URL]
+https://next-auth.js.org/warnings#nextauth_url
+[next-auth][warn][NO_SECRET]
+https://next-auth.js.org/warnings#no_secret
+ POST /api/auth/_log 200 in 653ms
+ POST /api/auth/_log 200 in 630ms
+ GET /api/auth/session 200 in 36ms
+ GET /api/proof/headers 200 in 62ms
+ GET /api/proof/headers 200 in 37ms
+ GET /api/auth/session 200 in 55ms
+ GET / 200 in 164ms
+ GET /api/auth/session 200 in 52ms
+ GET /api/auth/session 200 in 86ms
+ GET /api/proof/headers 200 in 48ms
+ GET /api/proof/headers 200 in 47ms
+ GET / 200 in 127ms
+ GET /api/auth/session 200 in 58ms
+ GET /api/auth/session 200 in 27ms
+ GET /api/proof/headers 200 in 61ms
+ GET /api/proof/headers 200 in 43ms
+ GET / 200 in 135ms
+ GET /api/auth/session 200 in 45ms
+ GET /api/auth/session 200 in 23ms
+ GET /api/proof/headers 200 in 54ms
+ GET /api/proof/headers 200 in 45ms
+ GET /services 200 in 73ms
+ GET /api/auth/session 200 in 50ms
+ GET /api/auth/session 200 in 93ms
+ GET /api/proof/headers 200 in 81ms
+ GET /api/proof/headers 200 in 80ms
+ GET /contact 200 in 101ms
+ GET /api/auth/session 200 in 37ms
+ GET /api/auth/session 200 in 73ms
+ GET /api/proof/headers 200 in 74ms
+ GET /api/proof/headers 200 in 70ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1553ms (1942 modules)
+ GET /app/node_modules/playwright/lib/index.js 404 in 1802ms
+ GET /app/.github/UI-I-Like-crispy-fishstick/e2e/app.spec.ts 404 in 37ms
+ GET / 200 in 223ms
+[next-auth][warn][NEXTAUTH_URL]
+https://next-auth.js.org/warnings#nextauth_url
+[next-auth][warn][NO_SECRET]
+https://next-auth.js.org/warnings#no_secret
+ GET /api/auth/session 200 in 110ms
+ GET /api/proof/headers 200 in 109ms
+ GET /api/proof/headers 200 in 109ms
+ GET /api/auth/session 200 in 59ms
+ ○ Compiling /work ...
+ ✓ Compiled /work in 1064ms (1949 modules)
+ GET /work 200 in 1306ms
+[next-auth][warn][NEXTAUTH_URL]
+https://next-auth.js.org/warnings#nextauth_url
+[next-auth][warn][NO_SECRET]
+https://next-auth.js.org/warnings#no_secret
+ GET /api/auth/session 200 in 95ms
+ GET /api/proof/headers 200 in 93ms
+ GET /api/proof/headers 200 in 91ms
+ GET /api/auth/session 200 in 71ms
+ GET /work 200 in 75ms
+ GET /api/auth/session 200 in 61ms
+ GET /api/auth/session 200 in 89ms
+ GET /api/proof/headers 200 in 59ms
+ GET /api/proof/headers 200 in 58ms
