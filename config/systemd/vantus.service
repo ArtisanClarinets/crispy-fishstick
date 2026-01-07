@@ -1,52 +1,55 @@
 [Unit]
-Description=Vantus Systems (Next.js) web application
-After=network-online.target
-Wants=network-online.target
+Description=Vantus Systems Next.js Application
+After=network.target
+Documentation=https://vantus.systems
 
 [Service]
 Type=simple
+User=vantus
+Group=vantus
+WorkingDirectory=/var/www/vantus
+EnvironmentFile=/etc/default/vantus
 
-# Run as a low-privilege user. For a hardened setup, create a dedicated user (recommended):
-#   sudo useradd --system --home /var/www/crispy-fishstick --shell /usr/sbin/nologin vantus
-# and then set User=vantus / Group=vantus
-User=www-data
-Group=www-data
+# Create state, logs, and runtime directories
+StateDirectory=vantus
+LogsDirectory=vantus
+RuntimeDirectory=vantus
 
-WorkingDirectory=/var/www/crispy-fishstick
-
-# App environment
+# Environment
 Environment=NODE_ENV=production
-Environment=PORT=3000
-# Ensure common binaries (node/npm) are discoverable
-Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-# Load secrets/config (do not commit this file's contents)
-EnvironmentFile=-/var/www/crispy-fishstick/.env
+Environment=HOSTNAME=0.0.0.0
 
-# Start the Next.js server (expects `npm install` + `npm run build` already completed)
-ExecStart=/usr/bin/env npm run start -- --port 3000
+# Security Hardening
+ProtectSystem=full
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
 
-# Reliability
-Restart=on-failure
-RestartSec=3
-TimeoutStartSec=90
-TimeoutStopSec=20
-KillSignal=SIGINT
+# Pre-start: Run migrations
+# Note: We use npx to run the local prisma binary
+ExecStartPre=/usr/bin/npx prisma migrate deploy
+
+# Start the application
+# Assumes 'npm run build' was run during deployment
+ExecStart=/usr/bin/npm start
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=200
+StartLimitBurst=5
 
 # Logging
+StandardOutput=journal
+StandardError=journal
 SyslogIdentifier=vantus
 
-# Security hardening (safe defaults; tighten further as you validate behavior)
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectHome=true
-ProtectSystem=full
-
-# If you use SQLite, the app needs write access to the DB file. Keep the DB under the repo
-# (e.g. prisma/dev.db) and allow writes there.
-ReadWritePaths=/var/www/crispy-fishstick
-
-# Resource limits
-LimitNOFILE=65535
+# Performance
+LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target

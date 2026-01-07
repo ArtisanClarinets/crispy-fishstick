@@ -1,21 +1,33 @@
 [Unit]
-Description=MEB Next.js Application
+Description=Vantus Systems Next.js Application
 After=network.target
+Documentation=https://vantus.systems
 
 [Service]
 Type=simple
-User=meb
-Group=meb
-WorkingDirectory=/opt/meb/app
-EnvironmentFile=/etc/default/meb
-StateDirectory=meb
-LogsDirectory=meb
-RuntimeDirectory=meb
+User=vantus
+Group=vantus
+WorkingDirectory=/var/www/vantus
+EnvironmentFile=/etc/default/vantus
 
-# Hardening
+# Create state, logs, and runtime directories
+StateDirectory=vantus
+LogsDirectory=vantus
+RuntimeDirectory=vantus
+
+# Environment
+Environment=NODE_ENV=production
+Environment=HOSTNAME=0.0.0.0
+
+# Security Hardening
 ProtectSystem=full
 PrivateTmp=true
 NoNewPrivileges=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
 
 # Pre-start: Run migrations
 # Note: We use npx to run the local prisma binary
@@ -25,8 +37,19 @@ ExecStartPre=/usr/bin/npx prisma migrate deploy
 # Assumes 'npm run build' was run during deployment
 ExecStart=/usr/bin/npm start
 
+# Restart policy
 Restart=always
 RestartSec=10
+StartLimitInterval=200
+StartLimitBurst=5
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vantus
+
+# Performance
+LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target

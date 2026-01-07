@@ -61,6 +61,30 @@ npm run dev
 
 Visit `http://localhost:3000` to view the application.
 
+### Production Deployment
+
+For complete production setup on Ubuntu 22.04 LTS:
+
+```bash
+# Clone the repository
+git clone https://github.com/Thompson-Development/crispy-fishstick.git
+cd crispy-fishstick
+
+# Run automated bootstrap script
+sudo bash scripts/bootstrap-ubuntu22.sh
+```
+
+The bootstrap script will:
+- Install all dependencies (Node.js, Nginx, SQLite, Certbot)
+- Configure environment variables interactively
+- Set up database with migrations
+- Build the application
+- Configure Nginx reverse proxy
+- Set up Systemd service
+- Optionally install SSL certificates
+
+**See [docs/PRODUCTION_DEPLOYMENT.md](docs/PRODUCTION_DEPLOYMENT.md) for complete deployment documentation.**
+
 ### Build
 
 Create a production build. This process also generates the "Build Proof" artifact.
