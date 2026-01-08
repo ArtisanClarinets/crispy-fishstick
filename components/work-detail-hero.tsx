@@ -23,7 +23,6 @@ export function WorkDetailHero({
     <div className={`relative w-full h-[60vh] md:h-[70vh] flex flex-col justify-end pb-12 md:pb-24 overflow-hidden`}>
       {/* Shared Element Background */}
       <motion.div
-        layoutId={`cover-${slug}`}
         className="absolute inset-0 z-0 bg-secondary"
       >
         <CoverArt slug={slug} />
@@ -41,7 +40,9 @@ export function WorkDetailHero({
         {/* Shared Element Title */}
         <div className="mb-6">
            <motion.h1
-             layoutId={`title-${slug}`}
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.5, ease: "easeOut" }}
              className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance inline-block"
            >
              {title}
