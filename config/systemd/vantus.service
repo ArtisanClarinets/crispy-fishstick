@@ -33,12 +33,12 @@ RestrictNamespaces=true
 
 # Pre-start: Run migrations
 # Note: We use npx to run the local prisma binary
-# ExecStartPre=/home/meb/.nvm/versions/node/v22.21.1/bin/npx prisma migrate deploy
-# ExecStartPre=/home/meb/.nvm/versions/node/v22.21.1/bin/npm run db:migrate
+# ExecStartPre=/usr/bin/npx prisma migrate deploy
+# ExecStartPre=/usr/bin/npm run db:migrate
 
 # Start the application
 # Assumes 'npm run build' was run during deployment
-ExecStart=/home/meb/.nvm/versions/node/v22.21.1/bin/npm start
+ExecStart=/usr/bin/npm start
 
 # Restart policy
 Restart=on-failure
