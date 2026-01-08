@@ -5,8 +5,8 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=vantus
-Group=vantus
+User=meb
+Group=meb
 WorkingDirectory=/var/www/vantus
 EnvironmentFile=/var/www/vantus/.env
 
@@ -42,7 +42,7 @@ ExecStart=/home/meb/.nvm/versions/node/v22.21.1/bin/npm start
 
 # Restart policy
 Restart=on-failure
-RestartSec=10
+RestartSec=60
 # StartLimitInterval=200
 # StartLimitBurst=5
 
