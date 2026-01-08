@@ -13,6 +13,12 @@ const rl = readline.createInterface({
 
 const question = (query) => new Promise((resolve) => rl.question(query, resolve));
 
+const isRootUser = typeof process.getuid === 'function' ? process.getuid() === 0 : false;
+const defaultDatabaseUrl = isRootUser ? 'file:/var/lib/vantus/prod.db' : 'file:./prisma/dev.db';
+const defaultDatabaseInfo = isRootUser
+  ? 'Production default: file:/var/lib/vantus/prod.db (ensure /var/lib/vantus is writable by the vantus user).'
+  : 'Development default: file:./prisma/dev.db (relative to this repo). Switch to file:/var/lib/vantus/prod.db or your Postgres DSN when deploying.';
+
 function generateSecret() {
   return crypto.randomBytes(32).toString('base64');
 }
@@ -39,7 +45,8 @@ async function main() {
   let currentEnv = {};
 
   // Check for existing .env or production env file
-  const prodEnvPath = '/etc/default/meb';
+  // Use the Vantus production env path by default
+  const prodEnvPath = '/etc/default/vantus';
   const checkPath = fs.existsSync(prodEnvPath) ? prodEnvPath : envPath;
 
   if (fs.existsSync(checkPath)) {
@@ -101,8 +108,8 @@ async function main() {
     { 
       key: 'DATABASE_URL', 
       description: 'Database connection string', 
-      default: 'file:/var/lib/meb/prod.db',
-      info: 'For SQLite use: file:/var/lib/meb/prod.db\nFor PostgreSQL: postgresql://user:pass@localhost:5432/dbname'
+      default: defaultDatabaseUrl,
+      info: `${defaultDatabaseInfo}\nFor PostgreSQL: postgresql://user:pass@localhost:5432/dbname`
     },
   ];
 

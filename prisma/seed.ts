@@ -1,9 +1,39 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import fs from "fs/promises";
+import path from "path";
 
-const prisma = new PrismaClient();
+let prisma: PrismaClient | null = null;
+
+async function ensureSqliteFileWritable() {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl || !databaseUrl.startsWith("file:")) {
+    return;
+  }
+
+  const sqlitePath = databaseUrl.replace(/^file:/, "");
+  if (!sqlitePath) {
+    throw new Error("DATABASE_URL must include a file path after the file: protocol.");
+  }
+
+  const resolvedPath = path.resolve(sqlitePath);
+  const dir = path.dirname(resolvedPath);
+
+  await fs.mkdir(dir, { recursive: true });
+
+  try {
+    const handle = await fs.open(resolvedPath, "a");
+    await handle.close();
+  } catch (error) {
+    console.warn(`⚠️  Unable to open sqlite file at ${resolvedPath}: ${(error as Error).message}`);
+    throw error;
+  }
+}
 
 async function main() {
+  await ensureSqliteFileWritable();
+  prisma = new PrismaClient();
+
   if (!process.env.ADMIN_BOOTSTRAP_EMAIL || !process.env.ADMIN_BOOTSTRAP_PASSWORD) {
     if (process.env.NODE_ENV === "production") {
       throw new Error("Missing required environment variables for seeding in production: ADMIN_BOOTSTRAP_EMAIL, ADMIN_BOOTSTRAP_PASSWORD");
@@ -116,10 +146,14 @@ async function main() {
 
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    if (prisma) {
+      await prisma.$disconnect();
+    }
   })
   .catch(async (e) => {
     console.error(e);
-    await prisma.$disconnect();
+    if (prisma) {
+      await prisma.$disconnect();
+    }
     process.exit(1);
   });

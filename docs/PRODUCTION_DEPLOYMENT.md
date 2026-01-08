@@ -117,6 +117,8 @@ Run the interactive setup script:
 npm run setup
 ```
 
+> **Tip:** When you run this locally (as a non-root user) the script now defaults `DATABASE_URL` to `file:./prisma/dev.db` so you can run migrations without touching `/var/lib/vantus`. Run it as `root` to keep the production default (`file:/var/lib/vantus/prod.db`), or manually override the prompt.
+
 This will guide you through configuring all environment variables and generate secure secrets.
 
 ### 2. Install Dependencies
@@ -141,8 +143,10 @@ npx prisma db seed
 ### 4. Build Application
 
 ```bash
-npm run build
+NODE_ENV=production npm run build
 ```
+
+> **Note:** `next build` must run with `NODE_ENV=production` to avoid prerender/runtime validation errors that occur when building with a non-standard value.
 
 ### 5. Generate Nginx Config
 

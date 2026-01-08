@@ -170,20 +170,24 @@ echo ""
 
 cd "$APP_DIR"
 
-# Run setup as the app user, but with sudo to write to /etc/default/
+# Run setup as the app user; this will create $APP_DIR/.env
 sudo -u "$APP_USER" NODE_ENV=production node scripts/setup-env.js
 
-# If .env was created in APP_DIR, move it to proper location
+# If .env was created in APP_DIR, keep it there (preferred for installer readability)
 if [ -f "$APP_DIR/.env" ]; then
-    log_info "Moving environment file to $ENV_FILE..."
-    mv "$APP_DIR/.env" "$ENV_FILE"
-    chown root:root "$ENV_FILE"
-    chmod 600 "$ENV_FILE"
-    log_success "Environment file secured at $ENV_FILE"
+    log_info "Keeping environment file at $APP_DIR/.env"
+    # Ensure app user owns the .env so app can read it during build/migrate
+    chown "$APP_USER:$APP_GROUP" "$APP_DIR/.env"
+    chmod 600 "$APP_DIR/.env"
+    # Also copy into /etc/default for systemd to read (systemd reads as root)
+    cp "$APP_DIR/.env" "$ENV_FILE" 2>/dev/null || true
+    chown root:root "$ENV_FILE" 2>/dev/null || true
+    chmod 600 "$ENV_FILE" 2>/dev/null || true
+    log_success "Environment file available at $APP_DIR/.env (and copied to $ENV_FILE)"
 fi
 
-if [ ! -f "$ENV_FILE" ]; then
-    log_error "Environment file not created. Cannot proceed."
+if [ ! -f "$APP_DIR/.env" ]; then
+    log_error "Environment file not created at $APP_DIR/.env. Cannot proceed."
     exit 1
 fi
 
@@ -210,19 +214,40 @@ log_section "STEP 7: Database Setup & Migrations"
 
 cd "$APP_DIR"
 
-# Source environment for database URL
-set -a
-source "$ENV_FILE"
-set +a
+# Source environment for database URL from app .env (preferred)
+if [ -f "$APP_DIR/.env" ]; then
+    # shellcheck disable=SC1090
+    source "$APP_DIR/.env"
+else
+    if [ -f "$ENV_FILE" ]; then
+        # shellcheck disable=SC1090
+        source "$ENV_FILE"
+    else
+        log_warning "No environment file found; continuing without it"
+    fi
+fi
+
+# If DATABASE_URL is a sqlite file:, ensure its directory exists and is owned by the app user
+if [ -n "$DATABASE_URL" ] && [[ "$DATABASE_URL" == file:* ]]; then
+    DB_PATH="${DATABASE_URL#file:}"
+    DB_DIR="$(dirname "$DB_PATH")"
+    if [ ! -d "$DB_DIR" ]; then
+        log_info "Creating database directory: $DB_DIR"
+        mkdir -p "$DB_DIR"
+        chown -R "$APP_USER:$APP_GROUP" "$DB_DIR"
+    else
+        chown -R "$APP_USER:$APP_GROUP" "$DB_DIR"
+    fi
+fi
 
 log_info "Generating Prisma client..."
-sudo -u "$APP_USER" npx prisma generate
+sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma generate"
 
 log_info "Running database migrations..."
-sudo -u "$APP_USER" npx prisma migrate deploy
+sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma migrate deploy"
 
 log_info "Seeding database with admin user..."
-sudo -u "$APP_USER" npx prisma db seed || log_warning "Database seeding failed (may already be seeded)"
+sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma db seed" || log_warning "Database seeding failed (may already be seeded)"
 
 log_success "Database setup complete"
 
@@ -235,7 +260,7 @@ log_section "STEP 8: Building Next.js Application"
 cd "$APP_DIR"
 
 log_info "Building production bundle (this may take several minutes)..."
-sudo -u "$APP_USER" npm run build
+sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npm run build"
 
 log_success "Application built successfully"
 
