@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
+import { tenantWhere } from "@/lib/admin/guards";
 import { sendEmail } from "@/lib/email";
 import { z } from "zod";
 
@@ -10,6 +10,7 @@ const updateProposalSchema = z.object({
   title: z.string().min(1, "Title is required").optional(),
   status: z.enum(["draft", "sent", "approved", "rejected", "pending_approval"]).optional(),
   validUntil: z.string().optional(),
+  deleteReason: z.string().optional(),
   items: z.array(z.object({
     id: z.string().optional(),
     description: z.string().min(1, "Description is required"),
@@ -19,14 +20,15 @@ const updateProposalSchema = z.object({
 });
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    await requireAdmin({ permissions: ["proposals.read"] });
-
-    const proposal = await prisma.proposal.findUnique({
-      where: { id: params.id },
+  return adminRead(req, { permissions: ["proposals.read"] }, async (user) => {
+    const proposal = await prisma.proposal.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+      },
       include: {
         ProposalItem: true,
         ProposalApproval: {
@@ -43,38 +45,31 @@ export async function GET(
     });
 
     if (!proposal) {
-      return new NextResponse("Not Found", { status: 404 });
+      return { error: "Proposal not found", status: 404 };
     }
 
-    return NextResponse.json(proposal);
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to fetch proposal:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: proposal };
+  });
 }
 
 export async function PATCH(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const user = await requireAdmin({ permissions: ["proposals.write"] });
-    const body = await req.json();
+  return adminMutation(req, { permissions: ["proposals.write"] }, async (user, body) => {
     const validatedData = updateProposalSchema.parse(body);
 
-    const existingProposal = await prisma.proposal.findUnique({
-      where: { id: params.id },
+    const existingProposal = await prisma.proposal.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+        deletedAt: null,
+      },
       include: { ProposalItem: true },
     });
 
     if (!existingProposal) {
-      return new NextResponse("Not Found", { status: 404 });
+      return { error: "Proposal not found", status: 404 };
     }
 
     let totalAmount = existingProposal.totalAmount;
@@ -85,9 +80,9 @@ export async function PATCH(
     }
 
     // Transaction to handle updates
-    await prisma.$transaction(async (tx) => {
+    const finalProposal = await prisma.$transaction(async (tx) => {
       // 1. Update basic fields
-      const updated = await tx.proposal.update({
+      await tx.proposal.update({
         where: { id: params.id },
         data: {
           title: validatedData.title,
@@ -144,78 +139,45 @@ export async function PATCH(
         });
       }
 
-      return updated;
+      // Fetch final state
+      return await tx.proposal.findUnique({
+        where: { id: params.id },
+        include: { ProposalItem: true },
+      });
     });
 
-    // Fetch final state for return and audit
-    const finalProposal = await prisma.proposal.findUnique({
-      where: { id: params.id },
-      include: { ProposalItem: true },
-    });
-
-    await createAuditLog({
-      action: "update",
-      resource: "proposal",
-      resourceId: params.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      before: existingProposal,
-      after: finalProposal,
-    });
-
-    return NextResponse.json(finalProposal);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ errors: error.errors }, { status: 400 });
-    }
-    if (error instanceof Error && error.message === "Unauthorized") {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to update proposal:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: finalProposal };
+  });
 }
 
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const user = await requireAdmin({ permissions: ["proposals.write"] });
+  return adminMutation(req, { permissions: ["proposals.write"] }, async (user, body) => {
+    const { deleteReason } = updateProposalSchema.parse(body);
 
-    const existingProposal = await prisma.proposal.findUnique({
-      where: { id: params.id },
+    const existingProposal = await prisma.proposal.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+        deletedAt: null,
+      },
     });
 
     if (!existingProposal) {
-      return new NextResponse("Not Found", { status: 404 });
+      return { error: "Proposal not found", status: 404 };
     }
 
-    await prisma.proposal.delete({
+    await prisma.proposal.update({
       where: { id: params.id },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: user.id,
+        deleteReason: deleteReason || "Archived by admin",
+      },
     });
 
-    await createAuditLog({
-      action: "delete",
-      resource: "proposal",
-      resourceId: params.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      before: existingProposal,
-    });
-
-    return new NextResponse(null, { status: 204 });
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to delete proposal:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: null, status: 204 };
+  });
 }

@@ -1,10 +1,9 @@
 export const dynamic = "force-dynamic";
 import { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
-import { assertSameOrigin } from "@/lib/security/origin";
+import { parsePaginationParams, buildPaginationResult } from "@/lib/api/pagination";
+import { tenantWhere } from "@/lib/admin/guards";
 import { z } from "zod";
 
 const createContractSchema = z.object({
@@ -17,81 +16,57 @@ const createContractSchema = z.object({
   content: z.string().optional(),
 });
 
-export async function POST(req: NextRequest) {
-  try {
-    // CSRF protection
-    try {
-      assertSameOrigin(req);
-    } catch (_error) {
-      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
-    }
-
-    const user = await requireAdmin({ permissions: ["contracts.write"] });
-    const body = await req.json();
-    const validatedData = createContractSchema.parse(body);
-
-    const contract = await prisma.contract.create({
-      data: validatedData,
-    });
-
-    await createAuditLog({
-      action: "create_contract",
-      resource: "contract",
-      resourceId: contract.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      after: contract,
-    });
-
-    return NextResponse.json(contract, {
-      status: 201,
-      headers: { "Cache-Control": "no-store" },
-    });
-  } catch (_error) {
-    if (_error instanceof z.ZodError) {
-      return NextResponse.json(
-        { errors: _error.errors },
-        { status: 400, headers: { "Cache-Control": "no-store" } }
-      );
-    }
-    if (_error instanceof Error && _error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store" } });
-    }
-    if (_error instanceof Error && _error.message === "Forbidden") {
-      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
-    }
-    console.error("Failed to create contract:", _error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500, headers: { "Cache-Control": "no-store" } }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    await requireAdmin({ permissions: ["contracts.read"] });
+export async function GET(req: NextRequest) {
+  return adminRead(req, { permissions: ["contracts.read"] }, async (user) => {
+    const { searchParams } = new URL(req.url);
+    const pagination = parsePaginationParams(searchParams);
     
+    // Filters
+    const status = searchParams.get("status") || undefined;
+    const showArchived = searchParams.get("showArchived") === "true";
+
+    const where = {
+      ...tenantWhere(user),
+      ...(status && { status }),
+      ...(!showArchived && { deletedAt: null }),
+    };
+
     const contracts = await prisma.contract.findMany({
+      where,
       orderBy: { createdAt: "desc" },
+      take: pagination.take,
+      ...(pagination.cursor && {
+        cursor: { id: pagination.cursor },
+        skip: 1,
+      }),
       include: {
         Tenant: true,
       },
     });
-    
-    return NextResponse.json(contracts, {
-      headers: { "Cache-Control": "no-store" },
+
+    return { data: buildPaginationResult(contracts, pagination) };
+  });
+}
+
+export async function POST(req: NextRequest) {
+  return adminMutation(req, { permissions: ["contracts.write"] }, async (user, body) => {
+    const validatedData = createContractSchema.parse(body);
+
+    // Validate tenant
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: validatedData.tenantId, deletedAt: null },
     });
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store" } });
+    if (!tenant) {
+      return { error: "Invalid tenant", status: 400 };
     }
-    if (error instanceof Error && error.message === "Forbidden") {
-      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
-    }
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500, headers: { "Cache-Control": "no-store" } }
-    );
-  }
+
+    const contract = await prisma.contract.create({
+      data: {
+        ...validatedData,
+        version: 1, // Initial version
+      },
+    });
+
+    return { data: contract, status: 201 };
+  });
 }

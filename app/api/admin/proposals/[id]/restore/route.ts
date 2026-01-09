@@ -1,24 +1,35 @@
+export const dynamic = "force-dynamic";
 import { NextRequest } from "next/server";
 import { adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
 import { tenantWhere } from "@/lib/admin/guards";
 
-export const dynamic = "force-dynamic";
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return adminMutation(req, { permissions: ["proposals.write"] }, async (user) => {
+    const proposal = await prisma.proposal.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+        deletedAt: { not: null },
+      },
+    });
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  return adminMutation(
-    request,
-    { permissions: ["proposals.write"], audit: { action: "restore_proposal", resource: "proposal", resourceId: params.id } },
-    async (user) => {
-      const existing = await prisma.proposal.findFirst({
-        where: { id: params.id, deletedAt: { not: null }, ...tenantWhere(user) },
-      });
-      if (!existing) return { error: "Proposal not found or not deleted", status: 404 };
-      const proposal = await prisma.proposal.update({
-        where: { id: params.id },
-        data: { deletedAt: null, deletedBy: null, deleteReason: null },
-      });
-      return { data: proposal };
+    if (!proposal) {
+      return { error: "Archived proposal not found", status: 404 };
     }
-  );
+
+    const restored = await prisma.proposal.update({
+      where: { id: params.id },
+      data: {
+        deletedAt: null,
+        deletedBy: null,
+        deleteReason: null,
+      },
+    });
+
+    return { data: restored };
+  });
 }

@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
+import { NextRequest } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
+import { tenantWhere } from "@/lib/admin/guards";
 import { z } from "zod";
 
 const updateContractSchema = z.object({
@@ -11,153 +12,110 @@ const updateContractSchema = z.object({
   endDate: z.string().transform((str) => new Date(str)).optional(),
   value: z.number().min(0).optional(),
   content: z.string().optional(),
-  // E-sig fields
   signedBy: z.string().optional(),
   signedAt: z.string().transform((str) => new Date(str)).optional(),
   signatureUrl: z.string().optional(),
+  deleteReason: z.string().optional(),
 });
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    await requireAdmin({ permissions: ["contracts.read"] });
-
-    const contract = await prisma.contract.findUnique({
-      where: { id: params.id },
+  return adminRead(req, { permissions: ["contracts.read"] }, async (user) => {
+    const contract = await prisma.contract.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+      },
       include: {
         Tenant: true,
-        versions: {
-          orderBy: { version: "desc" },
-        },
       },
     });
 
     if (!contract) {
-      return NextResponse.json({ error: "Contract not found" }, { status: 404 });
+      return { error: "Contract not found", status: 404 };
     }
 
-    return NextResponse.json(contract);
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-      return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to fetch contract:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: contract };
+  });
 }
 
 export async function PATCH(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const user = await requireAdmin({ permissions: ["contracts.write"] });
-
-    const body = await req.json();
+  return adminMutation(req, { permissions: ["contracts.write"] }, async (user, body) => {
     const validatedData = updateContractSchema.parse(body);
 
-    const existingContract = await prisma.contract.findUnique({
-      where: { id: params.id },
-      include: { versions: true },
-    });
-
-    if (!existingContract) {
-      return NextResponse.json({ error: "Contract not found" }, { status: 404 });
-    }
-
-    // Handle Versioning if content changes
-    if (validatedData.content && validatedData.content !== existingContract.content) {
-      const nextVersion = existingContract.versions.length + 1;
-      
-      await prisma.contractVersion.create({
-        data: {
-          contractId: existingContract.id,
-          version: nextVersion,
-          content: existingContract.content, // Save OLD content as version history? Or new? Usually snapshot current before update.
-          // Let's snapshot the PREVIOUS state.
-          status: existingContract.status,
-          changeLog: "Content updated",
-          createdBy: user.id,
-        },
-      });
-    }
-
-    const updatedContract = await prisma.contract.update({
-      where: { id: params.id },
-      data: validatedData,
-      include: {
-        versions: true,
+    // Optimistic concurrency control: check If-Match header
+    const ifMatch = req.headers.get("If-Match");
+    
+    const existingContract = await prisma.contract.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+        deletedAt: null,
       },
     });
 
-    await createAuditLog({
-      action: "update_contract",
-      resource: "contract",
-      resourceId: updatedContract.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      before: existingContract,
-      after: updatedContract,
+    if (!existingContract) {
+      return { error: "Contract not found", status: 404 };
+    }
+
+    // Version concurrency check
+    if (ifMatch) {
+      const expectedVersion = parseInt(ifMatch, 10);
+      if (existingContract.version !== expectedVersion) {
+        return { 
+          error: "Version conflict - contract has been modified by another user", 
+          status: 409,
+          data: { currentVersion: existingContract.version }
+        };
+      }
+    }
+
+    // Increment version on update
+    const updatedContract = await prisma.contract.update({
+      where: { id: params.id },
+      data: {
+        ...validatedData,
+        version: { increment: 1 },
+      },
     });
 
-    return NextResponse.json(updatedContract);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ errors: error.errors }, { status: 400 });
-    }
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-      return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to update contract:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: updatedContract };
+  });
 }
 
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const user = await requireAdmin({ permissions: ["contracts.write"] });
+  return adminMutation(req, { permissions: ["contracts.write"] }, async (user, body) => {
+    const { deleteReason } = updateContractSchema.parse(body);
 
-    const existingContract = await prisma.contract.findUnique({
-      where: { id: params.id },
+    const existingContract = await prisma.contract.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+        deletedAt: null,
+      },
     });
 
     if (!existingContract) {
-      return NextResponse.json({ error: "Contract not found" }, { status: 404 });
+      return { error: "Contract not found", status: 404 };
     }
 
-    await prisma.contract.delete({
+    await prisma.contract.update({
       where: { id: params.id },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: user.id,
+        deleteReason: deleteReason || "Archived by admin",
+      },
     });
 
-    await createAuditLog({
-      action: "delete_contract",
-      resource: "contract",
-      resourceId: params.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      before: existingContract,
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-      return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to delete contract:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: null, status: 204 };
+  });
 }
