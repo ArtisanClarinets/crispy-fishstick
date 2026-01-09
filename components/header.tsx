@@ -28,6 +28,18 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   const navLinks = [
     { href: "/work", label: "Work" },
     { href: "/lab/revenue-leak", label: "Lab" },
@@ -39,15 +51,16 @@ export function Header() {
     <header
       className={cn(
         "fixed top-0 w-full z-50 transition-all duration-300",
-        isScrolled
+        isScrolled || isOpen
           ? "bg-background/80 backdrop-blur-md border-b border-border/50"
           : "bg-transparent"
       )}
     >
-      <div className="container flex h-20 items-center justify-between">
+      <div className="container flex h-20 items-center justify-between relative z-50">
         <Link
             href="/"
             className="text-lg font-bold tracking-tight transition-opacity hover:opacity-80"
+            onClick={() => setIsOpen(false)}
         >
           {siteConfig.company}
         </Link>
@@ -92,7 +105,7 @@ export function Header() {
 
       {/* Mobile Nav */}
       {isOpen && (
-        <div className="md:hidden fixed inset-0 top-20 bg-background border-t border-border z-40 p-6 flex flex-col gap-6 animate-in slide-in-from-top-5 fade-in duration-200">
+        <div className="md:hidden fixed inset-0 top-0 z-40 bg-background/95 backdrop-blur-xl p-6 pt-24 flex flex-col gap-6 animate-in fade-in duration-200">
           <nav className="flex flex-col gap-6">
             {navLinks.map((link) => (
               <Link
