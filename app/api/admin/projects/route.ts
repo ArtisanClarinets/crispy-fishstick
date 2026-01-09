@@ -1,8 +1,9 @@
 export const dynamic = "force-dynamic";
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
+import { tenantWhere } from "@/lib/admin/guards";
+import { parsePaginationParams, buildPaginationResult } from "@/lib/api/pagination";
 import { z } from "zod";
 
 const createProjectSchema = z.object({
@@ -11,65 +12,79 @@ const createProjectSchema = z.object({
   status: z.enum(["active", "completed", "archived"]).default("active"),
 });
 
-export async function GET() {
-  try {
-    await requireAdmin({ permissions: ["projects.read"] });
+export async function GET(req: NextRequest) {
+  return adminRead(req, { permissions: ["projects.read"] }, async (user) => {
+    const { searchParams } = new URL(req.url);
+    const pagination = parsePaginationParams(searchParams);
+    
+    // Parse filters manually
+    const status = searchParams.get("status") as "active" | "completed" | "archived" | null;
+    const tenantId = searchParams.get("tenantId") || undefined;
+    const search = searchParams.get("search") || undefined;
 
-    const projects = await prisma.project.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        Tenant: true,
-        _count: {
-          select: { Assignment: true, TimeEntry: true },
+    const where = {
+      ...tenantWhere(user),
+      deletedAt: null,
+      ...(status && { status }),
+      ...(tenantId && { tenantId }),
+      ...(search && {
+        name: { contains: search, mode: "insensitive" as const },
+      }),
+    };
+
+    const [projects] = await Promise.all([
+      prisma.project.findMany({
+        where,
+        take: pagination.take + 1,
+        ...(pagination.cursor && {
+          skip: 1,
+          cursor: { id: pagination.cursor },
+        }),
+        orderBy: { createdAt: "desc" },
+        include: {
+          Tenant: true,
+          _count: {
+            select: { Assignment: true, TimeEntry: true },
+          },
         },
-      },
-    });
+      }),
+    ]);
 
-    return NextResponse.json(projects);
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to fetch projects:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return buildPaginationResult(projects, pagination);
+  });
 }
 
-export async function POST(req: Request) {
-  try {
-    const user = await requireAdmin({ permissions: ["projects.write"] });
+export async function POST(req: NextRequest) {
+  return adminMutation(
+    req,
+    { permissions: ["projects.write"], audit: { action: "create_project", resource: "project" } },
+    async (user, body) => {
+      const validatedData = createProjectSchema.parse(body);
 
-    const body = await req.json();
-    const validatedData = createProjectSchema.parse(body);
+      // Verify tenant exists and user has access
+      const tenant = await prisma.tenant.findFirst({
+        where: {
+          id: validatedData.tenantId,
+          deletedAt: null,
+          ...(user.tenantId && { id: user.tenantId }),
+        },
+      });
 
-    const project = await prisma.project.create({
-      data: validatedData,
-    });
+      if (!tenant) {
+        return { error: "Tenant not found or access denied", status: 403 };
+      }
 
-    await createAuditLog({
-      action: "create",
-      resource: "project",
-      resourceId: project.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      after: project,
-    });
+      const project = await prisma.project.create({
+        data: validatedData,
+        include: {
+          Tenant: true,
+          _count: {
+            select: { Assignment: true, TimeEntry: true },
+          },
+        },
+      });
 
-    return NextResponse.json(project, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ errors: error.errors }, { status: 400 });
+      return { data: project, status: 201 };
     }
-    if (error instanceof Error && error.message === "Unauthorized") {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to create project:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+  );
 }

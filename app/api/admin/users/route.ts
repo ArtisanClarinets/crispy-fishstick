@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
 import * as z from "zod";
@@ -32,7 +33,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     // Phase 6: CSRF/Origin Enforcement
     // @ts-ignore - req type mismatch between next/server and built-in Request, but it works at runtime

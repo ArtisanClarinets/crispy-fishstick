@@ -28,14 +28,19 @@ model AuditLog {
   resourceId String?
   before     String?
   after      String?
+  diff       String?   // JSON Patch or structured changes
   ip         String?
   userAgent  String?
+  origin     String?
+  referer    String?
+  requestId  String?
   meta       String?
   createdAt  DateTime @default(now())
 
   @@index([resource, resourceId])
   @@index([actorId])
   @@index([createdAt])
+  @@index([requestId])
 }
 
 model Contract {
@@ -47,16 +52,33 @@ model Contract {
   endDate   DateTime?
   value     Float     @default(0)
   content   String?
+  
+  // Optimistic concurrency control
+  version   Int       @default(1)
 
-  // E-signature fields
+  // E-signature fields (real flow)
+  signatureProvider    String?    // e.g., "docusign", "hellosign"
+  signatureEnvelopeId  String?    // Provider's envelope/document ID
+  signatureStatus      String?    // pending, signed, declined, voided
+  signatureCompletedAt DateTime?
+  
+  // Deprecated fake signature fields (keep for migration but don't use)
   signedBy     String?
   signedAt     DateTime?
   signatureUrl String?
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
 
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   Tenant    Tenant            @relation(fields: [tenantId], references: [id])
   versions  ContractVersion[]
+  
+  @@index([deletedAt])
+  @@index([tenantId])
 }
 
 model ContractVersion {
@@ -99,11 +121,20 @@ model Incident {
   serviceId   String?
   commanderId String?
   summary     String?
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   User        User?       @relation(fields: [commanderId], references: [id])
   Service     Service?    @relation(fields: [serviceId], references: [id])
   Postmortem  Postmortem?
+  
+  @@index([deletedAt])
+  @@index([status])
 }
 
 model Invoice {
@@ -116,11 +147,43 @@ model Invoice {
   totalAmount Float
   currency    String        @default("USD")
   notes       String?
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   Tenant      Tenant        @relation(fields: [tenantId], references: [id])
   InvoiceItem InvoiceItem[]
   TimeEntry   TimeEntry[]
+  
+  @@index([deletedAt])
+  @@index([tenantId])
+  @@index([status])
+}
+
+model InvoiceSequence {
+  tenantId String
+  year     Int
+  lastSeq  Int    @default(0)
+  Tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, year])
+}
+
+model IdempotencyKey {
+  key          String   @id
+  userId       String
+  route        String
+  requestHash  String
+  responseBody String
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+  
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model InvoiceItem {
@@ -162,12 +225,19 @@ model Lead {
   website    String?
   assignedTo String?
   tenantId   String?
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   Tenant     Tenant?  @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId])
   @@index([status])
+  @@index([deletedAt])
 }
 
 model MediaAsset {
@@ -178,7 +248,25 @@ model MediaAsset {
   size       Int
   uploadedBy String?
   tenantId   String?
+  
+  // Private-by-default artifacts vault
+  visibility          String   @default("private") // private, public, tenant
+  storageKey          String?  // Actual file path or object storage key
+  checksum            String?  // SHA-256 for integrity
+  contentType         String?  // Explicit content type
+  contentDisposition  String?  // attachment vs inline
+  expiresAt           DateTime?
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt  DateTime @default(now())
+  
+  @@index([deletedAt])
+  @@index([tenantId])
+  @@index([visibility])
 }
 
 model Postmortem {
@@ -208,11 +296,20 @@ model Project {
   name       String
   tenantId   String
   status     String       @default("active")
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   Assignment Assignment[]
   Tenant     Tenant       @relation(fields: [tenantId], references: [id])
   TimeEntry  TimeEntry[]
+  
+  @@index([deletedAt])
+  @@index([tenantId])
 }
 
 model Proposal {
@@ -223,10 +320,19 @@ model Proposal {
   clientEmail      String?
   content          String?
   validUntil       DateTime?
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   ProposalApproval ProposalApproval[]
   ProposalItem     ProposalItem[]
+  
+  @@index([deletedAt])
+  @@index([status])
 }
 
 model ProposalApproval {
@@ -246,9 +352,17 @@ model ProposalComponent {
   description    String?
   estimatedHours Float
   hourlyRate     Float
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   ProposalItem   ProposalItem[]
+  
+  @@index([deletedAt])
 }
 
 model ProposalItem {
@@ -280,11 +394,17 @@ model RoleAssignment {
   id        String   @id @default(cuid())
   userId    String
   roleId    String
+  
+  // Scoped RBAC
+  scopeType String   @default("GLOBAL") // GLOBAL, TENANT, PROJECT, SERVICE, REGION
+  scopeId   String?  // ID of the tenant, project, service, etc.
+  
   createdAt DateTime @default(now())
   Role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, roleId])
+  @@unique([userId, roleId, scopeType, scopeId])
+  @@index([scopeType, scopeId])
 }
 
 model Service {
@@ -294,24 +414,41 @@ model Service {
   ownerId     String?
   repoUrl     String?
   lifecycle   String     @default("production")
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   Incident    Incident[]
   User        User?      @relation(fields: [ownerId], references: [id])
+  
+  @@index([deletedAt])
 }
 
 model Tenant {
-  id              String            @id @default(cuid())
+  id              String             @id @default(cuid())
   name            String
-  slug            String            @unique
+  slug            String             @unique
   contactEmail    String?
-  createdAt       DateTime          @default(now())
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
+  createdAt       DateTime           @default(now())
   Contract        Contract[]
   Environment     Environment[]
   Invoice         Invoice[]
+  InvoiceSequence InvoiceSequence[]
   Lead            Lead[]
   Project         Project[]
   WebhookEndpoint WebhookEndpoint[]
+  
+  @@index([deletedAt])
 }
 
 model TimeEntry {
@@ -323,10 +460,27 @@ model TimeEntry {
   description String?
   billable    Boolean  @default(true)
   invoiceId   String?
+  
+  // Time tracking approvals
+  status      String   @default("draft") // draft, submitted, approved, rejected
+  approvedBy  String?
+  approvedAt  DateTime?
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt   DateTime @default(now())
   Invoice     Invoice? @relation(fields: [invoiceId], references: [id])
   User        User     @relation(fields: [userId], references: [id])
   Project     Project  @relation(fields: [projectId], references: [id])
+  
+  @@index([deletedAt])
+  @@index([status])
+  @@index([projectId])
+  @@index([userId])
+  @@index([invoiceId])
 }
 
 model User {
@@ -336,6 +490,12 @@ model User {
   passwordHash     String?
   mfaSecret        String?
   tenantId         String?
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   Assignment       Assignment[]
@@ -346,6 +506,8 @@ model User {
   Service          Service[]
   TimeEntry        TimeEntry[]
   Content          Content[]
+  
+  @@index([deletedAt])
 }
 
 model Content {
@@ -358,6 +520,12 @@ model Content {
   excerpt     String?
   authorId    String
   publishedAt DateTime?
+  
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   User        User     @relation(fields: [authorId], references: [id])
@@ -365,6 +533,7 @@ model Content {
   @@index([status])
   @@index([type])
   @@index([authorId])
+  @@index([deletedAt])
 }
 
 model WebhookDelivery {

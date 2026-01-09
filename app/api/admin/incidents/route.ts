@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
@@ -14,7 +15,7 @@ const createIncidentSchema = z.object({
   summary: z.string().optional(),
 });
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const user = await requireAdmin({ permissions: ["incidents.write"] });
     const body = await req.json();

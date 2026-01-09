@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
@@ -44,7 +45,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const user = await requireAdmin({ permissions: ["proposals.write"] });
     const body = await req.json();

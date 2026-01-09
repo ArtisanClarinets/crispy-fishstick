@@ -11,7 +11,9 @@ WorkingDirectory=/var/www/vantus
 EnvironmentFile=/var/www/vantus/.env
 
 # Create state, logs, and runtime directories
-StateDirectory=vantus
+# StateDirectory creates /var/lib/vantus (writable by service user)
+# uploads subdirectory will be created at runtime
+StateDirectory=vantus vantus/uploads
 LogsDirectory=vantus
 RuntimeDirectory=vantus
 
@@ -19,6 +21,7 @@ RuntimeDirectory=vantus
 Environment=NODE_ENV=production
 Environment=HOSTNAME=0.0.0.0
 Environment=PORT=3005
+Environment=UPLOADS_DIR=/var/lib/vantus/uploads
 
 # Security Hardening
 ProtectSystem=strict

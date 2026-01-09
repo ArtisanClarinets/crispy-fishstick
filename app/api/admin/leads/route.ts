@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
-import { assertSameOrigin } from "@/lib/security/origin";
+import { parsePaginationParams, buildPaginationResult } from "@/lib/api/pagination";
+import { tenantWhere } from "@/lib/admin/guards";
 import * as z from "zod";
 
 const createLeadSchema = z.object({
@@ -17,66 +17,58 @@ const createLeadSchema = z.object({
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  try {
-    await requireAdmin({ permissions: ["leads.read"] });
+export async function GET(req: NextRequest) {
+  return adminRead(req, { permissions: ["leads.read"] }, async (user) => {
+    const { searchParams } = new URL(req.url);
+    const pagination = parsePaginationParams(searchParams);
+    
+    // Parse filters manually
+    const status = searchParams.get("status") || undefined;
+    const source = searchParams.get("source") || undefined;
+    const search = searchParams.get("search") || undefined;
 
-    const leads = await prisma.lead.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+    // Build where clause with tenant scoping and soft delete filter
+    const where = {
+      ...tenantWhere(user),
+      deletedAt: null,
+      ...(status && { status }),
+      ...(source && { source }),
+      ...(search && {
+        OR: [
+          { name: { contains: search, mode: "insensitive" as const } },
+          { email: { contains: search, mode: "insensitive" as const } },
+          { message: { contains: search, mode: "insensitive" as const } },
+        ],
+      }),
+    };
 
-    return NextResponse.json(leads, {
-      headers: { "Cache-Control": "no-store" },
-    });
-  } catch (_error) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401, headers: { "Cache-Control": "no-store" } }
-    );
-  }
+    const [leads] = await Promise.all([
+      prisma.lead.findMany({
+        where,
+        take: pagination.take + 1,
+        ...(pagination.cursor && {
+          skip: 1,
+          cursor: { id: pagination.cursor },
+        }),
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    return buildPaginationResult(leads, pagination);
+  });
 }
 
-export async function POST(req: Request) {
-  try {
-    // CSRF protection
-    try {
-      assertSameOrigin(req);
-    } catch (_error) {
-      return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
-    }
-
-    const user = await requireAdmin({ permissions: ["leads.write"] });
-    const body = await req.json();
-
+export async function POST(req: NextRequest) {
+  return adminMutation(req, { permissions: ["leads.write"], audit: { action: "create_lead", resource: "lead" } }, async (user, body) => {
     const validatedData = createLeadSchema.parse(body);
 
     const lead = await prisma.lead.create({
-      data: validatedData,
+      data: {
+        ...validatedData,
+        ...(user.tenantId && { tenantId: user.tenantId }),
+      },
     });
 
-    await createAuditLog({
-      action: "create_lead",
-      resource: "lead",
-      resourceId: lead.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      after: lead,
-    });
-
-    return NextResponse.json(lead, {
-      status: 201,
-      headers: { "Cache-Control": "no-store" },
-    });
-  } catch (_error) {
-    if (_error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: _error.errors },
-        { status: 400, headers: { "Cache-Control": "no-store" } }
-      );
-    }
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500, headers: { "Cache-Control": "no-store" } }
-    );
-  }
+    return { data: lead, status: 201 };
+  });
 }
