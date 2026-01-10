@@ -71,16 +71,16 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-            include: {
-              RoleAssignment: {
-                include: {
-                  Role: true,
-                },
-              },
-            },
-          });
+            const user = await prisma.user.findUnique({
+             where: { email: credentials.email },
+             include: {
+               RoleAssignment: {
+                 include: {
+                   Role: true,
+                 },
+               },
+             },
+           });
 
           if (!user || !user.passwordHash) {
             return null;
@@ -101,7 +101,6 @@ export const authOptions: NextAuthOptions = {
               // Decrypt the stored secret before verification
               const decryptedSecret = await decryptSecret(user.mfaSecret);
               if (!decryptedSecret) {
-                  console.error("Failed to decrypt MFA secret for user:", user.id);
                   throw new Error("MFA_ERROR");
               }
 
@@ -139,7 +138,6 @@ export const authOptions: NextAuthOptions = {
         } catch (error: any) {
           // Handle Prisma errors (P2021: Table does not exist)
           if (error.code === 'P2021' || error.code === 'P2022') {
-            console.error("Database schema not ready:", error);
             throw new Error("DB_SCHEMA_NOT_READY");
           }
           
@@ -148,7 +146,6 @@ export const authOptions: NextAuthOptions = {
             throw error;
           }
 
-          console.error("Authorization error:", error);
           throw new Error("AUTH_ERROR");
         }
       },

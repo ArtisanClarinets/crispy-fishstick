@@ -19,8 +19,12 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   try {
     await requireAdmin({ permissions: ["users.read"] });
 
-    const user = await prisma.user.findUnique({
-      where: { id: params.id },
+    console.log('[DEBUG] User GET - params.id:', params.id);
+    const user = await prisma.user.findFirst({
+      where: {
+        id: params.id,
+        deletedAt: null, // Filter out soft-deleted users
+      },
       select: SAFE_USER_WITH_ROLES_SELECT,
     });
 
@@ -45,6 +49,18 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     const validatedData = updateUserSchema.parse(body);
     const { roleIds, ...userData } = validatedData;
+
+    // Check if user exists and is not soft-deleted
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        id: params.id,
+        deletedAt: null,
+      },
+    });
+
+    if (!existingUser) {
+      return jsonNoStore({ error: "User not found" }, { status: 404 });
+    }
 
     // Handle role updates if provided
     if (roleIds) {
@@ -110,18 +126,24 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       where.tenantId = actor.tenantId;
     }
 
-    // Get user state before deletion for audit
+    // Get user state before soft deletion for audit
     const userToDelete = await prisma.user.findFirst({
         where,
-        select: { id: true, email: true } 
+        select: { id: true, email: true }
     });
 
     if (!userToDelete) {
         return jsonNoStore({ error: "Not found" }, { status: 404 });
     }
 
-    await prisma.user.delete({
+    // Soft delete the user
+    await prisma.user.update({
       where: { id: params.id },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: actor.id,
+        deleteReason: "Soft deleted by admin",
+      },
     });
 
     await createAuditLog({

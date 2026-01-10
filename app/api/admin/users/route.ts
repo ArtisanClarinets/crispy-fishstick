@@ -22,7 +22,9 @@ export async function GET() {
   try {
     const user = await requireAdmin({ permissions: ["users.read"] });
 
-    const where: any = {};
+    const where: any = {
+      deletedAt: null, // Filter out soft-deleted users
+    };
     if (user.tenantId) {
       where.tenantId = user.tenantId;
     }

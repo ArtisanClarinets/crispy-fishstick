@@ -22,6 +22,7 @@ export async function GET(
     const service = await prisma.service.findFirst({
       where: {
         id: params.id,
+        deletedAt: null, // Filter out soft-deleted services
         ...tenantWhere(user),
       },
       include: {
