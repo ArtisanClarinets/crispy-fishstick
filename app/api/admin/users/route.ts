@@ -12,7 +12,7 @@ import { validatePassword } from "@/lib/security/password";
 const createUserSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email"),
-  password: z.string().optional(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   roleIds: z.array(z.string()).optional(), // Array of Role IDs
 });
 
@@ -20,9 +20,15 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    await requireAdmin({ permissions: ["users.read"] });
+    const user = await requireAdmin({ permissions: ["users.read"] });
+
+    const where: any = {};
+    if (user.tenantId) {
+      where.tenantId = user.tenantId;
+    }
 
     const users = await prisma.user.findMany({
+      where,
       orderBy: { createdAt: "desc" },
       select: SAFE_USER_WITH_ROLES_SELECT,
     });
@@ -39,27 +45,26 @@ export async function POST(req: NextRequest) {
     // @ts-ignore - req type mismatch between next/server and built-in Request, but it works at runtime
     assertSameOrigin(req);
 
-    const user = await requireAdmin({ permissions: ["users.write"] });
+    const actor = await requireAdmin({ permissions: ["users.write"] });
     const body = await req.json();
 
     const validatedData = createUserSchema.parse(body);
     const { roleIds, password, ...userData } = validatedData;
 
-    let passwordHash: string | undefined;
+    let passwordHash: string;
 
-    if (password) {
-      // Phase 7: Strict password policy
-      const passwordError = validatePassword(password);
-      if (passwordError) {
-        return jsonNoStore({ error: passwordError }, { status: 400 });
-      }
-      passwordHash = await bcrypt.hash(password, 10);
+    // Phase 7: Strict password policy
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return jsonNoStore({ error: passwordError }, { status: 400 });
     }
+    passwordHash = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.user.create({
       data: {
         ...userData,
         passwordHash,
+        tenantId: actor.tenantId || null,
         RoleAssignment: roleIds ? {
           create: roleIds.map((roleId) => ({
             Role: { connect: { id: roleId } },
@@ -73,8 +78,8 @@ export async function POST(req: NextRequest) {
       action: "create_user",
       resource: "user",
       resourceId: newUser.id,
-      actorId: user.id,
-      actorEmail: user.email,
+      actorId: actor.id,
+      actorEmail: actor.email,
       after: newUser,
     });
 

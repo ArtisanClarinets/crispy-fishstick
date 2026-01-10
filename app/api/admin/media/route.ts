@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest } from "next/server";
 import { adminRead, adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
-import { parsePaginationParams, buildPaginationResult } from "@/lib/api/pagination";
+import { parsePaginationParams, buildPaginationResult, getPrismaParams } from "@/lib/api/pagination";
 import { tenantWhere } from "@/lib/admin/guards";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
@@ -26,11 +26,7 @@ export async function GET(req: NextRequest) {
     const assets = await prisma.mediaAsset.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      take: pagination.take,
-      ...(pagination.cursor && {
-        cursor: { id: pagination.cursor },
-        skip: 1,
-      }),
+      ...getPrismaParams(pagination),
     });
 
     return { data: buildPaginationResult(assets, pagination) };

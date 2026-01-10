@@ -1,10 +1,10 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { adminRead, adminMutation } from "@/lib/admin/route";
 import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
 import { parseCommonFilters, buildDeletedFilter } from "@/lib/api/filters/common";
+import { adminRead, adminMutation } from "@/lib/admin/route";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const createTenantSchema = z.object({
@@ -13,20 +13,27 @@ const createTenantSchema = z.object({
   contactEmail: z.string().email().optional(),
 });
 
+
+
 /**
  * GET /api/admin/tenants
  * List tenants with pagination
  */
 export const GET = adminRead(
   { permissions: ["tenants.read"] },
-  async (req) => {
+  async (req, { user }) => {
     const { searchParams } = req.nextUrl;
     const pagination = parsePaginationParams(searchParams);
     const filters = parseCommonFilters(searchParams);
     
+    // Scoping: if user is tenant-scoped, they can only see their own tenant
     const where: any = {
       ...buildDeletedFilter(filters.includeDeleted),
     };
+
+    if (user.tenantId) {
+      where.id = user.tenantId;
+    }
     
     if (filters.q) {
       where.OR = [

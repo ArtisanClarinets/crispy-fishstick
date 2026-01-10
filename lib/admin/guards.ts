@@ -17,7 +17,7 @@ export async function getSessionUser(): Promise<AdminUserContext | null> {
   if (!session?.user?.email) return null;
 
   // Always re-fetch from DB to ensure latest permissions/roles/JIT
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: { email: session.user.email, deletedAt: null }, // Exclude soft-deleted users
     include: {
       RoleAssignment: {
@@ -97,6 +97,14 @@ export async function requireAdmin(opts: RequireAdminOptions = {}) {
       }
     }
   }
+  
+  // Enforce tenant scope if requested
+  if (opts.tenantScope === "tenantOnly") {
+    const hasWildcard = user.permissions.includes("*");
+    if (!hasWildcard && !user.tenantId) {
+      throw new Error("Forbidden");
+    }
+  }
 
   return user;
 }
@@ -124,7 +132,7 @@ export function tenantWhere(user: AdminUserContext, requestedTenantId?: string |
   if (requestedTenantId) {
     // Verify the requested tenant matches user's tenant
     if (requestedTenantId !== user.tenantId) {
-      throw new Error("Forbidden: Cannot access other tenant's data");
+      throw new Error("Forbidden");
     }
     return { tenantId: requestedTenantId };
   }
