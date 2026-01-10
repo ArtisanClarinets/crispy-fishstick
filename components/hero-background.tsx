@@ -82,8 +82,8 @@ export function HeroBackground() {
       className="absolute inset-0 -z-10 overflow-hidden bg-background"
       onMouseMove={handleMouseMove}
     >
-      {/* Header Fade Overlay - Ensures text legibility and cohesion */}
-      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-background via-background/60 to-transparent z-10 pointer-events-none" />
+      {/* Header Fade Overlay - Adjusted for better cohesion with glass header */}
+      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-background/40 via-background/20 to-transparent z-10 pointer-events-none" />
 
       {/* Dynamic Waves Background - Added for Cohesion */}
       <div className="absolute inset-0 z-0 opacity-40 mix-blend-screen [mask-image:linear-gradient(to_bottom,transparent,black_20%)]">
