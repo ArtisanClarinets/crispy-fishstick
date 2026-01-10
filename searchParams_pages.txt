@@ -1,0 +1,3 @@
+app/(admin)/admin/(dashboard)/contracts/page.tsx
+app/(admin)/admin/(dashboard)/invoices/page.tsx
+app/(admin)/admin/(dashboard)/proposals/page.tsx
