@@ -8,14 +8,6 @@ const nextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
-  async rewrites() {
-    return [
-      {
-        source: "/admin/login",
-        destination: "/auth/login",
-      },
-    ];
-  },
 };
 
 const withMDX = createMDX({

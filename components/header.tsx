@@ -63,7 +63,7 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          <ThemeToggle />
+          <ThemeToggle data-testid="theme-toggle-desktop" />
           <Button asChild variant="default" className="rounded-full px-6">
             <Link href={siteConfig.cta.primary.href}>
               {siteConfig.cta.primary.text}

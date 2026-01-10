@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
 
 const leadSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -64,17 +65,15 @@ export function LeadForm({ initialData }: LeadFormProps) {
       setLoading(true);
       
       if (initialData) {
-        const res = await fetch(`/api/admin/leads/${initialData.id}`, {
+        const res = await fetchWithCsrf(`/api/admin/leads/${initialData.id}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
         if (!res.ok) throw new Error("Failed to update");
         toast.success("Lead updated");
       } else {
-        const res = await fetch("/api/admin/leads", {
+        const res = await fetchWithCsrf("/api/admin/leads", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
         if (!res.ok) throw new Error("Failed to create");

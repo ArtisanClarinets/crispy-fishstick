@@ -27,6 +27,8 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -43,7 +45,10 @@ interface ContentFormProps {
 
 export function ContentForm({ initialData }: ContentFormProps) {
   const router = useRouter();
+  const { hasPermission } = useAdmin();
   const [loading, setLoading] = useState(false);
+
+  const canSubmit = initialData ? hasPermission("content.edit") : hasPermission("content.create");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,9 +70,8 @@ export function ContentForm({ initialData }: ContentFormProps) {
         : "/api/admin/content";
       const method = initialData ? "PUT" : "POST";
 
-      const res = await fetch(url, {
+      const res = await fetchWithCsrf(url, {
         method,
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
 
@@ -258,9 +262,11 @@ export function ContentForm({ initialData }: ContentFormProps) {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? "Saving..." : initialData ? "Update Content" : "Create Content"}
-              </Button>
+              {canSubmit && (
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : initialData ? "Update Content" : "Create Content"}
+                </Button>
+              )}
             </div>
           </form>
         </Form>

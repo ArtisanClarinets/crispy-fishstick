@@ -7,6 +7,7 @@
     "build": "node scripts/generate-build-proof.mjs && next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "postinstall": "node scripts/postinstall.js",
     "setup": "node scripts/setup-env.js",
     "test": "vitest run",

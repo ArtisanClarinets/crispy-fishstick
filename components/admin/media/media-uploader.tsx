@@ -14,9 +14,12 @@ import {
 } from "@/components/ui/dialog";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 export function MediaUploader() {
   const router = useRouter();
+  const { hasPermission } = useAdmin();
   const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -29,7 +32,7 @@ export function MediaUploader() {
 
     try {
       setUploading(true);
-      const res = await fetch("/api/admin/media", {
+      const res = await fetchWithCsrf("/api/admin/media", {
         method: "POST",
         body: formData,
       });
@@ -45,6 +48,10 @@ export function MediaUploader() {
       setUploading(false);
     }
   };
+
+  if (!hasPermission("media.upload")) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -12,6 +12,8 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 type Lead = {
   id: string;
@@ -26,14 +28,14 @@ type Lead = {
 export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
   const router = useRouter();
   const { toast } = useToast();
+  const { hasPermission } = useAdmin();
   const [updating, setUpdating] = useState<string | null>(null);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     setUpdating(id);
     try {
-      const res = await fetch("/api/admin/leads", {
+      const res = await fetchWithCsrf("/api/admin/leads", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),
       });
 
@@ -87,7 +89,7 @@ export function LeadsTable({ initialLeads }: { initialLeads: Lead[] }) {
                   className="bg-transparent border border-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-primary outline-none"
                   value={lead.status}
                   onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-                  disabled={updating === lead.id}
+                  disabled={updating === lead.id || !hasPermission("leads.write")}
                 >
                   <option value="new">New</option>
                   <option value="contacted">Contacted</option>

@@ -53,6 +53,7 @@ The `bootstrap-ubuntu22.sh` script automates the entire production setup:
 2. **Installs dependencies:**
    - Node.js 20.x
    - Nginx (web server & reverse proxy)
+   - Redis (required for BullMQ job queues)
    - SQLite3 (database)
    - Certbot (SSL certificates)
    - Required utilities

@@ -11,6 +11,10 @@ import { formatDate } from "@/lib/utils";
 import { ContractFilters } from "@/components/admin/contracts/contract-filters";
 import { CheckExpiringButton } from "@/components/admin/contracts/check-expiring-button";
 import { addDays } from "date-fns";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
+
+export const dynamic = "force-dynamic";
 
 export default async function ContractsPage({
   searchParams,
@@ -22,6 +26,9 @@ export default async function ContractsPage({
   const search = typeof searchParams.search === "string" ? searchParams.search : undefined;
   const status = typeof searchParams.status === "string" ? searchParams.status : undefined;
   const expiring = typeof searchParams.expiring === "string" ? searchParams.expiring : undefined;
+
+  const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
+  const prismaParams = getPrismaParams(params);
 
   const where: any = {};
 
@@ -47,11 +54,14 @@ export default async function ContractsPage({
 
   const contracts = await prisma.contract.findMany({
     where,
+    ...prismaParams,
     orderBy: { createdAt: "desc" },
     include: {
       Tenant: true,
     },
   });
+
+  const { data, nextCursor, prevCursor } = buildPaginationResult(contracts, params);
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -104,14 +114,14 @@ export default async function ContractsPage({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {contracts.length === 0 ? (
+              {data.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No contracts found.
                   </TableCell>
                 </TableRow>
               ) : (
-                contracts.map((contract) => (
+                data.map((contract) => (
                   <TableRow key={contract.id}>
                     <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
@@ -142,6 +152,8 @@ export default async function ContractsPage({
           </Table>
         </CardContent>
       </Card>
+      
+      <PaginationControls nextCursor={nextCursor} prevCursor={prevCursor} />
     </div>
   );
 }

@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
 
 interface AuditLog {
   id: string;
@@ -42,7 +43,7 @@ export function AuditList() {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await fetch('/api/admin/audit');
+        const res = await fetchWithCsrf('/api/admin/audit');
         if (res.ok) {
           const data = await res.json();
           setLogs(data);

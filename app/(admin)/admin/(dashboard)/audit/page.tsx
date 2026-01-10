@@ -10,16 +10,27 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
 
 export const dynamic = "force-dynamic";
 
-export default async function AuditLogsPage() {
+export default async function AuditLogsPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   await requireAdmin({ permissions: ["audit.read"] });
 
+  const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
+  const prismaParams = getPrismaParams(params);
+
   const logs = await prisma.auditLog.findMany({
+    ...prismaParams,
     orderBy: { createdAt: "desc" },
-    take: 100,
   });
+
+  const { data, nextCursor, prevCursor } = buildPaginationResult(logs, params);
 
   return (
     <div className="flex flex-col gap-6">
@@ -44,7 +55,7 @@ export default async function AuditLogsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {logs.map((log) => (
+              {data.map((log) => (
                 <TableRow key={log.id}>
                   <TableCell className="whitespace-nowrap">
                     {new Date(log.createdAt).toLocaleString()}
@@ -69,7 +80,7 @@ export default async function AuditLogsPage() {
                   </TableCell>
                 </TableRow>
               ))}
-              {logs.length === 0 && (
+              {data.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                     No logs found.
@@ -80,6 +91,8 @@ export default async function AuditLogsPage() {
           </Table>
         </CardContent>
       </Card>
+      
+      <PaginationControls nextCursor={nextCursor} prevCursor={prevCursor} />
     </div>
   );
 }
