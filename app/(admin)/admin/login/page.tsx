@@ -22,7 +22,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      router.push('/admin');
+      console.log("[Admin Login] User already authenticated, redirecting to /admin");
+      // Small delay to ensure session is properly established
+      const timer = setTimeout(() => {
+        router.push('/admin');
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [status, router]);
 
@@ -31,6 +36,10 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
 
+    console.log("[Admin Login] Attempting login for:", email);
+    console.log("[Admin Login] Current URL:", window.location.href);
+    console.log("[Admin Login] Callback URL param:", new URLSearchParams(window.location.search).get("callbackUrl"));
+    
     try {
       const result = await signIn('credentials', {
         email,
@@ -68,7 +77,21 @@ export default function LoginPage() {
           });
         }
       } else {
-        router.push('/admin');
+        console.log("[Admin Login] Authentication successful, redirecting to /admin");
+        const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl");
+        if (callbackUrl) {
+          console.log("[Admin Login] Found callback URL:", callbackUrl);
+          try {
+            const decodedUrl = decodeURIComponent(decodeURIComponent(callbackUrl));
+            console.log("[Admin Login] Decoded callback URL:", decodedUrl);
+            router.push(decodedUrl);
+          } catch (e) {
+            console.error("[Admin Login] Error decoding callback URL:", e);
+            router.push('/admin');
+          }
+        } else {
+          router.push('/admin');
+        }
         router.refresh();
       }
     } catch (_error) {

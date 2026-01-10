@@ -43,6 +43,42 @@ model AuditLog {
   @@index([requestId])
 }
 
+model SecurityAuditLog {
+  id          String   @id @default(cuid())
+  timestamp   DateTime @default(now())
+  eventType   String
+  severity    String
+  userId      String?
+  email       String?
+  ipAddress   String
+  userAgent   String?
+  metadata    String?
+  status      String
+
+  @@index([timestamp])
+  @@index([severity])
+  @@index([userId])
+  @@index([ipAddress])
+  @@index([eventType])
+}
+
+model SecurityAlert {
+  id          String   @id @default(cuid())
+  alertType   String
+  message     String
+  severity    String
+  context     String
+  timestamp   DateTime @default(now())
+  resolved    Boolean   @default(false)
+  resolvedAt  DateTime?
+  resolvedBy  String?
+
+  @@index([timestamp])
+  @@index([severity])
+  @@index([alertType])
+  @@index([resolved])
+}
+
 model Contract {
   id        String    @id @default(cuid())
   title     String
@@ -494,13 +530,23 @@ model User {
   name             String?
   passwordHash     String?
   mfaSecret        String?
+  mfaBackupCodes   String?            // JSON array of hashed backup codes
+  mfaRecoveryCode  String?            // Current recovery code (hashed)
+  mfaRecoveryCodeExpiresAt DateTime?  // When recovery code expires
+  mfaDeviceFingerprint String?        // Device fingerprint for MFA device
   tenantId         String?
-  
+
+  // Password history for security
+  passwordHistory  PasswordHistory[]
+
+  // Session tracking
+  sessions         Session[]
+
   // Soft delete
   deletedAt    DateTime?
   deletedBy    String?
   deleteReason String?
-  
+
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   Assignment       Assignment[]
@@ -511,8 +557,41 @@ model User {
   Service          Service[]
   TimeEntry        TimeEntry[]
   Content          Content[]
-  
+
   @@index([deletedAt])
+}
+
+model PasswordHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  passwordHash String
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Session {
+  id             String   @id @default(cuid())
+  userId         String
+  sessionToken   String   @unique
+  ipAddress      String?
+  userAgent      String?
+  deviceInfo     String?
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  lastActiveAt   DateTime @updatedAt
+  isRevoked      Boolean  @default(false)
+  revokedAt      DateTime?
+  revokedReason  String?
+
+  User           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([isRevoked])
+  @@index([lastActiveAt])
 }
 
 model Content {

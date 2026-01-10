@@ -6,11 +6,14 @@ import { SAFE_USER_WITH_ROLES_SELECT } from "@/lib/security/safe-user";
 import { jsonNoStore } from "@/lib/security/response";
 import * as z from "zod";
 import { assertSameOrigin } from "@/lib/security/origin";
+import bcrypt from "bcryptjs";
+import { validatePasswordEnhanced, addToPasswordHistory } from "@/lib/security/password-enhanced";
 
 const updateUserSchema = z.object({
   name: z.string().optional(),
   email: z.string().email().optional(),
   roleIds: z.array(z.string()).optional(),
+  password: z.string().min(12, "Password must be at least 12 characters").optional(),
 });
 
 export const dynamic = "force-dynamic";
@@ -48,7 +51,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     const body = await req.json();
 
     const validatedData = updateUserSchema.parse(body);
-    const { roleIds, ...userData } = validatedData;
+    const { roleIds, password, ...userData } = validatedData;
 
     // Check if user exists and is not soft-deleted
     const existingUser = await prisma.user.findFirst({
@@ -60,6 +63,26 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     if (!existingUser) {
       return jsonNoStore({ error: "User not found" }, { status: 404 });
+    }
+
+    // Handle password change if provided
+    if (password) {
+      // Enhanced password validation
+      const passwordError = await validatePasswordEnhanced(password, params.id);
+      if (passwordError) {
+        return jsonNoStore({ error: passwordError }, { status: 400 });
+      }
+
+      // Hash the new password
+      const newPasswordHash = await bcrypt.hash(password, 10);
+
+      // If user already has a password, add it to history before changing
+      if (existingUser.passwordHash) {
+        await addToPasswordHistory(params.id, existingUser.passwordHash);
+      }
+
+      // Add passwordHash to userData
+      (userData as any).passwordHash = newPasswordHash;
     }
 
     // Handle role updates if provided

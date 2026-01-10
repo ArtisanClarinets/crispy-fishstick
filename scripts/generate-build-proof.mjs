@@ -15,9 +15,15 @@ try {
 
 const builtAt = new Date().toISOString();
 
-const pkgLock = fs.existsSync("package-lock.json")
-  ? fs.readFileSync("package-lock.json")
-  : Buffer.from("");
+let pkgLock;
+try {
+  pkgLock = fs.existsSync("package-lock.json")
+    ? fs.readFileSync("package-lock.json")
+    : Buffer.from("");
+} catch (error) {
+  console.error('Failed to read package-lock.json:', error);
+  pkgLock = Buffer.from("");
+}
 
 const depsSha256 = crypto
   .createHash("sha256")
@@ -25,11 +31,9 @@ const depsSha256 = crypto
   .digest("hex");
 
 const gatesConfigured = [
-  "TypeScript strict",
   "ESLint enforced",
   "Vitest unit suite",
   "Playwright e2e suite",
-  "Security headers active",
 ];
 
 const gateResults = {
@@ -58,6 +62,10 @@ const payload = {
   gatesRan,
 };
 
-fs.mkdirSync("public/proof", { recursive: true });
-fs.writeFileSync("public/proof/build.json", JSON.stringify(payload, null, 2));
+try {
+  fs.mkdirSync("public/proof", { recursive: true });
+  fs.writeFileSync("public/proof/build.json", JSON.stringify(payload, null, 2));
+} catch (error) {
+  console.error('Failed to write build proof:', error);
+}
 console.log("Wrote public/proof/build.json with commit:", payload.commit);

@@ -166,8 +166,70 @@ async function main() {
     } else {
       newEnvContent += `\n${item.key}="${value}"`;
     }
-    
+     
     currentEnv[item.key] = value;
+  }
+
+  // Apply production-specific defaults or auto-generation
+  const productionMode = currentEnv['NODE_ENV'] === 'production';
+  
+  if (productionMode) {
+    // Enforce production defaults for critical settings
+    if (!currentEnv['NODE_ENV'] || currentEnv['NODE_ENV'] === '') {
+      currentEnv['NODE_ENV'] = 'production';
+      const nodeEnvRegex = new RegExp(`^NODE_ENV=.*`, 'm');
+      if (nodeEnvRegex.test(newEnvContent)) {
+        newEnvContent = newEnvContent.replace(nodeEnvRegex, `NODE_ENV="production"`);
+      } else {
+        newEnvContent += `\nNODE_ENV="production"`;
+      }
+    }
+    
+    if (!currentEnv['LOG_LEVEL'] || currentEnv['LOG_LEVEL'] === '') {
+      currentEnv['LOG_LEVEL'] = 'error';
+      const logLevelRegex = new RegExp(`^LOG_LEVEL=.*`, 'm');
+      if (logLevelRegex.test(newEnvContent)) {
+        newEnvContent = newEnvContent.replace(logLevelRegex, `LOG_LEVEL="error"`);
+      } else {
+        newEnvContent += `\nLOG_LEVEL="error"`;
+      }
+    }
+    
+    // Critical security: Ensure all required secrets are generated for production
+    const criticalSecrets = [
+      { key: 'NEXTAUTH_SECRET', genFunc: generateSecret },
+      { key: 'MFA_ENCRYPTION_KEY', genFunc: generateMFAKey },
+      { key: 'CSRF_SECRET', genFunc: generateSecret },
+      { key: 'CRON_SECRET', genFunc: generateSecret },
+      { key: 'SESSION_ENCRYPTION_KEY', genFunc: generateSecret }
+    ];
+    
+    for (const secret of criticalSecrets) {
+      if (!currentEnv[secret.key] || currentEnv[secret.key] === '' || currentEnv[secret.key] === 'generate-me-in-production-must-be-secure') {
+        console.log(`Generating secure secret for ${secret.key}...`);
+        const generatedValue = secret.genFunc();
+        currentEnv[secret.key] = generatedValue;
+        const secretRegex = new RegExp(`^${secret.key}=.*`, 'm');
+        if (secretRegex.test(newEnvContent)) {
+          newEnvContent = newEnvContent.replace(secretRegex, `${secret.key}="${generatedValue}"`);
+        } else {
+          newEnvContent += `\n${secret.key}="${generatedValue}"`;
+        }
+      }
+    }
+    
+    // Force strong admin password in production
+    if (!currentEnv['ADMIN_BOOTSTRAP_PASSWORD'] || currentEnv['ADMIN_BOOTSTRAP_PASSWORD'] === '' || currentEnv['ADMIN_BOOTSTRAP_PASSWORD'] === 'admin') {
+      const strongPassword = generateSecret(16);
+      currentEnv['ADMIN_BOOTSTRAP_PASSWORD'] = strongPassword;
+      console.log(`Generated strong initial ADMIN_BOOTSTRAP_PASSWORD for production: ${strongPassword}`);
+      const passwordRegex = new RegExp(`^ADMIN_BOOTSTRAP_PASSWORD=.*`, 'm');
+      if (passwordRegex.test(newEnvContent)) {
+        newEnvContent = newEnvContent.replace(passwordRegex, `ADMIN_BOOTSTRAP_PASSWORD="${strongPassword}"`);
+      } else {
+        newEnvContent += `\nADMIN_BOOTSTRAP_PASSWORD="${strongPassword}"`;
+      }
+    }
   }
 
   // Security Keys
@@ -189,9 +251,15 @@ async function main() {
       required: true,
       customGen: generateMFAKey
     },
-    { 
-      key: 'CRON_SECRET', 
-      description: 'Secret key for securing cron job endpoints', 
+    {
+      key: 'CRON_SECRET',
+      description: 'Secret key for securing cron job endpoints',
+      generate: true,
+      required: true
+    },
+    {
+      key: 'SESSION_ENCRYPTION_KEY',
+      description: 'Secret for session data encryption',
       generate: true,
       required: true
     },

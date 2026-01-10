@@ -1,12 +1,35 @@
-console.log('\x1b[36m%s\x1b[0m', '=======================================================');
-console.log('\x1b[36m%s\x1b[0m', '  🚀 Crispy Fishstick Installation Complete!');
-console.log('\x1b[36m%s\x1b[0m', '=======================================================');
-console.log('');
-console.log('  To configure your environment for production/dev:');
-console.log('  👉 \x1b[33mnpm run setup\x1b[0m');
-console.log('');
-console.log('  Then start the application:');
-console.log('  👉 \x1b[33mnpm run dev\x1b[0m (Development)');
-console.log('  👉 \x1b[33mnpm run build && npm start\x1b[0m (Production)');
-console.log('');
-console.log('\x1b[36m%s\x1b[0m', '=======================================================');
+#!/usr/bin/env node
+/**
+ * postinstall hook (production-safe)
+ *
+ * - Validates Node version range (warn only)
+ * - Generates build proof artifact (non-fatal in CI if filesystem is read-only)
+ */
+
+const { execSync } = require("child_process");
+
+function run(cmd) {
+  execSync(cmd, { stdio: "inherit" });
+}
+
+function semverMajor(v) {
+  const m = String(v).match(/^v?(\d+)/);
+  return m ? Number(m[1]) : null;
+}
+
+try {
+  const major = semverMajor(process.version);
+  if (major && major < 18) {
+    console.warn(`⚠ Node ${process.version} detected. Recommended Node 18+ (prefer 20 LTS).`);
+  }
+
+  // Generate build proof if script exists (do not hard-fail install if missing)
+  try {
+    run("node scripts/generate-build-proof.mjs");
+  } catch (e) {
+    console.warn("⚠ build-proof generation failed (continuing):", e?.message || e);
+  }
+} catch (err) {
+  console.error("postinstall failed:", err?.message || err);
+  process.exit(1);
+}

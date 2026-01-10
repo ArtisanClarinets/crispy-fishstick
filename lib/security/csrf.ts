@@ -7,7 +7,24 @@ import { NextRequest } from "next/server";
 import { randomBytes, createHmac } from "crypto";
 import { cookies } from "next/headers";
 
-const CSRF_SECRET = process.env.CSRF_SECRET || process.env.NEXTAUTH_SECRET || "INSECURE_FALLBACK_CHANGE_ME";
+// Get CSRF secret with fail-fast approach in production
+function getCsrfSecret(): string {
+  const secret = process.env.CSRF_SECRET || process.env.NEXTAUTH_SECRET;
+
+  if (process.env.NODE_ENV === "production" && !secret) {
+    throw new Error(
+      "CSRF_SECRET or NEXTAUTH_SECRET is required in production. Please set CSRF_SECRET in your environment variables."
+    );
+  }
+
+  if (!secret) {
+    console.warn("WARNING: No CSRF secret configured. CSRF protection will not work reliably.");
+  }
+
+  return secret || "";
+}
+
+const CSRF_SECRET = getCsrfSecret();
 const CSRF_COOKIE_NAME = "csrf-token";
 const CSRF_HEADER_NAME = "x-csrf-token";
 

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
 import { decryptSecret } from "@/lib/security/mfa";
+import { updateSessionActivity } from "@/lib/security/session";
 
 // Enforce NEXTAUTH_SECRET in production; fail fast if missing
 const nextAuthSecret = process.env.NEXTAUTH_SECRET;
@@ -32,6 +33,8 @@ declare module "next-auth/jwt" {
     roles: string[];
     permissions: string[];
     tenantId?: string | null;
+    sessionToken?: string;
+    sessionCreatedAt?: number;
   }
 }
 
@@ -152,13 +155,28 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.roles = (user as any).roles || [];
         token.permissions = (user as any).permissions || [];
         token.tenantId = (user as any).tenantId;
       }
+      
+      // Handle session creation on sign-in
+      if (trigger === "signIn") {
+        // This will be handled in the authorize function where we have access to the request
+      }
+      
+      // Handle session update on activity
+      if (trigger === "update" && token.sessionToken) {
+        try {
+          await updateSessionActivity(token.sessionToken);
+        } catch (error) {
+          console.error("Failed to update session activity:", error);
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {

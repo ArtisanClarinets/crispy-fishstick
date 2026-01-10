@@ -156,6 +156,12 @@ rsync -av \
     "$PROJECT_ROOT/" "$APP_DIR/"
 
 chown -R "$APP_USER:$APP_GROUP" "$APP_DIR"
+
+# Set least privilege file permissions
+log_info "Setting least privilege file permissions..."
+find "$APP_DIR" -type f -exec chmod 644 {} +
+find "$APP_DIR" -type d -exec chmod 755 {} +
+
 log_success "Application files deployed"
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -183,6 +189,21 @@ if [ -f "$APP_DIR/.env" ]; then
     cp "$APP_DIR/.env" "$ENV_FILE" 2>/dev/null || true
     chown root:root "$ENV_FILE" 2>/dev/null || true
     chmod 600 "$ENV_FILE" 2>/dev/null || true
+    
+    # Verify environment file ownership and permissions
+    if [ -f "$ENV_FILE" ]; then
+        log_info "Verifying environment file security..."
+        if [ "$(stat -c %u:%g "$ENV_FILE")" != "0:0" ]; then
+            chown root:root "$ENV_FILE"
+            log_warning "Fixed ownership of $ENV_FILE to root:root"
+        fi
+        if [ "$(stat -c %a "$ENV_FILE")" != "600" ]; then
+            chmod 600 "$ENV_FILE"
+            log_warning "Fixed permissions of $ENV_FILE to 600"
+        fi
+        log_success "Environment file security verified"
+    fi
+    
     log_success "Environment file available at $APP_DIR/.env (and copied to $ENV_FILE)"
 fi
 
@@ -316,7 +337,12 @@ fi
 log_section "STEP 10: Configuring Systemd Service"
 
 log_info "Installing systemd service file..."
-cp "$APP_DIR/config/systemd/vantus.service" "/etc/systemd/system/"
+if [ ! -f "/etc/systemd/system/vantus.service" ]; then
+    cp "$APP_DIR/config/systemd/vantus.service" "/etc/systemd/system/"
+    log_info "Systemd service file installed"
+else
+    log_warning "Systemd service file already exists, skipping copy"
+fi
 
 log_info "Reloading systemd daemon..."
 systemctl daemon-reload
@@ -338,11 +364,20 @@ systemctl start vantus.service
 # Wait a moment for service to start
 sleep 3
 
-if systemctl is-active --quiet vantus.service; then
-    log_success "Vantus service is running!"
+# Wait for service to start and perform HTTP health check
+log_info "Waiting for application to become ready..."
+sleep 5
+
+# Perform HTTP health check
+HEALTH_CHECK_URL="http://localhost:3000/api/proof/headers"
+log_info "Performing health check at $HEALTH_CHECK_URL..."
+
+if curl --fail --silent --show-error "$HEALTH_CHECK_URL" >/dev/null; then
+    log_success "Application health check passed!"
 else
-    log_error "Failed to start Vantus service"
-    log_info "Check logs with: journalctl -u vantus.service -n 50"
+    log_error "Application health check failed"
+    log_info "Check service status with: systemctl status vantus.service"
+    log_info "Check application logs with: journalctl -u vantus.service -n 50"
     exit 1
 fi
 
