@@ -8,10 +8,23 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 
-export default async function ProjectsPage() {
+import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+
+export const dynamic = "force-dynamic";
+
+export default async function ProjectsPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   await requireAdmin({ permissions: ["projects.read"] });
 
+  const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
+  const prismaParams = getPrismaParams(params);
+
   const projects = await prisma.project.findMany({
+    ...prismaParams,
     orderBy: { createdAt: "desc" },
     include: {
       Tenant: true,
@@ -20,6 +33,8 @@ export default async function ProjectsPage() {
       },
     },
   });
+
+  const { data, nextCursor, prevCursor } = buildPaginationResult(projects, params);
 
   return (
     <div className="flex flex-col gap-6">
@@ -57,14 +72,14 @@ export default async function ProjectsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {projects.length === 0 ? (
+              {data.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No projects found.
                   </TableCell>
                 </TableRow>
               ) : (
-                projects.map((project) => (
+                data.map((project) => (
                   <TableRow key={project.id}>
                     <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
@@ -96,6 +111,8 @@ export default async function ProjectsPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <PaginationControls nextCursor={nextCursor} prevCursor={prevCursor} />
     </div>
   );
 }

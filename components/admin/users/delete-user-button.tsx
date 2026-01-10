@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface DeleteUserButtonProps {
   userId: string;
@@ -25,12 +27,15 @@ interface DeleteUserButtonProps {
 export function DeleteUserButton({ userId, userName }: DeleteUserButtonProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { hasPermission } = useAdmin();
   const [isDeleting, setIsDeleting] = useState(false);
+
+  if (!hasPermission("users.delete")) return null;
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const response = await fetch(`/api/admin/users/${userId}`, {
+      const response = await fetchWithCsrf(`/api/admin/users/${userId}`, {
         method: "DELETE",
       });
 

@@ -7,7 +7,12 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { cn } from "@/lib/utils";
-import { SplineBlueprintCanvas } from "@/components/spline-blueprint-canvas";
+import dynamic from "next/dynamic";
+
+const SplineBlueprintCanvas = dynamic(
+  () => import("@/components/spline-blueprint-canvas").then((mod) => mod.SplineBlueprintCanvas),
+  { ssr: false }
+);
 
 gsap.registerPlugin(ScrollTrigger);
 

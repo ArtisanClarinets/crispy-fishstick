@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Upload, FileIcon } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import Image from 'next/image';
+import { fetchWithCsrf } from '@/lib/fetchWithCsrf';
+import { useAdmin } from '@/hooks/useAdmin';
 
 interface MediaAsset {
   id: string;
@@ -19,13 +21,14 @@ interface MediaAsset {
 }
 
 export function MediaManager() {
+  const { hasPermission } = useAdmin();
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchAssets = async () => {
     try {
-      const res = await fetch('/api/admin/media');
+      const res = await fetchWithCsrf('/api/admin/media');
       if (res.ok) {
         const data = await res.json();
         setAssets(data);
@@ -50,7 +53,7 @@ export function MediaManager() {
 
     setIsUploading(true);
     try {
-      const res = await fetch('/api/admin/media', {
+      const res = await fetchWithCsrf('/api/admin/media', {
         method: 'POST',
         body: formData,
       });
@@ -87,21 +90,23 @@ export function MediaManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Media Library</h2>
-        <div className="flex items-center gap-2">
-          <Input
-            type="file"
-            className="hidden"
-            id="file-upload"
-            onChange={handleUpload}
-            disabled={isUploading}
-          />
-          <Button disabled={isUploading} asChild>
-            <label htmlFor="file-upload" className="cursor-pointer">
-              <Upload className="mr-2 h-4 w-4" />
-              {isUploading ? 'Uploading...' : 'Upload Asset'}
-            </label>
-          </Button>
-        </div>
+        {hasPermission("media.upload") && (
+          <div className="flex items-center gap-2">
+            <Input
+              type="file"
+              className="hidden"
+              id="file-upload"
+              onChange={handleUpload}
+              disabled={isUploading}
+            />
+            <Button disabled={isUploading} asChild>
+              <label htmlFor="file-upload" className="cursor-pointer">
+                <Upload className="mr-2 h-4 w-4" />
+                Upload Media
+              </label>
+            </Button>
+          </div>
+        )}
       </div>
 
       {isLoading ? (

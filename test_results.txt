@@ -1,0 +1,820 @@
+
+Running 29 tests using 6 workers
+
+[1A[2K[1/29] [chromium] › e2e/app.spec.ts:10:7 › Homepage › should have navigation links
+[1A[2K[2/29] [chromium] › e2e/app.spec.ts:19:7 › Homepage › should navigate to work page
+[1A[2K[3/29] [chromium] › e2e/app.spec.ts:4:7 › Homepage › should load the homepage
+[1A[2K[4/29] [chromium] › e2e/admin-flow.spec.ts:4:7 › Admin Flow › should allow login and view leads
+[1A[2K[5/29] [chromium] › e2e/app.spec.ts:25:7 › Homepage › should have theme toggle
+[1A[2K[6/29] [chromium] › e2e/app.spec.ts:31:7 › Homepage › should have accessible hero section
+[1A[2K[7/29] [chromium] › e2e/app.spec.ts:40:7 › Work Page › should display case studies
+[1A[2K[8/29] [chromium] › e2e/app.spec.ts:47:7 › Work Page › should navigate to case study detail
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K[9/29] [chromium] › e2e/app.spec.ts:56:7 › Contact Page › should have contact form
+[1A[2K[10/29] [chromium] › e2e/app.spec.ts:62:7 › Contact Page › should validate required fields
+[1A[2K[11/29] [chromium] › e2e/app.spec.ts:71:7 › Accessibility › should have proper heading hierarchy on homepage
+[1A[2K[12/29] [chromium] › e2e/app.spec.ts:77:7 › Accessibility › should have alt text for images
+[1A[2K[13/29] [chromium] › e2e/content-flow.spec.ts:13:7 › Content Flow › should create, update and delete content
+[1A[2K[14/29] [chromium] › e2e/contracts-flow.spec.ts:13:7 › Contracts Flow › should create and update a contract
+[1A[2K[15/29] [chromium] › e2e/csrf.spec.ts:13:7 › CSRF Protection › should include CSRF token in mutation requests
+[1A[2K[16/29] [chromium] › e2e/incidents-flow.spec.ts:13:7 › Incidents Flow › should create and update an incident
+[1A[2K[17/29] [chromium] › e2e/invoices-flow.spec.ts:13:7 › Invoices Flow › should create a new invoice
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K  1) [chromium] › e2e/admin-flow.spec.ts:4:7 › Admin Flow › should allow login and view leads ──────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin$/[39m
+    Received string:  [31m"http://localhost:3002/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+      13 |     // 3. Should redirect to Dashboard
+      14 |     // Note: The dashboard URL might be /admin
+    > 15 |     await expect(page).toHaveURL(/\/admin$/);
+         |                        ^
+      16 |     
+      17 |     // 4. Navigate to Leads
+      18 |     // Assuming there is a sidebar link
+        at /home/meb/crispy-fishstick/e2e/admin-flow.spec.ts:15:24
+
+    Error Context: test-results/admin-flow-Admin-Flow-should-allow-login-and-view-leads-chromium/error-context.md
+
+
+[1A[2K[18/29] [chromium] › e2e/leads-flow.spec.ts:13:7 › Leads Flow › should create and update a lead
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K  2) [chromium] › e2e/content-flow.spec.ts:13:7 › Content Flow › should create, update and delete content 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin$/[39m
+    Received string:  [31m"http://localhost:3002/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       8 |     await page.fill('input[name="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await expect(page).toHaveURL(/\/admin$/);
+         |                        ^
+      11 |   });
+      12 |
+      13 |   test('should create, update and delete content', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/content-flow.spec.ts:10:24
+
+    Error Context: test-results/content-flow-Content-Flow--41227-e-update-and-delete-content-chromium/error-context.md
+
+
+[1A[2K  3) [chromium] › e2e/contracts-flow.spec.ts:13:7 › Contracts Flow › should create and update a contract 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin$/[39m
+    Received string:  [31m"http://localhost:3002/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       8 |     await page.fill('input[name="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await expect(page).toHaveURL(/\/admin$/);
+         |                        ^
+      11 |   });
+      12 |
+      13 |   test('should create and update a contract', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/contracts-flow.spec.ts:10:24
+
+    Error Context: test-results/contracts-flow-Contracts-F-54670-reate-and-update-a-contract-chromium/error-context.md
+
+
+[1A[2K  4) [chromium] › e2e/incidents-flow.spec.ts:13:7 › Incidents Flow › should create and update an incident 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin$/[39m
+    Received string:  [31m"http://localhost:3002/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       8 |     await page.fill('input[name="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await expect(page).toHaveURL(/\/admin$/);
+         |                        ^
+      11 |   });
+      12 |
+      13 |   test('should create and update an incident', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/incidents-flow.spec.ts:10:24
+
+    Error Context: test-results/incidents-flow-Incidents-F-4b97a-eate-and-update-an-incident-chromium/error-context.md
+
+
+[1A[2K  5) [chromium] › e2e/invoices-flow.spec.ts:13:7 › Invoices Flow › should create a new invoice ─────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected: [32m"http://localhost:3002/admin"[39m
+    Received: [31m"http://localhost:3002/admin[7m/login[27m"[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       8 |     await page.getByLabel('Password').fill('admin');
+       9 |     await page.getByRole('button', { name: 'Sign in' }).click();
+    > 10 |     await expect(page).toHaveURL('/admin');
+         |                        ^
+      11 |   });
+      12 |
+      13 |   test('should create a new invoice', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/invoices-flow.spec.ts:10:24
+
+    Error Context: test-results/invoices-flow-Invoices-Flow-should-create-a-new-invoice-chromium/error-context.md
+
+
+[1A[2K[19/29] [chromium] › e2e/living-blueprint.spec.ts:4:7 › Living Blueprint Page › should render the Living Blueprint section
+[1A[2K[20/29] [chromium] › e2e/media-flow.spec.ts:15:7 › Media Flow › should upload and delete media
+[1A[2K[21/29] [chromium] › e2e/mfa-flow.spec.ts:5:7 › MFA Flow › should enable, enforce, and disable MFA
+[1A[2K[22/29] [chromium] › e2e/pagination.spec.ts:13:7 › Admin Pagination › should navigate through pages using cursor pagination
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K  6) [chromium] › e2e/leads-flow.spec.ts:13:7 › Leads Flow › should create and update a lead ───────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin$/[39m
+    Received string:  [31m"http://localhost:3002/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       8 |     await page.fill('input[name="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await expect(page).toHaveURL(/\/admin$/);
+         |                        ^
+      11 |   });
+      12 |
+      13 |   test('should create and update a lead', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/leads-flow.spec.ts:10:24
+
+    Error Context: test-results/leads-flow-Leads-Flow-should-create-and-update-a-lead-chromium/error-context.md
+
+
+[1A[2K[23/29] [chromium] › e2e/pagination.spec.ts:34:7 › Admin Pagination › should update limit parameter
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K  7) [chromium] › e2e/media-flow.spec.ts:15:7 › Media Flow › should upload and delete media ────────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin$/[39m
+    Received string:  [31m"http://localhost:3002/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+      10 |     await page.fill('input[name="password"]', 'admin123');
+      11 |     await page.click('button[type="submit"]');
+    > 12 |     await expect(page).toHaveURL(/\/admin$/);
+         |                        ^
+      13 |   });
+      14 |
+      15 |   test('should upload and delete media', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/media-flow.spec.ts:12:24
+
+    Error Context: test-results/media-flow-Media-Flow-should-upload-and-delete-media-chromium/error-context.md
+
+
+[1A[2K  8) [chromium] › e2e/mfa-flow.spec.ts:5:7 › MFA Flow › should enable, enforce, and disable MFA ────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected: [32m"http://localhost:3002/admin"[39m
+    Received: [31m"http://localhost:3002/admin[7m/login[27m"[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       9 |     await page.getByLabel('Password').fill('admin');
+      10 |     await page.getByRole('button', { name: 'Sign In' }).click();
+    > 11 |     await expect(page).toHaveURL('/admin');
+         |                        ^
+      12 |
+      13 |     // 2. Navigate to Security Settings
+      14 |     await page.goto('/admin/settings/security');
+        at /home/meb/crispy-fishstick/e2e/mfa-flow.spec.ts:11:24
+
+    Error Context: test-results/mfa-flow-MFA-Flow-should-enable-enforce-and-disable-MFA-chromium/error-context.md
+
+
+[1A[2K  9) [chromium] › e2e/living-blueprint.spec.ts:4:7 › Living Blueprint Page › should render the Living Blueprint section 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#living-blueprint')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('#living-blueprint')[22m
+
+
+       7 |
+       8 |     const section = page.locator("#living-blueprint");
+    >  9 |     await expect(section).toBeVisible();
+         |                           ^
+      10 |
+      11 |     // Wait for client hydration so scroll-driven state updates are active.
+      12 |     await expect(section).toHaveAttribute("data-hydrated", "true");
+        at /home/meb/crispy-fishstick/e2e/living-blueprint.spec.ts:9:27
+
+    Error Context: test-results/living-blueprint-Living-Bl-02264-he-Living-Blueprint-section-chromium/error-context.md
+
+
+[1A[2K[24/29] [chromium] › e2e/services-flow.spec.ts:13:7 › Services Flow › should create and update a service
+[1A[2K[25/29] [chromium] › e2e/proposals-flow.spec.ts:13:7 › Proposals Flow › should create, update, and delete a proposal
+[1A[2K[26/29] [chromium] › e2e/projects-flow.spec.ts:13:7 › Projects Flow › should create a new project
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K  10) [chromium] › e2e/services-flow.spec.ts:13:7 › Services Flow › should create and update a service 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin$/[39m
+    Received string:  [31m"http://localhost:3002/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       8 |     await page.fill('input[name="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await expect(page).toHaveURL(/\/admin$/);
+         |                        ^
+      11 |   });
+      12 |
+      13 |   test('should create and update a service', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/services-flow.spec.ts:10:24
+
+    Error Context: test-results/services-flow-Services-Flo-23122-create-and-update-a-service-chromium/error-context.md
+
+
+[1A[2K  11) [chromium] › e2e/proposals-flow.spec.ts:13:7 › Proposals Flow › should create, update, and delete a proposal 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin$/[39m
+    Received string:  [31m"http://localhost:3002/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       8 |     await page.fill('input[name="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await expect(page).toHaveURL(/\/admin$/);
+         |                        ^
+      11 |   });
+      12 |
+      13 |   test('should create, update, and delete a proposal', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/proposals-flow.spec.ts:10:24
+
+    Error Context: test-results/proposals-flow-Proposals-F-a966a-pdate-and-delete-a-proposal-chromium/error-context.md
+
+
+[1A[2K  12) [chromium] › e2e/projects-flow.spec.ts:13:7 › Projects Flow › should create a new project ────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected: [32m"http://localhost:3002/admin"[39m
+    Received: [31m"http://localhost:3002/admin[7m/login[27m"[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       8 |     await page.getByLabel('Password').fill('admin');
+       9 |     await page.getByRole('button', { name: 'Sign in' }).click();
+    > 10 |     await expect(page).toHaveURL('/admin');
+         |                        ^
+      11 |   });
+      12 |
+      13 |   test('should create a new project', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/projects-flow.spec.ts:10:24
+
+    Error Context: test-results/projects-flow-Projects-Flow-should-create-a-new-project-chromium/error-context.md
+
+
+[1A[2K[27/29] [chromium] › e2e/users-flow.spec.ts:13:7 › Users Flow › should create and update a user
+[1A[2K[28/29] [chromium] › e2e/theme-visual.spec.ts:31:7 › Theme Visual Verification › should respect reduced motion
+[1A[2K[29/29] [chromium] › e2e/theme-visual.spec.ts:4:7 › Theme Visual Verification › should render home hero in light and dark mode
+[1A[2K[2m[WebServer] [22mDatabase schema not ready: PrismaClientKnownRequestError: 
+[2m[WebServer] [22mInvalid `prisma.user.findUnique()` invocation:
+[2m[WebServer] [22m
+[2m[WebServer] [22m
+[2m[WebServer] [22mThe column `main.User.deletedAt` does not exist in the current database.
+[2m[WebServer] [22m    at $n.handleRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:7315[90m)[39m
+[2m[WebServer] [22m    at $n.handleAndLogRequestError [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6623[90m)[39m
+[2m[WebServer] [22m    at $n.request [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:121:6307[90m)[39m
+[2m[WebServer] [22m    at async l [90m(/home/meb/crispy-fishstick/[39mnode_modules/[4m@prisma/client[24m/runtime/library.js:130:9633[90m)[39m
+[2m[WebServer] [22m    at async Object.authorize [90m(/home/meb/crispy-fishstick/[39m.next/server/app/api/auth/[...nextauth]/route.js:1:2460[90m)[39m
+[2m[WebServer] [22m    at async Object.c [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:4502[90m)[39m
+[2m[WebServer] [22m    at async _ [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:1:114763[90m)[39m
+[2m[WebServer] [22m    at async a [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:20116[90m)[39m
+[2m[WebServer] [22m    at async e.length.t [90m(/home/meb/crispy-fishstick/[39m.next/server/chunks/655.js:25:21606[90m)[39m
+[2m[WebServer] [22m    at async [90m/home/meb/crispy-fishstick/[39mnode_modules/[4mnext[24m/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+[2m[WebServer] [22m  code: [32m'P2022'[39m,
+[2m[WebServer] [22m  clientVersion: [32m'5.22.0'[39m,
+[2m[WebServer] [22m  meta: { modelName: [32m'User'[39m, column: [32m'main.User.deletedAt'[39m }
+[2m[WebServer] [22m}
+
+[1A[2K  13) [chromium] › e2e/users-flow.spec.ts:13:7 › Users Flow › should create and update a user ──────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin$/[39m
+    Received string:  [31m"http://localhost:3002/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3002/admin/login"[22m
+
+
+       8 |     await page.fill('input[name="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await expect(page).toHaveURL(/\/admin$/);
+         |                        ^
+      11 |   });
+      12 |
+      13 |   test('should create and update a user', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/users-flow.spec.ts:10:24
+
+    Error Context: test-results/users-flow-Users-Flow-should-create-and-update-a-user-chromium/error-context.md
+
+
+[1A[2K  14) [chromium] › e2e/theme-visual.spec.ts:4:7 › Theme Visual Verification › should render home hero in light and dark mode 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('hero-signal-field')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('hero-signal-field')[22m
+
+
+      17 |     // Let's force it.
+      18 |     
+    > 19 |     await expect(page.getByTestId('hero-signal-field')).toBeVisible();
+         |                                                         ^
+      20 |     await page.waitForTimeout(1000); // Allow canvas to render
+      21 |     await page.screenshot({ path: 'verification/home-light.png', fullPage: false });
+      22 |
+        at /home/meb/crispy-fishstick/e2e/theme-visual.spec.ts:19:57
+
+    Error Context: test-results/theme-visual-Theme-Visual--9ac46-hero-in-light-and-dark-mode-chromium/error-context.md
+
+
+[1A[2K  15) [chromium] › e2e/theme-visual.spec.ts:31:7 › Theme Visual Verification › should respect reduced motion 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('hero-signal-field')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('hero-signal-field')[22m
+
+
+      34 |     await page.waitForTimeout(1000);
+      35 |     // We expect the canvas to still be there, but static
+    > 36 |     await expect(page.getByTestId('hero-signal-field')).toBeVisible();
+         |                                                         ^
+      37 |     await page.screenshot({ path: 'verification/home-reduced-motion.png' });
+      38 |   });
+      39 | });
+        at /home/meb/crispy-fishstick/e2e/theme-visual.spec.ts:36:57
+
+    Error Context: test-results/theme-visual-Theme-Visual--f7618-ould-respect-reduced-motion-chromium/error-context.md
+
+
+[1A[2K  16) [chromium] › e2e/csrf.spec.ts:13:7 › CSRF Protection › should include CSRF token in mutation requests 
+
+    [31mTest timeout of 60000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('CSRF Protection', () => {
+    > 4 |   test.beforeEach(async ({ page }) => {
+        |        ^
+      5 |     // Login first
+      6 |     await page.goto('/admin/login');
+      7 |     await page.fill('input[type="email"]', 'admin@vantus.systems');
+        at /home/meb/crispy-fishstick/e2e/csrf.spec.ts:4:8
+
+    Error: page.waitForURL: Test timeout of 60000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/admin" until "load"
+    ============================================================
+
+       8 |     await page.fill('input[type="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await page.waitForURL('/admin');
+         |                ^
+      11 |   });
+      12 |
+      13 |   test('should include CSRF token in mutation requests', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/csrf.spec.ts:10:16
+
+    Error Context: test-results/csrf-CSRF-Protection-shoul-15ee8--token-in-mutation-requests-chromium/error-context.md
+
+
+[1A[2K  17) [chromium] › e2e/pagination.spec.ts:13:7 › Admin Pagination › should navigate through pages using cursor pagination 
+
+    [31mTest timeout of 60000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Admin Pagination', () => {
+    > 4 |   test.beforeEach(async ({ page }) => {
+        |        ^
+      5 |     // Login first
+      6 |     await page.goto('/admin/login');
+      7 |     await page.fill('input[type="email"]', 'admin@vantus.systems');
+        at /home/meb/crispy-fishstick/e2e/pagination.spec.ts:4:8
+
+    Error: page.waitForURL: Test timeout of 60000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/admin" until "load"
+    ============================================================
+
+       8 |     await page.fill('input[type="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await page.waitForURL('/admin');
+         |                ^
+      11 |   });
+      12 |
+      13 |   test('should navigate through pages using cursor pagination', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/pagination.spec.ts:10:16
+
+    Error Context: test-results/pagination-Admin-Paginatio-10bf6-ges-using-cursor-pagination-chromium/error-context.md
+
+
+[1A[2K  18) [chromium] › e2e/pagination.spec.ts:34:7 › Admin Pagination › should update limit parameter ──
+
+    [31mTest timeout of 60000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Admin Pagination', () => {
+    > 4 |   test.beforeEach(async ({ page }) => {
+        |        ^
+      5 |     // Login first
+      6 |     await page.goto('/admin/login');
+      7 |     await page.fill('input[type="email"]', 'admin@vantus.systems');
+        at /home/meb/crispy-fishstick/e2e/pagination.spec.ts:4:8
+
+    Error: page.waitForURL: Test timeout of 60000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/admin" until "load"
+    ============================================================
+
+       8 |     await page.fill('input[type="password"]', 'admin123');
+       9 |     await page.click('button[type="submit"]');
+    > 10 |     await page.waitForURL('/admin');
+         |                ^
+      11 |   });
+      12 |
+      13 |   test('should navigate through pages using cursor pagination', async ({ page }) => {
+        at /home/meb/crispy-fishstick/e2e/pagination.spec.ts:10:16
+
+    Error Context: test-results/pagination-Admin-Pagination-should-update-limit-parameter-chromium/error-context.md
+
+
+[1A[2K  18 failed
+    [chromium] › e2e/admin-flow.spec.ts:4:7 › Admin Flow › should allow login and view leads ───────
+    [chromium] › e2e/content-flow.spec.ts:13:7 › Content Flow › should create, update and delete content 
+    [chromium] › e2e/contracts-flow.spec.ts:13:7 › Contracts Flow › should create and update a contract 
+    [chromium] › e2e/csrf.spec.ts:13:7 › CSRF Protection › should include CSRF token in mutation requests 
+    [chromium] › e2e/incidents-flow.spec.ts:13:7 › Incidents Flow › should create and update an incident 
+    [chromium] › e2e/invoices-flow.spec.ts:13:7 › Invoices Flow › should create a new invoice ──────
+    [chromium] › e2e/leads-flow.spec.ts:13:7 › Leads Flow › should create and update a lead ────────
+    [chromium] › e2e/living-blueprint.spec.ts:4:7 › Living Blueprint Page › should render the Living Blueprint section 
+    [chromium] › e2e/media-flow.spec.ts:15:7 › Media Flow › should upload and delete media ─────────
+    [chromium] › e2e/mfa-flow.spec.ts:5:7 › MFA Flow › should enable, enforce, and disable MFA ─────
+    [chromium] › e2e/pagination.spec.ts:13:7 › Admin Pagination › should navigate through pages using cursor pagination 
+    [chromium] › e2e/pagination.spec.ts:34:7 › Admin Pagination › should update limit parameter ────
+    [chromium] › e2e/projects-flow.spec.ts:13:7 › Projects Flow › should create a new project ──────
+    [chromium] › e2e/proposals-flow.spec.ts:13:7 › Proposals Flow › should create, update, and delete a proposal 
+    [chromium] › e2e/services-flow.spec.ts:13:7 › Services Flow › should create and update a service 
+    [chromium] › e2e/theme-visual.spec.ts:4:7 › Theme Visual Verification › should render home hero in light and dark mode 
+    [chromium] › e2e/theme-visual.spec.ts:31:7 › Theme Visual Verification › should respect reduced motion 
+    [chromium] › e2e/users-flow.spec.ts:13:7 › Users Flow › should create and update a user ────────
+  11 passed (1.7m)

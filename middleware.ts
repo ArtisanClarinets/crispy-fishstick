@@ -17,6 +17,7 @@ export async function middleware(request: NextRequest) {
 
   // Note: 'unsafe-eval' is often required for development (HMR) and some libraries.
   // We remove 'unsafe-inline' for scripts to strictly enforce nonce usage.
+  // In production, we strictly forbid 'unsafe-eval'.
   const isDev = process.env.NODE_ENV === "development";
   const scriptSrc = `script-src 'self' 'nonce-${nonce}' ${isDev ? "'unsafe-eval'" : ""}`;
 
@@ -37,11 +38,14 @@ export async function middleware(request: NextRequest) {
   // AUTHENTICATION LOGIC
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    const secret = process.env.NEXTAUTH_SECRET;
+    const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
+    console.log("[Middleware] Checking auth for:", pathname);
+    console.log("[Middleware] Secret exists:", !!secret);
+    
     if (!secret) {
       console.error("NEXTAUTH_SECRET is not set. Admin routes will not authenticate.");
       const url = new URL("/admin/login", request.url);
-      url.searchParams.set("callbackUrl", encodeURIComponent(pathname + request.nextUrl.search));
+      url.searchParams.set("callbackUrl", encodeURIComponent(encodeURIComponent(pathname + request.nextUrl.search)));
       return NextResponse.redirect(url);
     }
     
@@ -49,10 +53,12 @@ export async function middleware(request: NextRequest) {
       req: request, 
       secret 
     });
+    console.log("[Middleware] Token found:", !!token);
 
     if (!token) {
+      console.log("[Middleware] No token, redirecting to login");
       const url = new URL("/admin/login", request.url);
-      url.searchParams.set("callbackUrl", encodeURIComponent(pathname + request.nextUrl.search));
+      url.searchParams.set("callbackUrl", encodeURIComponent(encodeURIComponent(pathname + request.nextUrl.search)));
       return NextResponse.redirect(url);
     }
   }

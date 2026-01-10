@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface ContentActionsProps {
   id: string;
@@ -13,6 +15,7 @@ interface ContentActionsProps {
 
 export function ContentActions({ id }: ContentActionsProps) {
   const router = useRouter();
+  const { hasPermission } = useAdmin();
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -20,7 +23,7 @@ export function ContentActions({ id }: ContentActionsProps) {
 
     try {
       setDeleting(true);
-      const res = await fetch(`/api/admin/content/${id}`, {
+      const res = await fetchWithCsrf(`/api/admin/content/${id}`, {
         method: "DELETE",
       });
 
@@ -37,20 +40,24 @@ export function ContentActions({ id }: ContentActionsProps) {
 
   return (
     <div className="flex justify-end gap-2">
-      <Link href={`/admin/content/${id}`}>
-        <Button variant="ghost" size="icon">
-          <Edit className="h-4 w-4" />
+      {hasPermission("content.edit") && (
+        <Link href={`/admin/content/${id}`}>
+          <Button variant="ghost" size="icon">
+            <Edit className="h-4 w-4" />
+          </Button>
+        </Link>
+      )}
+      {hasPermission("content.delete") && (
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={handleDelete}
+          disabled={deleting}
+          className="text-destructive hover:text-destructive"
+        >
+          <Trash2 className="h-4 w-4" />
         </Button>
-      </Link>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        onClick={handleDelete}
-        disabled={deleting}
-        className="text-destructive hover:text-destructive"
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
+      )}
     </div>
   );
 }

@@ -1,0 +1,40 @@
+
+> crispy-fishstick@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+   automatically enabled Fast Refresh for 1 custom loader
+ ✓ Ready in 1838ms
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1170ms (171 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 13.3s (1673 modules)
+ ✓ Compiled in 1746ms (817 modules)
+ GET / 200 in 15099ms
+ ○ Compiling /api/proof/headers ...
+ ✓ Compiled /api/proof/headers in 9.6s (1087 modules)
+ ✓ Compiled (1113 modules)
+ GET /api/proof/headers 200 in 9861ms
+ GET /api/proof/headers 200 in 10036ms
+WARNING: No MFA encryption key configured. MFA will not work reliably.
+ GET / 200 in 8867ms
+WARNING: No MFA encryption key configured. MFA will not work reliably.
+[next-auth][warn][NEXTAUTH_URL]
+https://next-auth.js.org/warnings#nextauth_url
+[next-auth][warn][NO_SECRET]
+https://next-auth.js.org/warnings#no_secret
+ GET /api/auth/session 200 in 11372ms
+ GET /api/auth/session 200 in 40ms
+ GET /api/auth/session 200 in 41ms
+ GET /api/auth/session 200 in 25ms
+WARNING: No MFA encryption key configured. MFA will not work reliably.
+ GET /api/proof/headers 200 in 22ms
+ GET /api/proof/headers 200 in 30ms

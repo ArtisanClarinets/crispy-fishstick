@@ -60,7 +60,14 @@ export function buildPaginationResult<T extends { id: string }>(
   
   if (items.length > take) {
     hasMore = true;
-    data = items.slice(0, take);
+    if (direction === "backward") {
+      // For backward pagination, the extra item is at the beginning (furthest from cursor)
+      // So we keep the last 'take' items
+      data = items.slice(items.length - take);
+    } else {
+      // For forward pagination, the extra item is at the end
+      data = items.slice(0, take);
+    }
   }
   
   const nextCursor = hasMore && data.length > 0 ? data[data.length - 1].id : null;

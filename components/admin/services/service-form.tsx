@@ -26,6 +26,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
 
 const serviceSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -67,17 +68,15 @@ export function ServiceForm({ initialData, users }: ServiceFormProps) {
       };
 
       if (initialData) {
-        const res = await fetch(`/api/admin/services/${initialData.id}`, {
+        const res = await fetchWithCsrf(`/api/admin/services/${initialData.id}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("Failed to update");
         toast.success("Service updated");
       } else {
-        const res = await fetch("/api/admin/services", {
+        const res = await fetchWithCsrf("/api/admin/services", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("Failed to create");

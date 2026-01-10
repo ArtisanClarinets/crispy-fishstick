@@ -47,9 +47,11 @@ dev_server.log
 next-env.d.ts
 
 # security
-prisma/*.db
-prisma/dev.db
+prisma/**/*.db
+prisma/**/*.db-journal
 contact_submissions.json
 public/uploads/
 data/uploads/
 uploads/
+server.log
+test_results.txt

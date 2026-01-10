@@ -7,11 +7,19 @@ import { Plus, Server } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
+import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 
-export default async function ServicesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ServicesPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   await requireAdmin({ permissions: ["services.read"] });
 
+  const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
+  const prismaParams = getPrismaParams(params);
+
   const services = await prisma.service.findMany({
+    ...prismaParams,
     orderBy: { createdAt: "desc" },
     include: {
       User: true,
@@ -20,6 +28,8 @@ export default async function ServicesPage() {
       },
     },
   });
+
+  const { data, nextCursor, prevCursor } = buildPaginationResult(services, params);
 
   return (
     <div className="flex flex-col gap-6">
@@ -57,14 +67,14 @@ export default async function ServicesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {services.length === 0 ? (
+              {data.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No services registered.
                   </TableCell>
                 </TableRow>
               ) : (
-                services.map((service) => (
+                data.map((service) => (
                   <TableRow key={service.id}>
                     <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
@@ -100,6 +110,8 @@ export default async function ServicesPage() {
               )}
             </TableBody>
           </Table>
+          
+          <PaginationControls nextCursor={nextCursor} prevCursor={prevCursor} />
         </CardContent>
       </Card>
     </div>

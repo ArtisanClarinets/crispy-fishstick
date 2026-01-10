@@ -26,6 +26,7 @@ export async function GET(
     const contract = await prisma.contract.findFirst({
       where: {
         id: params.id,
+        deletedAt: null, // Filter out soft-deleted contracts
         ...tenantWhere(user),
       },
       include: {

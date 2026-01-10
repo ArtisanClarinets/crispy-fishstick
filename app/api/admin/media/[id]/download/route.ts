@@ -18,8 +18,17 @@ export const GET = adminRead(
   async (_req, { user, params }: any) => {
     const { id } = params;
     
-    const asset = await prisma.mediaAsset.findUnique({
-      where: { id, deletedAt: null },
+    // Try to find by ID first, then storageKey
+    // Since storageKey is unique, we can query it directly if ID lookup fails
+    // or use findFirst with OR condition
+    const asset = await prisma.mediaAsset.findFirst({
+      where: {
+        OR: [
+          { id },
+          { storageKey: id }
+        ],
+        deletedAt: null 
+      },
     });
     
     if (!asset) {

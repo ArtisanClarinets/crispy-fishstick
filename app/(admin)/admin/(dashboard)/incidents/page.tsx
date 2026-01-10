@@ -7,17 +7,31 @@ import { Plus, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
 
-export default async function IncidentsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function IncidentsPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   await requireAdmin({ permissions: ["incidents.read"] });
 
+  const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
+  const prismaParams = getPrismaParams(params);
+
   const incidents = await prisma.incident.findMany({
+    ...prismaParams,
     orderBy: { createdAt: "desc" },
     include: {
       Service: true,
       User: true,
     },
   });
+
+  const { data, nextCursor, prevCursor } = buildPaginationResult(incidents, params);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -76,14 +90,14 @@ export default async function IncidentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {incidents.length === 0 ? (
+              {data.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No incidents found.
                   </TableCell>
                 </TableRow>
               ) : (
-                incidents.map((incident) => (
+                data.map((incident) => (
                   <TableRow key={incident.id}>
                     <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
@@ -116,6 +130,8 @@ export default async function IncidentsPage() {
           </Table>
         </CardContent>
       </Card>
+      
+      <PaginationControls nextCursor={nextCursor} prevCursor={prevCursor} />
     </div>
   );
 }

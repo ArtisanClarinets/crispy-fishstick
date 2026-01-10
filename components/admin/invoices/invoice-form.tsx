@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Plus, Trash } from "lucide-react";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const invoiceSchema = z.object({
   tenantId: z.string().min(1, "Tenant is required"),
@@ -39,7 +41,10 @@ interface InvoiceFormProps {
 export function InvoiceForm({ tenants }: InvoiceFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { hasPermission } = useAdmin();
   const [isLoading, setIsLoading] = useState(false);
+
+  const canCreate = hasPermission("invoices.create");
 
   const {
     register,
@@ -71,11 +76,8 @@ export function InvoiceForm({ tenants }: InvoiceFormProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/admin/invoices", {
+      const response = await fetchWithCsrf("/api/admin/invoices", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(data),
       });
 
@@ -273,10 +275,12 @@ export function InvoiceForm({ tenants }: InvoiceFormProps) {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" disabled={isLoading} className="ml-auto">
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create Invoice
-          </Button>
+          {canCreate && (
+            <Button type="submit" disabled={isLoading} className="ml-auto">
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Create Invoice
+            </Button>
+          )}
         </CardFooter>
       </form>
     </Card>

@@ -20,6 +20,7 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       roles: string[];
+      permissions: string[];
       tenantId?: string | null;
     };
   }
@@ -29,6 +30,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     roles: string[];
+    permissions: string[];
     tenantId?: string | null;
   }
 }
@@ -69,16 +71,16 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-            include: {
-              RoleAssignment: {
-                include: {
-                  Role: true,
-                },
-              },
-            },
-          });
+            const user = await prisma.user.findUnique({
+             where: { email: credentials.email },
+             include: {
+               RoleAssignment: {
+                 include: {
+                   Role: true,
+                 },
+               },
+             },
+           });
 
           if (!user || !user.passwordHash) {
             return null;
@@ -99,7 +101,6 @@ export const authOptions: NextAuthOptions = {
               // Decrypt the stored secret before verification
               const decryptedSecret = await decryptSecret(user.mfaSecret);
               if (!decryptedSecret) {
-                  console.error("Failed to decrypt MFA secret for user:", user.id);
                   throw new Error("MFA_ERROR");
               }
 
@@ -116,17 +117,27 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
+          // Parse permissions
+          const permissions = user.RoleAssignment.flatMap((r) => {
+            try {
+              return JSON.parse(r.Role.permissions);
+            } catch {
+              return [];
+            }
+          });
+          const uniquePermissions = Array.from(new Set(permissions));
+
           return {
             id: user.id,
             email: user.email,
             name: user.name,
             roles: user.RoleAssignment.map((r) => r.Role.name),
+            permissions: uniquePermissions as string[],
             tenantId: user.tenantId,
           };
         } catch (error: any) {
           // Handle Prisma errors (P2021: Table does not exist)
           if (error.code === 'P2021' || error.code === 'P2022') {
-            console.error("Database schema not ready:", error);
             throw new Error("DB_SCHEMA_NOT_READY");
           }
           
@@ -135,7 +146,6 @@ export const authOptions: NextAuthOptions = {
             throw error;
           }
 
-          console.error("Authorization error:", error);
           throw new Error("AUTH_ERROR");
         }
       },
@@ -146,6 +156,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.roles = (user as any).roles || [];
+        token.permissions = (user as any).permissions || [];
         token.tenantId = (user as any).tenantId;
       }
       return token;
@@ -154,6 +165,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.roles = token.roles;
+        session.user.permissions = token.permissions;
         session.user.tenantId = token.tenantId;
       }
       return session;

@@ -17,6 +17,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface MediaItemProps {
   asset: {
@@ -32,13 +34,14 @@ interface MediaItemProps {
 
 export function MediaItem({ asset }: MediaItemProps) {
   const router = useRouter();
+  const { hasPermission } = useAdmin();
   const [deleting, setDeleting] = useState(false);
   const [open, setOpen] = useState(false);
 
   const handleDelete = async () => {
     try {
       setDeleting(true);
-      const res = await fetch(`/api/admin/media/${asset.id}`, {
+      const res = await fetchWithCsrf(`/api/admin/media/${asset.id}`, {
         method: "DELETE",
       });
       
@@ -78,15 +81,17 @@ export function MediaItem({ asset }: MediaItemProps) {
         </div>
         
         <AlertDialog open={open} onOpenChange={setOpen}>
-          <AlertDialogTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-6 w-6 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
-          </AlertDialogTrigger>
+          {hasPermission("media.delete") && (
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </AlertDialogTrigger>
+          )}
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>

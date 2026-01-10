@@ -5,6 +5,7 @@ import { WorkloadIntent, RecommendationResult } from "@/lib/server-config/types"
 import { IntentForm } from "./intent-form";
 import { RecommendationView } from "./recommendation-view";
 import { AnimatePresence, motion } from "framer-motion";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
 
 export function ConfigWizard() {
   const [step, setStep] = useState<"intent" | "result">("intent");
@@ -12,9 +13,8 @@ export function ConfigWizard() {
 
   const handleIntentSubmit = async (intent: WorkloadIntent) => {
     try {
-      const res = await fetch("/api/server-config/recommend", {
+      const res = await fetchWithCsrf("/api/server-config/recommend", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(intent),
       });
 

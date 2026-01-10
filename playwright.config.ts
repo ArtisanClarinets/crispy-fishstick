@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
+  timeout: 60000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -21,6 +22,10 @@ export default defineConfig({
     // Force using an explicit port to avoid accidentally hitting an unrelated server
     command: "npm run build && npm run start -- -p 3002",
     url: "http://localhost:3002",
+    env: {
+      NEXTAUTH_URL: "http://localhost:3002",
+      NEXTAUTH_SECRET: "e67jcdS2iFcrpNRvcvtgv2/7qMsaFBg2wSVho0wZKAU=",
+    },
     // Always start a fresh server locally for deterministic test runs
     reuseExistingServer: !process.env.CI,
     timeout: 120000,

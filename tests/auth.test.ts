@@ -53,6 +53,7 @@ describe('Authentication Logic', () => {
       email: 'test@example.com',
       name: 'Test User',
       roles: ['Admin'],
+      permissions: [],
       tenantId: 'tenant-1',
     });
   });

@@ -26,6 +26,8 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Check, ChevronRight, User, Calendar, FileText } from "lucide-react";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const contractSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -52,8 +54,11 @@ const steps = [
 
 export function ContractForm({ initialData, tenants }: ContractFormProps) {
   const router = useRouter();
+  const { hasPermission } = useAdmin();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+
+  const canSubmit = initialData ? hasPermission("contracts.edit") : hasPermission("contracts.create");
 
   const form = useForm<ContractFormValues>({
     resolver: zodResolver(contractSchema),
@@ -83,17 +88,15 @@ export function ContractForm({ initialData, tenants }: ContractFormProps) {
       };
 
       if (initialData) {
-        const res = await fetch(`/api/admin/contracts/${initialData.id}`, {
+        const res = await fetchWithCsrf(`/api/admin/contracts/${initialData.id}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("Failed to update");
         toast.success("Contract updated");
       } else {
-        const res = await fetch("/api/admin/contracts", {
+        const res = await fetchWithCsrf("/api/admin/contracts", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("Failed to create");
@@ -329,9 +332,11 @@ export function ContractForm({ initialData, tenants }: ContractFormProps) {
                     Next <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={loading}>
-                    {loading ? "Saving..." : initialData ? "Update Contract" : "Create Contract"}
-                  </Button>
+                  canSubmit && (
+                    <Button type="submit" disabled={loading}>
+                      {loading ? "Saving..." : initialData ? "Update Contract" : "Create Contract"}
+                    </Button>
+                  )
                 )}
               </div>
             </CardContent>
