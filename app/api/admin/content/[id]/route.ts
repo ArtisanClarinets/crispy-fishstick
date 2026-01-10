@@ -1,74 +1,65 @@
-import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
+import { NextRequest } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
 import { z } from "zod";
 
-export const dynamic = "force-dynamic";
-
 const contentSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  slug: z.string().min(1, "Slug is required"),
-  type: z.enum(["post", "page", "article"]).default("post"),
-  status: z.enum(["draft", "published", "archived"]).default("draft"),
+  title: z.string().optional(),
+  slug: z.string().optional(),
+  type: z.enum(["post", "page", "article"]).optional(),
+  status: z.enum(["draft", "published", "archived"]).optional(),
   content: z.string().optional(),
   excerpt: z.string().optional(),
+  deleteReason: z.string().optional(),
 });
 
 export async function GET(
-  _req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    await requireAdmin({ permissions: ["content.read"] });
-
+  return adminRead(req, { permissions: ["content.read"] }, async (_user) => {
     const item = await prisma.content.findUnique({
-      where: { id: params.id },
+      where: {
+        id: params.id,
+      },
       include: {
-        User: {
-          select: { name: true, email: true },
-        },
+        User: { select: { name: true, email: true } },
       },
     });
 
     if (!item) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return { error: "Content not found", status: 404 };
     }
 
-    return NextResponse.json(item);
-  } catch (error) {
-    console.error("Content fetch error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: item };
+  });
 }
 
-export async function PUT(
-  req: Request,
+export async function PATCH(
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const user = await requireAdmin({ permissions: ["content.write"] });
-    const body = await req.json();
+  return adminMutation(req, { permissions: ["content.write"] }, async (user, body) => {
     const validated = contentSchema.parse(body);
 
-    const existing = await prisma.content.findUnique({
-      where: { id: params.id },
+    const existing = await prisma.content.findFirst({
+      where: {
+        id: params.id,
+        deletedAt: null,
+      },
     });
 
     if (!existing) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return { error: "Content not found", status: 404 };
     }
 
-    // Check slug uniqueness if changed
-    if (validated.slug !== existing.slug) {
+    if (validated.slug && validated.slug !== existing.slug) {
       const slugCheck = await prisma.content.findUnique({
         where: { slug: validated.slug },
       });
       if (slugCheck) {
-        return NextResponse.json(
-          { error: "Slug already exists" },
-          { status: 400 }
-        );
+        return { error: "Slug already exists", status: 400 };
       }
     }
 
@@ -77,64 +68,41 @@ export async function PUT(
       data: {
         ...validated,
         updatedAt: new Date(),
-        publishedAt: 
-          validated.status === "published" && existing.status !== "published"
-            ? new Date() 
-            : (validated.status !== "published" ? null : existing.publishedAt),
+        publishedAt: validated.status === "published" && !existing.publishedAt ? new Date() : undefined,
       },
     });
 
-    await createAuditLog({
-      action: "update_content",
-      resource: "content",
-      resourceId: item.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      before: existing,
-      after: item,
-    });
-
-    return NextResponse.json(item);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
-    }
-    console.error("Content update error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: item };
+  });
 }
 
 export async function DELETE(
-  _req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const user = await requireAdmin({ permissions: ["content.write"] });
+  return adminMutation(req, { permissions: ["content.write"] }, async (user, body) => {
+    const { deleteReason } = contentSchema.parse(body);
 
-    const existing = await prisma.content.findUnique({
-      where: { id: params.id },
+    const existing = await prisma.content.findFirst({
+      where: {
+        id: params.id,
+        deletedAt: null,
+      },
     });
 
     if (!existing) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return { error: "Content not found", status: 404 };
     }
 
-    await prisma.content.delete({
+    await prisma.content.update({
       where: { id: params.id },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: user.id,
+        deleteReason: deleteReason || "Archived by admin",
+      },
     });
 
-    await createAuditLog({
-      action: "delete_content",
-      resource: "content",
-      resourceId: params.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      before: existing,
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Content delete error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: null, status: 204 };
+  });
 }

@@ -1,0 +1,52 @@
+[Unit]
+Description=Vantus Background Job Worker (BullMQ)
+After=network-online.target redis.service
+Wants=network-online.target
+Requires=redis.service
+
+[Service]
+Type=simple
+User=vantus
+Group=vantus
+WorkingDirectory=/var/www/vantus
+EnvironmentFile=/var/www/vantus/.env
+
+# Use state directories from main service
+StateDirectory=vantus vantus/uploads
+LogsDirectory=vantus
+RuntimeDirectory=vantus
+
+# Environment
+Environment=NODE_ENV=production
+Environment=UPLOADS_DIR=/var/lib/vantus/uploads
+
+# Security Hardening
+ProtectSystem=strict
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+RestrictRealtime=true
+RestrictNamespaces=true
+
+# Start the worker process
+ExecStart=/usr/bin/node scripts/worker.js
+
+# Restart policy: Always restart on failure
+Restart=always
+RestartSec=5s
+
+# Graceful shutdown
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vantus-worker
+
+[Install]
+WantedBy=multi-user.target

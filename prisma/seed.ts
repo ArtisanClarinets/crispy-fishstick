@@ -132,11 +132,22 @@ async function main() {
     });
 
     const assignment = await prisma.roleAssignment.findUnique({
-        where: { userId_roleId: { userId: user.id, roleId: ownerRole.id } }
+        where: { 
+          userId_roleId_scopeType_scopeId: { 
+            userId: user.id, 
+            roleId: ownerRole.id,
+            scopeType: "GLOBAL",
+            scopeId: "",
+          } 
+        }
     });
     if (!assignment) {
         await prisma.roleAssignment.create({
-            data: { userId: user.id, roleId: ownerRole.id }
+            data: { 
+              userId: user.id, 
+              roleId: ownerRole.id,
+              scopeType: "GLOBAL",
+            }
         });
     }
   }

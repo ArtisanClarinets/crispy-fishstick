@@ -11,6 +11,10 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { ProposalFilters } from "@/components/admin/proposals/proposal-filters";
 import { ProposalsExportButton } from "@/components/admin/proposals/proposals-export-button";
 import { DollarSign, CheckCircle, Clock, TrendingUp } from "lucide-react";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
+
+export const dynamic = "force-dynamic";
 
 export default async function ProposalsPage({
   searchParams,
@@ -21,6 +25,9 @@ export default async function ProposalsPage({
 
   const search = typeof searchParams.search === "string" ? searchParams.search : undefined;
   const status = typeof searchParams.status === "string" ? searchParams.status : undefined;
+  
+  const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
+  const prismaParams = getPrismaParams(params);
 
   const where: any = {};
 
@@ -35,6 +42,7 @@ export default async function ProposalsPage({
   const [proposals, stats, approvedCount, pendingCount, rejectedCount] = await Promise.all([
     prisma.proposal.findMany({
       where,
+      ...prismaParams,
       orderBy: { createdAt: "desc" },
       include: {
         ProposalItem: true,
@@ -53,6 +61,8 @@ export default async function ProposalsPage({
     prisma.proposal.count({ where: { status: "pending_approval" } }),
     prisma.proposal.count({ where: { status: "rejected" } }),
   ]);
+
+  const { data, nextCursor, prevCursor } = buildPaginationResult(proposals, params);
 
   const totalClosed = approvedCount + rejectedCount;
   const winRate = totalClosed > 0 ? Math.round((approvedCount / totalClosed) * 100) : 0;
@@ -116,7 +126,7 @@ export default async function ProposalsPage({
           <p className="text-muted-foreground">Manage client proposals and estimates.</p>
         </div>
         <div className="flex gap-2">
-          <ProposalsExportButton proposals={proposals} />
+          <ProposalsExportButton proposals={data} />
           <Button asChild>
             <Link href="/admin/proposals/new">
               <Plus className="mr-2 h-4 w-4" />
@@ -148,14 +158,14 @@ export default async function ProposalsPage({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {proposals.length === 0 ? (
+              {data.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     No proposals found. Create your first one!
                   </TableCell>
                 </TableRow>
               ) : (
-                proposals.map((proposal) => (
+                data.map((proposal) => (
                   <TableRow key={proposal.id}>
                     <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
@@ -187,6 +197,8 @@ export default async function ProposalsPage({
           </Table>
         </CardContent>
       </Card>
+      
+      <PaginationControls nextCursor={nextCursor} prevCursor={prevCursor} />
     </div>
   );
 }

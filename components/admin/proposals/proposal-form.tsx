@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Plus, Trash, Wand2 } from "lucide-react";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
 
 const proposalSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -67,7 +68,7 @@ const TEMPLATES = [
   }
 ];
 
-export function ProposalForm() {
+export function ProposalForm({ initialData }: { initialData?: any }) {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -81,7 +82,7 @@ export function ProposalForm() {
     formState: { errors },
   } = useForm<ProposalFormValues>({
     resolver: zodResolver(proposalSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       status: "draft",
       clientEmail: "",
       content: "",
@@ -114,11 +115,13 @@ export function ProposalForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/admin/proposals", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const url = initialData 
+        ? `/api/admin/proposals/${initialData.id}` 
+        : "/api/admin/proposals";
+      const method = initialData ? "PATCH" : "POST";
+
+      const response = await fetchWithCsrf(url, {
+        method,
         body: JSON.stringify(data),
       });
 

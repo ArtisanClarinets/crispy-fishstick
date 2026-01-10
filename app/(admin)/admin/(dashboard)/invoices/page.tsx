@@ -10,29 +10,40 @@ import { formatDate, formatCurrency } from "@/lib/utils";
 import { InvoiceFilters } from "@/components/admin/invoices/invoice-filters";
 import { Prisma } from "@prisma/client";
 
-export default async function InvoicesPage({ searchParams }: { searchParams: { search?: string; status?: string } }) {
+import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+
+export const dynamic = "force-dynamic";
+
+export default async function InvoicesPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   await requireAdmin({ permissions: ["invoices.read"] });
+
+  const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
+  const prismaParams = getPrismaParams(params);
 
   const where: Prisma.InvoiceWhereInput = {};
 
   if (searchParams.status && searchParams.status !== "all") {
-    where.status = searchParams.status;
+    where.status = searchParams.status as string;
   }
 
   if (searchParams.search) {
     where.OR = [
-      { number: { contains: searchParams.search } },
-      { Tenant: { name: { contains: searchParams.search } } },
+      { number: { contains: searchParams.search as string } },
+      { Tenant: { name: { contains: searchParams.search as string } } },
     ];
   }
 
   const invoices = await prisma.invoice.findMany({
     where,
+    ...prismaParams,
     orderBy: { createdAt: "desc" },
     include: {
       Tenant: true,
     },
   });
+
+  const { data, nextCursor, prevCursor } = buildPaginationResult(invoices, params);
 
   return (
     <div className="flex flex-col gap-6">
@@ -72,14 +83,14 @@ export default async function InvoicesPage({ searchParams }: { searchParams: { s
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.length === 0 ? (
+              {data.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No invoices found.
                   </TableCell>
                 </TableRow>
               ) : (
-                invoices.map((invoice) => (
+                data.map((invoice) => (
                   <TableRow key={invoice.id}>
                     <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
@@ -112,6 +123,8 @@ export default async function InvoicesPage({ searchParams }: { searchParams: { s
           </Table>
         </CardContent>
       </Card>
+
+      <PaginationControls nextCursor={nextCursor} prevCursor={prevCursor} />
     </div>
   );
 }

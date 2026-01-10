@@ -12,15 +12,23 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { requireAdmin } from "@/lib/admin/guards";
 import { prisma } from "@/lib/prisma";
+import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function LeadsPage() {
+export default async function LeadsPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   await requireAdmin({ permissions: ["leads.read"] });
 
+  const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
+  const prismaParams = getPrismaParams(params);
+
   const leads = await prisma.lead.findMany({
+    ...prismaParams,
     orderBy: { createdAt: "desc" },
   });
+
+  const { data, nextCursor, prevCursor } = buildPaginationResult(leads, params);
 
   return (
     <div className="flex flex-col gap-6">
@@ -50,23 +58,21 @@ export default async function LeadsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {leads.map((lead) => (
+            {data.map((lead) => (
               <TableRow key={lead.id}>
                 <TableCell className="font-medium">{lead.name}</TableCell>
                 <TableCell>{lead.email}</TableCell>
                 <TableCell>
                   <Badge variant={
                     lead.status === "new" ? "default" :
-                    lead.status === "won" ? "secondary" : // Changed from success (might not exist)
-                    lead.status === "lost" ? "destructive" : "outline"
+                    lead.status === "contacted" ? "secondary" :
+                    "outline"
                   }>
                     {lead.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{lead.source || "-"}</TableCell>
-                <TableCell>
-                  {new Date(lead.createdAt).toLocaleDateString()}
-                </TableCell>
+                <TableCell>{lead.source}</TableCell>
+                <TableCell>{lead.createdAt.toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Button variant="ghost" size="sm" asChild>
                     <Link href={`/admin/leads/${lead.id}`}>Edit</Link>
@@ -74,9 +80,9 @@ export default async function LeadsPage() {
                 </TableCell>
               </TableRow>
             ))}
-            {leads.length === 0 && (
+            {data.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="h-24 text-center">
                   No leads found.
                 </TableCell>
               </TableRow>
@@ -84,6 +90,8 @@ export default async function LeadsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <PaginationControls nextCursor={nextCursor} prevCursor={prevCursor} />
     </div>
   );
 }

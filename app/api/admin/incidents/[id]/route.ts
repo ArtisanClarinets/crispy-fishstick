@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
+import { tenantWhere } from "@/lib/admin/guards";
 import { z } from "zod";
 
 const updateIncidentSchema = z.object({
@@ -12,16 +12,19 @@ const updateIncidentSchema = z.object({
   serviceId: z.string().nullable().optional(),
   commanderId: z.string().nullable().optional(),
   summary: z.string().optional(),
+  deleteReason: z.string().optional(),
 });
 
 export async function GET(
-  _req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    await requireAdmin({ permissions: ["incidents.read"] });
-    const incident = await prisma.incident.findUnique({
-      where: { id: params.id },
+  return adminRead(req, { permissions: ["incidents.read"] }, async (user) => {
+    const incident = await prisma.incident.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+      },
       include: {
         Service: true,
         User: true,
@@ -29,36 +32,30 @@ export async function GET(
     });
 
     if (!incident) {
-      return new NextResponse("Not Found", { status: 404 });
+      return { error: "Incident not found", status: 404 };
     }
 
-    return NextResponse.json(incident);
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: incident };
+  });
 }
 
 export async function PATCH(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const user = await requireAdmin({ permissions: ["incidents.write"] });
-    const body = await req.json();
+  return adminMutation(req, { permissions: ["incidents.write"] }, async (user, body) => {
     const validatedData = updateIncidentSchema.parse(body);
 
-    const existingIncident = await prisma.incident.findUnique({
-      where: { id: params.id },
+    const existingIncident = await prisma.incident.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+        deletedAt: null,
+      },
     });
 
     if (!existingIncident) {
-      return new NextResponse("Not Found", { status: 404 });
+      return { error: "Incident not found", status: 404 };
     }
 
     const updatedIncident = await prisma.incident.update({
@@ -66,67 +63,38 @@ export async function PATCH(
       data: validatedData,
     });
 
-    await createAuditLog({
-      action: "update_incident",
-      resource: "incident",
-      resourceId: params.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      before: existingIncident,
-      after: updatedIncident,
-    });
-
-    return NextResponse.json(updatedIncident);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ errors: error.errors }, { status: 400 });
-    }
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: updatedIncident };
+  });
 }
 
 export async function DELETE(
-  _req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const user = await requireAdmin({ permissions: ["incidents.write"] });
+  return adminMutation(req, { permissions: ["incidents.write"] }, async (user, body) => {
+    const { deleteReason } = updateIncidentSchema.parse(body);
 
-    const existingIncident = await prisma.incident.findUnique({
-      where: { id: params.id },
+    const existingIncident = await prisma.incident.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+        deletedAt: null,
+      },
     });
 
     if (!existingIncident) {
-      return new NextResponse("Not Found", { status: 404 });
+      return { error: "Incident not found", status: 404 };
     }
 
-    await prisma.incident.delete({
+    await prisma.incident.update({
       where: { id: params.id },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: user.id,
+        deleteReason: deleteReason || "Archived by admin",
+      },
     });
 
-    await createAuditLog({
-      action: "delete_incident",
-      resource: "incident",
-      resourceId: params.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      before: existingIncident,
-    });
-
-    return new NextResponse(null, { status: 204 });
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: null, status: 204 };
+  });
 }

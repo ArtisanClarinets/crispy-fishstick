@@ -26,6 +26,8 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const incidentSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -46,7 +48,10 @@ interface IncidentFormProps {
 
 export function IncidentForm({ initialData, services, users }: IncidentFormProps) {
   const router = useRouter();
+  const { hasPermission } = useAdmin();
   const [loading, setLoading] = useState(false);
+
+  const canSubmit = initialData ? hasPermission("incidents.edit") : hasPermission("incidents.create");
 
   const form = useForm<IncidentFormValues>({
     resolver: zodResolver(incidentSchema),
@@ -71,17 +76,15 @@ export function IncidentForm({ initialData, services, users }: IncidentFormProps
       };
 
       if (initialData) {
-        const res = await fetch(`/api/admin/incidents/${initialData.id}`, {
+        const res = await fetchWithCsrf(`/api/admin/incidents/${initialData.id}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("Failed to update");
         toast.success("Incident updated");
       } else {
-        const res = await fetch("/api/admin/incidents", {
+        const res = await fetchWithCsrf("/api/admin/incidents", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("Failed to create");
@@ -250,10 +253,12 @@ export function IncidentForm({ initialData, services, users }: IncidentFormProps
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {initialData ? "Update Incident" : "Create Incident"}
-              </Button>
+              {canSubmit && (
+                <Button type="submit" disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {initialData ? "Update Incident" : "Create Incident"}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

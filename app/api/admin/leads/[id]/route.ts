@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
+import { tenantWhere } from "@/lib/admin/guards";
 import * as z from "zod";
 
 const updateLeadSchema = z.object({
@@ -13,80 +13,85 @@ const updateLeadSchema = z.object({
   budget: z.string().optional(),
   website: z.string().optional(),
   assignedTo: z.string().optional().nullable(),
-  tenantId: z.string().optional().nullable(),
 });
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  void request;
-  try {
-    await requireAdmin({ permissions: ["leads.read"] });
-
-    const lead = await prisma.lead.findUnique({
-      where: { id: params.id },
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  return adminRead(request, { permissions: ["leads.read"] }, async (user) => {
+    const lead = await prisma.lead.findFirst({
+      where: {
+        id: params.id,
+        deletedAt: null,
+        ...tenantWhere(user),
+      },
     });
 
     if (!lead) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return { error: "Lead not found", status: 404 };
     }
 
-    return NextResponse.json(lead);
-  } catch (_error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    return { data: lead };
+  });
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  try {
-    const actor = await requireAdmin({ permissions: ["leads.write"] });
-    const body = await req.json();
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  return adminMutation(
+    req,
+    { 
+      permissions: ["leads.write"], 
+      audit: { action: "update_lead", resource: "lead", resourceId: params.id } 
+    },
+    async (user, body) => {
+      const validatedData = updateLeadSchema.parse(body);
 
-    const validatedData = updateLeadSchema.parse(body);
+      const lead = await prisma.lead.updateMany({
+        where: {
+          id: params.id,
+          deletedAt: null,
+          ...tenantWhere(user),
+        },
+        data: validatedData,
+      });
 
-    const lead = await prisma.lead.update({
-      where: { id: params.id },
-      data: validatedData,
-    });
+      if (lead.count === 0) {
+        return { error: "Lead not found or already deleted", status: 404 };
+      }
 
-    await createAuditLog({
-      action: "update_lead",
-      resource: "lead",
-      resourceId: lead.id,
-      actorId: actor.id,
-      actorEmail: actor.email,
-      after: lead,
-    });
-
-    return NextResponse.json(lead);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
+      const updated = await prisma.lead.findUniqueOrThrow({ where: { id: params.id } });
+      return { data: updated };
     }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+  );
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  void request;
-  try {
-    const actor = await requireAdmin({ permissions: ["leads.write"] });
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  return adminMutation(
+    request,
+    { 
+      permissions: ["leads.write"], 
+      audit: { action: "delete_lead", resource: "lead", resourceId: params.id } 
+    },
+    async (user) => {
+      const deleteReason = request.headers.get("X-Delete-Reason") || "Deleted by admin";
 
-    const lead = await prisma.lead.delete({
-      where: { id: params.id },
-    });
+      const lead = await prisma.lead.updateMany({
+        where: {
+          id: params.id,
+          deletedAt: null,
+          ...tenantWhere(user),
+        },
+        data: {
+          deletedAt: new Date(),
+          deletedBy: user.id,
+          deleteReason,
+        },
+      });
 
-    await createAuditLog({
-      action: "delete_lead",
-      resource: "lead",
-      resourceId: params.id,
-      actorId: actor.id,
-      actorEmail: actor.email,
-      before: lead,
-    });
+      if (lead.count === 0) {
+        return { error: "Lead not found or already deleted", status: 404 };
+      }
 
-    return NextResponse.json(lead);
-  } catch (_error) {
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+      return { data: { success: true, message: "Lead soft deleted" } };
+    }
+  );
 }

@@ -1,8 +1,9 @@
 export const dynamic = "force-dynamic";
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
+import { parsePaginationParams, buildPaginationResult } from "@/lib/api/pagination";
+import { tenantWhere } from "@/lib/admin/guards";
 import { z } from "zod";
 
 const createProposalSchema = z.object({
@@ -11,6 +12,7 @@ const createProposalSchema = z.object({
   clientEmail: z.string().email().optional().or(z.literal("")),
   content: z.string().optional(),
   validUntil: z.string().optional(),
+  tenantId: z.string().optional(),
   items: z.array(z.object({
     description: z.string().min(1, "Description is required"),
     hours: z.number().min(0, "Hours must be non-negative"),
@@ -18,12 +20,29 @@ const createProposalSchema = z.object({
   })).min(1, "At least one item is required"),
 });
 
-export async function GET() {
-  try {
-    await requireAdmin({ permissions: ["proposals.read"] });
+export async function GET(req: NextRequest) {
+  return adminRead(req, { permissions: ["proposals.read"] }, async (user) => {
+    const { searchParams } = new URL(req.url);
+    const pagination = parsePaginationParams(searchParams);
+    
+    // Filters
+    const status = searchParams.get("status") || undefined;
+    const showArchived = searchParams.get("showArchived") === "true";
+
+    const where = {
+      ...tenantWhere(user),
+      ...(status && { status }),
+      ...(!showArchived && { deletedAt: null }),
+    };
 
     const proposals = await prisma.proposal.findMany({
+      where,
       orderBy: { createdAt: "desc" },
+      take: pagination.take,
+      ...(pagination.cursor && {
+        cursor: { id: pagination.cursor },
+        skip: 1,
+      }),
       include: {
         _count: {
           select: { ProposalItem: true, ProposalApproval: true },
@@ -31,25 +50,23 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(proposals);
-  } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to fetch proposals:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: buildPaginationResult(proposals, pagination) };
+  });
 }
 
-export async function POST(req: Request) {
-  try {
-    const user = await requireAdmin({ permissions: ["proposals.write"] });
-    const body = await req.json();
-
+export async function POST(req: NextRequest) {
+  return adminMutation(req, { permissions: ["proposals.write"] }, async (user, body) => {
     const validatedData = createProposalSchema.parse(body);
+
+    // Validate tenant if provided
+    if (validatedData.tenantId) {
+      const tenant = await prisma.tenant.findUnique({
+        where: { id: validatedData.tenantId, deletedAt: null },
+      });
+      if (!tenant) {
+        return { error: "Invalid tenant", status: 400 };
+      }
+    }
 
     const totalAmount = validatedData.items.reduce((sum, item) => sum + (item.hours * item.rate), 0);
 
@@ -75,27 +92,6 @@ export async function POST(req: Request) {
       }
     });
 
-    await createAuditLog({
-      action: "create",
-      resource: "proposal",
-      resourceId: proposal.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      after: proposal,
-    });
-
-    return NextResponse.json(proposal, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-        return NextResponse.json({ errors: error.errors }, { status: 400 });
-    }
-    if (error instanceof Error && error.message === "Unauthorized") {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-    if (error instanceof Error && error.message === "Forbidden") {
-        return new NextResponse("Forbidden", { status: 403 });
-    }
-    console.error("Failed to create proposal:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
+    return { data: proposal, status: 201 };
+  });
 }

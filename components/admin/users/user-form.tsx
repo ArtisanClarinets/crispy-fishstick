@@ -20,6 +20,8 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { SafeUserWithRolesDto } from "@/lib/security/safe-user";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const userSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -51,7 +53,10 @@ interface UserFormProps {
  */
 export function UserForm({ initialData, roles }: UserFormProps) {
   const router = useRouter();
+  const { hasPermission } = useAdmin();
   const [loading, setLoading] = useState(false);
+
+  const canSubmit = initialData ? hasPermission("users.edit") : hasPermission("users.create");
 
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
@@ -69,17 +74,15 @@ export function UserForm({ initialData, roles }: UserFormProps) {
       const payload = { ...data };
 
       if (initialData) {
-        const res = await fetch(`/api/admin/users/${initialData.id}`, {
+        const res = await fetchWithCsrf(`/api/admin/users/${initialData.id}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("Failed to update");
         toast.success("User updated");
       } else {
-        const res = await fetch("/api/admin/users", {
+        const res = await fetchWithCsrf("/api/admin/users", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error("Failed to create");
@@ -189,9 +192,11 @@ export function UserForm({ initialData, roles }: UserFormProps) {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? "Saving..." : initialData ? "Update User" : "Create User"}
-              </Button>
+              {canSubmit && (
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : initialData ? "Update User" : "Create User"}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

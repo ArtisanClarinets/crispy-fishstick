@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Trash, CheckCircle, XCircle, Mail, Printer } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface ProposalActionsProps {
   proposalId: string;
@@ -20,6 +22,7 @@ interface ProposalActionsProps {
 export function ProposalActions({ proposalId, currentStatus }: ProposalActionsProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { hasPermission } = useAdmin();
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePrint = () => {
@@ -29,9 +32,8 @@ export function ProposalActions({ proposalId, currentStatus }: ProposalActionsPr
   const updateStatus = async (status: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/proposals/${proposalId}`, {
+      const response = await fetchWithCsrf(`/api/admin/proposals/${proposalId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
 
@@ -59,7 +61,7 @@ export function ProposalActions({ proposalId, currentStatus }: ProposalActionsPr
 
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/proposals/${proposalId}`, {
+      const response = await fetchWithCsrf(`/api/admin/proposals/${proposalId}`, {
         method: "DELETE",
       });
 
@@ -88,7 +90,7 @@ export function ProposalActions({ proposalId, currentStatus }: ProposalActionsPr
         <Printer className="mr-2 h-4 w-4" />
         Print
       </Button>
-      {currentStatus === "draft" && (
+      {currentStatus === "draft" && hasPermission("proposals.edit") && (
         <Button 
           variant="outline" 
           size="sm"
@@ -103,7 +105,7 @@ export function ProposalActions({ proposalId, currentStatus }: ProposalActionsPr
         </Button>
       )}
       
-      {currentStatus === "sent" && (
+      {currentStatus === "sent" && hasPermission("proposals.edit") && (
         <>
           <Button 
             variant="outline" 
@@ -128,23 +130,25 @@ export function ProposalActions({ proposalId, currentStatus }: ProposalActionsPr
         </>
       )}
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" disabled={isLoading}>
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Actions</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem 
-            className="text-destructive"
-            onClick={deleteProposal}
-          >
-            <Trash className="mr-2 h-4 w-4" />
-            Delete Proposal
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {hasPermission("proposals.delete") && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" disabled={isLoading}>
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Actions</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem 
+              className="text-destructive"
+              onClick={deleteProposal}
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              Delete Proposal
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 }

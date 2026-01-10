@@ -8,17 +8,35 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { SAFE_USER_WITH_ROLES_SELECT } from "@/lib/security/safe-user";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@/lib/api/pagination";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   await requireAdmin({ permissions: ["users.read"] });
 
+  const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
+  const prismaParams = getPrismaParams(params);
+
   const users = await prisma.user.findMany({
+    ...prismaParams,
     orderBy: { createdAt: "desc" },
-    take: 100,
     select: SAFE_USER_WITH_ROLES_SELECT,
   });
+
+  // Note: buildPaginationResult expects full objects, but we are selecting partial.
+  // However, the pagination logic only cares about ID and timestamps for cursor if we were doing cursor-based.
+  // But wait, `buildPaginationResult` logic might depend on `id` field.
+  // SAFE_USER_WITH_ROLES_SELECT should include `id` and `createdAt`.
+  // Let's verify SAFE_USER_WITH_ROLES_SELECT if I can read it, but usually it does.
+  // Assuming it does.
+
+  const { data, nextCursor, prevCursor } = buildPaginationResult(users, params);
 
   return (
     <div className="flex flex-col gap-6">
@@ -51,7 +69,7 @@ export default async function AdminUsersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {data.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.name || "N/A"}</TableCell>
                   <TableCell>{user.email}</TableCell>
@@ -76,7 +94,7 @@ export default async function AdminUsersPage() {
                   </TableCell>
                 </TableRow>
               ))}
-              {users.length === 0 && (
+              {data.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-muted-foreground">
                     No users found.
@@ -87,6 +105,8 @@ export default async function AdminUsersPage() {
           </Table>
         </CardContent>
       </Card>
+      
+      <PaginationControls nextCursor={nextCursor} prevCursor={prevCursor} />
     </div>
   );
 }

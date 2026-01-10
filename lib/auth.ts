@@ -20,6 +20,7 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       roles: string[];
+      permissions: string[];
       tenantId?: string | null;
     };
   }
@@ -29,6 +30,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     roles: string[];
+    permissions: string[];
     tenantId?: string | null;
   }
 }
@@ -116,11 +118,22 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
+          // Parse permissions
+          const permissions = user.RoleAssignment.flatMap((r) => {
+            try {
+              return JSON.parse(r.Role.permissions);
+            } catch {
+              return [];
+            }
+          });
+          const uniquePermissions = Array.from(new Set(permissions));
+
           return {
             id: user.id,
             email: user.email,
             name: user.name,
             roles: user.RoleAssignment.map((r) => r.Role.name),
+            permissions: uniquePermissions as string[],
             tenantId: user.tenantId,
           };
         } catch (error: any) {
@@ -146,6 +159,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.roles = (user as any).roles || [];
+        token.permissions = (user as any).permissions || [];
         token.tenantId = (user as any).tenantId;
       }
       return token;
@@ -154,6 +168,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.roles = token.roles;
+        session.user.permissions = token.permissions;
         session.user.tenantId = token.tenantId;
       }
       return session;

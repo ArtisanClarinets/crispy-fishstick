@@ -1,83 +1,92 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin/guards";
-import { createAuditLog } from "@/lib/admin/audit";
-import { unlink } from "fs/promises";
-import { join } from "path";
-import { assertSameOrigin } from "@/lib/security/origin";
-
 export const dynamic = "force-dynamic";
+import { NextRequest } from "next/server";
+import { adminRead, adminMutation } from "@/lib/admin/route";
+import { prisma } from "@/lib/prisma";
+import { tenantWhere } from "@/lib/admin/guards";
+import { z } from "zod";
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  try {
-    // CSRF protection
-    try {
-      assertSameOrigin(req);
-    } catch (_error) {
-      return NextResponse.json({ error: "Invalid Origin" }, { status: 403 });
-    }
+const updateMediaSchema = z.object({
+  key: z.string().optional(),
+  visibility: z.enum(["PUBLIC", "PRIVATE", "TENANT", "PROJECT"]).optional(),
+  deleteReason: z.string().optional(),
+});
 
-    const user = await requireAdmin({ permissions: ["media.write"] });
-
-    const asset = await prisma.mediaAsset.findUnique({
-      where: { id: params.id },
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return adminRead(req, { permissions: ["media.read"] }, async (user) => {
+    const asset = await prisma.mediaAsset.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+      },
     });
 
     if (!asset) {
-      return NextResponse.json(
-        { error: "Not found" },
-        { status: 404, headers: { "Cache-Control": "no-store" } }
-      );
+      return { error: "Media asset not found", status: 404 };
     }
 
-    // Delete file using asset.key (not URL)
-    try {
-      const filepath = join(process.cwd(), "uploads", asset.key);
-      await unlink(filepath);
-    } catch (err) {
-      console.error("Failed to delete file:", err);
-      // Continue to delete record even if file is missing
+    return { data: asset };
+  });
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return adminMutation(req, { permissions: ["media.write"] }, async (user, body) => {
+    const validated = updateMediaSchema.parse(body);
+
+    const existing = await prisma.mediaAsset.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+        deletedAt: null,
+      },
+    });
+
+    if (!existing) {
+      return { error: "Media asset not found", status: 404 };
     }
 
-    await prisma.mediaAsset.delete({
+    const updated = await prisma.mediaAsset.update({
       where: { id: params.id },
+      data: validated,
     });
 
-    await createAuditLog({
-      action: "delete_media",
-      resource: "media",
-      resourceId: asset.id,
-      actorId: user.id,
-      actorEmail: user.email,
-      before: asset,
+    return { data: updated };
+  });
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return adminMutation(req, { permissions: ["media.write"] }, async (user, body) => {
+    const { deleteReason } = updateMediaSchema.parse(body);
+
+    const existing = await prisma.mediaAsset.findFirst({
+      where: {
+        id: params.id,
+        ...tenantWhere(user),
+        deletedAt: null,
+      },
     });
 
-    return NextResponse.json(asset, {
-      headers: { "Cache-Control": "no-store" },
+    if (!existing) {
+      return { error: "Media asset not found", status: 404 };
+    }
+
+    await prisma.mediaAsset.update({
+      where: { id: params.id },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: user.id,
+        deleteReason: deleteReason || "Archived by admin",
+      },
     });
-  } catch (_error) {
-    if (_error instanceof Error && _error.message === "Invalid Origin") {
-      return NextResponse.json(
-        { error: "Invalid Origin" },
-        { status: 403, headers: { "Cache-Control": "no-store" } }
-      );
-    }
-    if (_error instanceof Error && _error.message === "Unauthorized") {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401, headers: { "Cache-Control": "no-store" } }
-      );
-    }
-    if (_error instanceof Error && _error.message === "Forbidden") {
-      return NextResponse.json(
-        { error: "Forbidden" },
-        { status: 403, headers: { "Cache-Control": "no-store" } }
-      );
-    }
-    console.error("Failed to delete media:", _error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500, headers: { "Cache-Control": "no-store" } }
-    );
-  }
+
+    return { data: null, status: 204 };
+  });
 }

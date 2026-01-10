@@ -18,7 +18,7 @@ export async function getSessionUser(): Promise<AdminUserContext | null> {
 
   // Always re-fetch from DB to ensure latest permissions/roles/JIT
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { email: session.user.email, deletedAt: null }, // Exclude soft-deleted users
     include: {
       RoleAssignment: {
         include: {
@@ -99,6 +99,42 @@ export async function requireAdmin(opts: RequireAdminOptions = {}) {
   }
 
   return user;
+}
+
+/**
+ * Build Prisma where clause for tenant scoping
+ * 
+ * Enforces tenant boundaries for tenant-owned resources.
+ * - If user has wildcard permission, no tenant filter
+ * - If requestedTenantId provided, ensure user has access
+ * - Otherwise, filter to user's tenant only
+ */
+export function tenantWhere(user: AdminUserContext, requestedTenantId?: string | null) {
+  const hasWildcard = user.permissions.includes("*");
+  
+  if (hasWildcard) {
+    // Global admin can see all tenants
+    if (requestedTenantId) {
+      return { tenantId: requestedTenantId };
+    }
+    return {}; // No tenant filter
+  }
+  
+  // Non-global users are restricted to their tenant
+  if (requestedTenantId) {
+    // Verify the requested tenant matches user's tenant
+    if (requestedTenantId !== user.tenantId) {
+      throw new Error("Forbidden: Cannot access other tenant's data");
+    }
+    return { tenantId: requestedTenantId };
+  }
+  
+  // Default to user's tenant
+  if (!user.tenantId) {
+    throw new Error("User has no tenant assignment");
+  }
+  
+  return { tenantId: user.tenantId };
 }
 
 // Helper to wrap route handlers

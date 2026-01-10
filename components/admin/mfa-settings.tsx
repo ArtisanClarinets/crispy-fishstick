@@ -10,6 +10,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import QRCode from 'qrcode';
 import Image from 'next/image';
+import { fetchWithCsrf } from '@/lib/fetchWithCsrf';
 
 interface MFASettingsProps {
   initialEnabled: boolean;
@@ -27,7 +28,7 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
   const startSetup = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/admin/auth/mfa/generate', { method: 'POST' });
+      const res = await fetchWithCsrf('/api/admin/auth/mfa/generate', { method: 'POST' });
       if (!res.ok) throw new Error('Failed to generate MFA secret');
       
       const data = await res.json();
@@ -50,9 +51,8 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
   const verifyAndEnable = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/admin/auth/mfa/enable', {
+      const res = await fetchWithCsrf('/api/admin/auth/mfa/enable', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, secret }),
       });
 
@@ -88,7 +88,7 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
 
     setIsLoading(true);
     try {
-      const res = await fetch('/api/admin/auth/mfa/disable', { method: 'POST' });
+      const res = await fetchWithCsrf('/api/admin/auth/mfa/disable', { method: 'POST' });
       if (!res.ok) throw new Error('Failed to disable MFA');
 
       setIsEnabled(false);

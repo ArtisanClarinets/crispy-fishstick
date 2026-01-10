@@ -1,0 +1,171 @@
+openapi: 3.0.0
+info:
+  title: Vantus Systems API
+  version: 1.0.0
+  description: |
+    API documentation for Vantus Systems ERP.
+    
+    Authentication is handled via NextAuth.js session cookies.
+    CSRF protection is required for all mutation methods (POST, PUT, PATCH, DELETE) via the `x-csrf-token` header.
+
+servers:
+  - url: /api
+    description: Internal API
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+    csrfAuth:
+      type: apiKey
+      in: header
+      name: x-csrf-token
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+    
+    PaginationMeta:
+      type: object
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+        hasMore:
+          type: boolean
+
+    Lead:
+      type: object
+      properties:
+        id:
+          type: string
+        companyName:
+          type: string
+        contactName:
+          type: string
+        email:
+          type: string
+        status:
+          type: string
+          enum: [new, contacted, qualified, proposal, negotiation, closed_won, closed_lost]
+        value:
+          type: number
+
+security:
+  - cookieAuth: []
+  - csrfAuth: []
+
+paths:
+  /admin/leads:
+    get:
+      summary: List leads with cursor-based pagination
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: ID of the last item from previous page
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Lead'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+    
+    post:
+      summary: Create a new lead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lead'
+      responses:
+        '201':
+          description: Lead created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '400':
+          description: Validation error
+        '403':
+          description: Insufficient permissions
+
+  /admin/leads/{id}:
+    get:
+      summary: Get lead details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lead details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '404':
+          description: Lead not found
+
+    patch:
+      summary: Update lead
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lead'
+      responses:
+        '200':
+          description: Lead updated
+    
+    delete:
+      summary: Delete lead
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lead deleted
+
+  # Note: This is a sample spec. 
+  # Real implementation includes 17+ entities following the same pattern:
+  # - GET /admin/{entity} (List with pagination)
+  # - POST /admin/{entity} (Create)
+  # - GET /admin/{entity}/{id} (Read)
+  # - PATCH /admin/{entity}/{id} (Update)
+  # - DELETE /admin/{entity}/{id} (Delete)

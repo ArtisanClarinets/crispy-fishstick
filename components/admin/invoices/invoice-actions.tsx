@@ -13,6 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface InvoiceActionsProps {
   invoiceId: string;
@@ -22,6 +24,7 @@ interface InvoiceActionsProps {
 export function InvoiceActions({ invoiceId, status: _status }: InvoiceActionsProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { hasPermission } = useAdmin();
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePrint = () => {
@@ -31,9 +34,8 @@ export function InvoiceActions({ invoiceId, status: _status }: InvoiceActionsPro
   const updateStatus = async (newStatus: string) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/admin/invoices/${invoiceId}`, {
+      const response = await fetchWithCsrf(`/api/admin/invoices/${invoiceId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
 
@@ -66,30 +68,32 @@ export function InvoiceActions({ invoiceId, status: _status }: InvoiceActionsPro
         Print / Export
       </Button>
       
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button disabled={isLoading}>
-            Actions
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Update Status</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => updateStatus("sent")}>
-            <Send className="mr-2 h-4 w-4" />
-            Mark as Sent
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => updateStatus("paid")}>
-            <CreditCard className="mr-2 h-4 w-4" />
-            Mark as Paid
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => updateStatus("void")} className="text-destructive">
-            <Ban className="mr-2 h-4 w-4" />
-            Void Invoice
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {hasPermission("invoices.edit") && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button disabled={isLoading}>
+              Actions
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Update Status</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => updateStatus("sent")}>
+              <Send className="mr-2 h-4 w-4" />
+              Mark as Sent
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateStatus("paid")}>
+              <CreditCard className="mr-2 h-4 w-4" />
+              Mark as Paid
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => updateStatus("void")} className="text-destructive">
+              <Ban className="mr-2 h-4 w-4" />
+              Void Invoice
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
 
 interface Role {
   id: string;
@@ -46,9 +47,8 @@ export function UserRolesForm({
   const onSubmit = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/admin/users/${userId}/roles`, {
+      const res = await fetchWithCsrf(`/api/admin/users/${userId}/roles`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roleIds: selectedRoleIds }),
       });
 

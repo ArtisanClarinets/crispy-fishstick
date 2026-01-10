@@ -50,7 +50,6 @@ next-env.d.ts
 prisma/*.db
 prisma/dev.db
 contact_submissions.json
-.agent/
 public/uploads/
 data/uploads/
 uploads/

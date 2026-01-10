@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
 import { toast } from "sonner";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
 
 export function CheckExpiringButton() {
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,7 @@ export function CheckExpiringButton() {
   const handleCheck = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/cron/contract-reminders");
+      const res = await fetchWithCsrf("/api/cron/contract-reminders");
       const data = await res.json();
       
       if (data.success) {

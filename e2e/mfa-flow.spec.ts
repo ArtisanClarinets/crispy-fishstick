@@ -5,8 +5,8 @@ test.describe('MFA Flow', () => {
   test('should enable, enforce, and disable MFA', async ({ page }) => {
     // 1. Login
     await page.goto('/admin/login');
-    await page.getByLabel('Email').fill('admin@vantus.com');
-    await page.getByLabel('Password').fill('admin');
+    await page.getByLabel('Email').fill('admin@vantus.systems');
+    await page.getByLabel('Password').fill('admin123');
     await page.getByRole('button', { name: 'Sign In' }).click();
     await expect(page).toHaveURL('/admin');
 
@@ -51,8 +51,8 @@ test.describe('MFA Flow', () => {
     await page.goto('/admin/login');
 
     // 6. Login with MFA
-    await page.getByLabel('Email').fill('admin@vantus.com');
-    await page.getByLabel('Password').fill('admin');
+    await page.getByLabel('Email').fill('admin@vantus.systems');
+    await page.getByLabel('Password').fill('admin123');
     await page.getByRole('button', { name: 'Sign In' }).click();
 
     // Should see MFA prompt

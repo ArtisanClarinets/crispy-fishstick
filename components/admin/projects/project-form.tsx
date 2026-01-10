@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
 
 const projectSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -78,11 +79,8 @@ export function ProjectForm({ tenants, initialData }: ProjectFormProps) {
         : "/api/admin/projects";
       const method = initialData ? "PATCH" : "POST";
 
-      const response = await fetch(url, {
+      const response = await fetchWithCsrf(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(data),
       });
 
@@ -113,7 +111,7 @@ export function ProjectForm({ tenants, initialData }: ProjectFormProps) {
     setIsDeleting(true);
 
     try {
-      const response = await fetch(`/api/admin/projects/${initialData.id}`, {
+      const response = await fetchWithCsrf(`/api/admin/projects/${initialData.id}`, {
         method: "DELETE",
       });
 

@@ -38,6 +38,9 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
     const secret = process.env.NEXTAUTH_SECRET;
+    console.log("[Middleware] Checking auth for:", pathname);
+    console.log("[Middleware] Secret exists:", !!secret);
+    
     if (!secret) {
       console.error("NEXTAUTH_SECRET is not set. Admin routes will not authenticate.");
       const url = new URL("/admin/login", request.url);
@@ -49,8 +52,10 @@ export async function middleware(request: NextRequest) {
       req: request, 
       secret 
     });
+    console.log("[Middleware] Token found:", !!token);
 
     if (!token) {
+      console.log("[Middleware] No token, redirecting to login");
       const url = new URL("/admin/login", request.url);
       url.searchParams.set("callbackUrl", encodeURIComponent(pathname + request.nextUrl.search));
       return NextResponse.redirect(url);
