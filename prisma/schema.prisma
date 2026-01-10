@@ -242,7 +242,8 @@ model Lead {
 
 model MediaAsset {
   id         String   @id @default(cuid())
-  key        String   @unique
+  key        String   // Original filename or path
+  originalName String? // Optional original name if key is a path
   url        String
   mime       String
   size       Int
@@ -250,8 +251,8 @@ model MediaAsset {
   tenantId   String?
   
   // Private-by-default artifacts vault
-  visibility          String   @default("private") // private, public, tenant
-  storageKey          String?  // Actual file path or object storage key
+  visibility          String   @default("PRIVATE") // PUBLIC, PRIVATE, TENANT, PROJECT
+  storageKey          String   @unique // Actual file path or object storage key
   checksum            String?  // SHA-256 for integrity
   contentType         String?  // Explicit content type
   contentDisposition  String?  // attachment vs inline
@@ -315,6 +316,7 @@ model Project {
 model Proposal {
   id               String             @id @default(cuid())
   title            String
+  tenantId         String
   status           String             @default("draft")
   totalAmount      Float              @default(0)
   clientEmail      String?
@@ -328,11 +330,13 @@ model Proposal {
   
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
+  Tenant           Tenant             @relation(fields: [tenantId], references: [id])
   ProposalApproval ProposalApproval[]
   ProposalItem     ProposalItem[]
   
   @@index([deletedAt])
   @@index([status])
+  @@index([tenantId])
 }
 
 model ProposalApproval {
@@ -446,6 +450,7 @@ model Tenant {
   InvoiceSequence InvoiceSequence[]
   Lead            Lead[]
   Project         Project[]
+  Proposal        Proposal[]
   WebhookEndpoint WebhookEndpoint[]
   
   @@index([deletedAt])

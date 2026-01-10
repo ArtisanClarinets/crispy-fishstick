@@ -1,12 +1,21 @@
-import { getCsrfToken } from "next-auth/react";
+import { toast } from "sonner";
 
 /**
  * Enhanced fetch wrapper that automatically adds CSRF token to requests
  * and handles common error scenarios.
  */
 export async function fetchWithCsrf(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-  // Get CSRF token
-  const csrfToken = await getCsrfToken();
+  // Fetch CSRF token from our endpoint
+  let csrfToken: string | null = null;
+  try {
+    const csrfRes = await fetch("/api/csrf");
+    if (csrfRes.ok) {
+      const data = await csrfRes.json();
+      csrfToken = data.csrfToken;
+    }
+  } catch (e) {
+    console.error("Failed to fetch CSRF token", e);
+  }
   
   const headers = new Headers(init?.headers);
   
@@ -15,12 +24,6 @@ export async function fetchWithCsrf(input: RequestInfo | URL, init?: RequestInit
     headers.set("Content-Type", "application/json");
   }
   
-  // Add CSRF token header (standard for NextAuth / CSRF protection)
-  // Some backends might look for X-CSRF-Token or X-XSRF-Token.
-  // NextAuth.js uses `next-auth.csrf-token` cookie, but we can also pass it in headers or body.
-  // Since we are building the backend, we should verify how we want to validate it.
-  // NextAuth v4 usually doesn't strictly enforce CSRF on API routes unless configured or using middleware.
-  // However, for hardening, we should send it.
   if (csrfToken) {
     headers.set("X-CSRF-Token", csrfToken);
   }
@@ -31,8 +34,10 @@ export async function fetchWithCsrf(input: RequestInfo | URL, init?: RequestInit
   });
 
   if (response.status === 401) {
-    // Handle unauthorized - could redirect or throw
-    // window.location.href = "/admin/login";
+    // Handle unauthorized
+     toast.error("Session expired. Please login again.");
+     // Optional: Redirect to login
+     // window.location.href = "/admin/login";
   }
 
   return response;

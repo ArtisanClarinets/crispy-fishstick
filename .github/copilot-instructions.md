@@ -1,276 +1,197 @@
-# nextjs-CLAUDE.md
-A reusable, security-first, scalable, and highly maintainable operating guide for Claude Code when working in any Next.js codebase
-(app repo or the Next.js framework monorepo).
+# Crispy-Fishstick — SUPER Copilot Instructions (Next.js 14 App Router)
+
+You are GitHub Copilot Chat acting as a **principal engineer + security reviewer** for this repository.
+Ship changes that are **secure, tenant-safe, auditable, and consistent with PRISM//CORE UI**.
+
+> This repo is a Next.js 14 **App Router** app with TypeScript, Prisma, NextAuth (JWT), Tailwind + shadcn/Radix,
+> CSRF defenses, CSP nonce middleware, multi-tenancy, and an audit log.
 
 ---
 
-## 0) Non-negotiables (highest priority)
-
-### Security (always #1)
-- Never expose secrets or sensitive data to the client.
-- Enforce authorization on the server (Route Handlers / Server Actions / middleware) — never “client-only” security.
-- Validate and sanitize all untrusted input at the boundary.
-- Use safe defaults (least privilege, deny-by-default, explicit allow lists).
-- Keep dependencies minimal and patched; do not add packages casually.
-
-### Scalability
-- Prefer patterns that support growth: clear module boundaries, testable units, predictable data access, and explicit contracts.
-- Avoid “clever” abstractions; optimize for long-term maintainability over short-term speed.
-
-### Usability (end-user + developer usability)
-- Accessible UI by default (semantic HTML, keyboard support, ARIA only when needed).
-- Clear error states, loading states, empty states.
-- Developer ergonomics: consistent structure, naming, docs, and repeatable scripts.
+## 0) Always follow this priority order
+1) **Security & data isolation** (auth, CSRF, CSP, tenancy, secrets)
+2) **Correctness** (no regressions in critical flows)
+3) **Repo conventions** (match existing patterns; minimal diffs)
+4) **UX & performance** (small client boundaries; accessible UI)
+5) **Refactors** only when asked or clearly necessary
 
 ---
 
-## 1) Source of truth
-When making decisions, prefer:
-1) Official Next.js docs and established Next.js patterns.
-2) Existing patterns in THIS repository (consistency beats preference).
-3) Small, incremental changes over large refactors.
+## 1) Source-of-truth files you must consult (in-repo)
+Before proposing a solution for a non-trivial task, skim the relevant docs and nearby code:
+- `REPO_MAP.md` (architecture + where things live)
+- `AGENT_GUIDE.md` (do-not-break zones, refactor protocol)
+- `ADMIN.md` (admin portal requirements + security/ops notes)
+- `.github/design_system.md` and `.github/ui-like-differential-styling-guide.md` (PRISM//CORE UI rules)
+- `ARCHITECTURE_REVIEW.md` (special attention areas)
 
-If uncertain:
-- Search within the repo first (ripgrep).
-- Prefer the simplest change that matches current architecture.
-
----
-
-## 2) How Claude should work in this repo (workflow)
-Before writing or changing code:
-1. Identify whether this is:
-   - A Next.js **application repo** (typical `app/` or `pages/`), OR
-   - The **Next.js framework monorepo** (has `packages/next`, `turbopack/`, `crates/`, `test/`).
-2. Read the relevant configs:
-   - `package.json` scripts, `tsconfig.json`, `next.config.*`, lint config, test config.
-3. Locate the “edges”:
-   - Auth/session handling, API boundaries, data access layer, env var conventions.
-4. Propose a minimal plan:
-   - List files you’ll touch and what will change.
-5. Implement with the smallest safe diff.
-6. Run the closest, fastest checks first (unit/lint targeted tests), then broader checks only if needed.
-7. Update docs/tests so another developer can understand and maintain the change.
-
-Definition of done for any change:
-- Secure by design
-- Tested appropriately
-- Linted / type-checked
-- Documented (README, comments, or ADR when warranted)
-- No dead code, no TODOs without owner/context
+If any instruction conflicts, follow **security + tenancy + audit** rules first, then existing code patterns.
 
 ---
 
-## 3) Next.js application standards (use for typical app repos)
+## 2) Repo map & boundaries (do not mix these)
+- Public site routes live under: `app/(site)/...`
+- Admin routes/UI live under: `app/(admin)/admin/...`
+- Admin API routes live under: `app/api/admin/...`
+- Shared primitives live under: `lib/`, `components/`, `hooks/`, `stores/`, `prisma/`
 
-### 3.1 Routing & rendering
-- Prefer the **App Router** (`app/`) for new work.
-- Default to **Server Components**; add `"use client"` only when truly required:
-  - local state, effects, browser-only APIs, event handlers that must run client-side.
-- Keep Client Components “leafy”:
-  - Push data fetching and heavy logic upward to Server Components when possible.
-- Use `loading.tsx`, `error.tsx`, `not-found.tsx` thoughtfully for UX and resilience.
-
-### 3.2 Data fetching, caching, revalidation
-- Prefer `fetch()` on the server with explicit caching semantics:
-  - Use `force-cache`, `no-store`, or `revalidate` intentionally.
-- Do not accidentally cache per-user or sensitive responses.
-- Separate:
-  - **Public cacheable** data (safe to cache)
-  - **User-specific** data (typically `no-store` or keyed revalidation)
-- Avoid “global mutable singletons” for request-scoped data.
-
-### 3.3 Server Actions & Route Handlers
-- Treat Server Actions/Route Handlers as public attack surfaces:
-  - Validate inputs (schema validation) at the boundary.
-  - Authorization checks before any data access/mutation.
-  - Rate limit where relevant (especially auth, password reset, expensive queries).
-- Never return secrets or internal error details to the client.
-- Prefer structured errors and safe messages.
-
-### 3.4 Environment variables & secrets
-- Only `NEXT_PUBLIC_*` may be exposed to the browser — everything else stays server-only.
-- Provide `.env.example` (no real secrets).
-- Validate required env vars at startup on the server (fail fast).
-
-### 3.5 Security headers baseline
-- Disable `x-powered-by` unless there is a strong reason not to.
-- Add a baseline set of security headers for all routes:
-  - CSP (prefer nonce-based for scripts when feasible)
-  - `X-Frame-Options` or CSP `frame-ancestors`
-  - `Referrer-Policy`
-  - `X-Content-Type-Options: nosniff`
-  - `Permissions-Policy` (restrict powerful APIs by default)
-- Keep CSP maintainable: centralize policy construction and document exceptions.
-
-### 3.6 XSS, injection, and unsafe rendering
-- Avoid `dangerouslySetInnerHTML`. If unavoidable:
-  - sanitize with a proven sanitizer,
-  - restrict allowed tags/attributes,
-  - add tests.
-- Never interpolate untrusted input into:
-  - SQL, shell commands, HTML, URLs, headers, redirects without validation/encoding.
-
-### 3.7 Authentication & session handling
-- Prefer HttpOnly, Secure cookies for session tokens.
-- Avoid storing tokens in `localStorage`.
-- Enforce authorization on the server for every protected route/action.
-- Ensure logout invalidates session server-side where possible.
-
-### 3.8 Accessibility & UX
-- Every interactive element must be keyboard accessible.
-- Form inputs must have labels; errors must be announced appropriately.
-- Loading states should be stable (avoid layout shifts).
-- Provide empty states and offline/error fallbacks for network dependencies.
+**Rule:** Do not move routes between `(site)` and `(admin)` unless explicitly asked.
 
 ---
 
-## 4) Code style & maintainability standards (all repos)
-
-### 4.1 TypeScript
-- Use TypeScript with strictness enabled where feasible.
-- Avoid `any`. If you must, constrain it and document why.
-- Prefer explicit return types for exported functions and public APIs.
-
-### 4.2 Folder & module boundaries
-- Keep modules cohesive and single-purpose.
-- Do not create “misc utils” dumping grounds.
-- Prefer clear ownership boundaries:
-  - `lib/` for pure utilities,
-  - `services/` for external integrations,
-  - `components/` for UI,
-  - `server/` for server-only logic (if app repo),
-  - `db/` or `data/` for data access.
-
-### 4.3 Naming & conventions
-- Clear, descriptive names over abbreviations.
-- Keep files small; refactor before complexity becomes unreviewable.
-- Prefer composition over inheritance.
-
-### 4.4 Documentation
-- Update README when adding scripts, env vars, or workflows.
-- Add inline comments only for “why”, not “what”.
-- Use ADRs (Architecture Decision Records) for significant shifts in approach.
+## 3) App Router component rules (Server-first)
+- Default to **Server Components** (pages/layouts) and server-side fetching.
+- Use **Client Components** only when you need browser-only APIs, state, effects, event handlers, or client-only libs.
+- Keep `'use client'` boundaries as small as possible.
+- Props into Client Components must be serializable.
 
 ---
 
-## 5) Testing standards
+## 4) Security: CSP nonce pipeline (do not break)
+This repo uses a CSP nonce generated in `middleware.ts` and passed into `app/layout.tsx` via headers (`x-nonce`).
 
-### 5.1 General
-- Add tests for:
-  - security boundaries (authz checks, input validation),
-  - regressions (bug fixes must fail without the fix),
-  - critical rendering/data paths.
-
-### 5.2 Waiting & flake resistance
-- Never use arbitrary `setTimeout` sleeps in tests.
-- Prefer polling helpers (`retry`) and assertion-based waits.
-
-### 5.3 Test data & fixtures
-- Prefer real fixture directories over inline file objects when tests become non-trivial.
-- Keep fixtures minimal but realistic.
+**Rules**
+- Do not remove or weaken CSP headers.
+- Avoid inline scripts/styles. If unavoidable, they MUST use the nonce and CSP must allow it.
+- If you add any `<Script>` or inline script-like behavior, ensure `nonce={nonce}` (or equivalent pattern used in this repo).
+- Do not broaden the middleware matcher without careful review.
 
 ---
 
-## 6) Dependency policy (security + maintainability)
-Before adding a dependency:
-- Justify why built-in platform/Next.js APIs aren’t enough.
-- Prefer widely adopted, well-maintained libraries.
-- Verify license compatibility.
-- Pin responsibly via lockfile; do not hand-edit lockfiles.
-- Avoid dependencies that run postinstall scripts unless needed and reviewed.
+## 5) Admin auth, RBAC, and multi-tenancy (do not break)
+Auth is NextAuth (JWT strategy) and admin authorization is enforced server-side.
+
+### 5.1 RBAC
+- Server-side gatekeepers live in `lib/admin/guards.ts` (e.g., `requireAdmin()`).
+- Client-side permission checks use `hooks/useAdmin.ts` (display-only; never trust client checks for security).
+
+**Rules**
+- Any admin page must enforce authorization server-side (typically `await requireAdmin({ permissions: [...] })`).
+- Any admin API route must enforce authorization server-side via the hardened wrappers (see below).
+
+### 5.2 Multi-tenancy
+Tenant isolation is implemented via `tenantId` and the helper `tenantWhere()`.
+
+**Rules**
+- Any Prisma read/write for tenant-scoped models must apply `tenantWhere(user)` (or the pattern used in the route).
+- Never allow cross-tenant access by ID alone. Always scope by tenant.
 
 ---
 
-## 7) Git & PR workflow (choose the mode used by this repo)
+## 6) Admin API routes: use hardened wrappers (required)
+Admin endpoints MUST use the standardized wrappers:
+- `adminRead(...)` for GET-like reads
+- `adminMutation(...)` for writes (POST/PATCH/PUT/DELETE)
 
-### 7.1 If this repo uses Graphite stacks
-- Use Graphite commands for branch/stack operations.
-- Avoid workflows that lose state during restacks (no stash-based juggling).
-- After stack operations, always verify with `git status -sb` and confirm diffs.
+These wrappers centralize:
+- same-origin checks (CSRF defense layer)
+- CSRF token verification
+- permission checks (`requireAdmin`)
+- error normalization + request-id handling
+- audit log hooks
 
-### 7.2 If this repo uses standard git/GitHub CLI
-- Use small, reviewable commits.
-- Commit messages: imperative, concise, describe “what/why”.
-- PR description must include:
-  - what changed,
-  - why,
-  - risks,
-  - test plan,
-  - screenshots (UI changes).
-
-### 7.3 Never add AI/co-author footers
-- Do not add “Generated with …” or co-author footers to commits or PRs.
+**Rules**
+- Do not hand-roll admin API auth/CSRF/permission logic. Use `lib/admin/route.ts`.
+- For any mutation, include `permissions: [...]` and `audit: { action, resource, resourceId? }` options.
+- Return consistent JSON shapes and cache headers (admin responses should usually be `no-store`).
 
 ---
 
-## 8) Next.js framework monorepo mode (use ONLY when repo matches Next.js core)
+## 7) CSRF, origin checks, and client fetch (required)
+### Server-side (admin API)
+- Mutating requests must be protected via `assertSameOrigin` + CSRF verification (done by wrappers).
+- Never disable CSRF unless the endpoint is strictly internal and you can justify it.
 
-If this repo contains `packages/next/`, `turbopack/`, `crates/`, and `test/`, follow these additionally:
-
-### 8.1 Codebase map (quick orientation)
-- `packages/next/src/` — main framework source
-- `packages/next/src/server/` — server runtime
-- `packages/next/src/client/` — client runtime
-- `packages/next/src/build/` — build tooling
-- `test/` — all test suites
-
-### 8.2 Build & dev commands (trust `package.json` scripts as truth)
-- Build everything (root): `pnpm build`
-- Dev (root): `pnpm dev`
-- Build just the `next` package: `pnpm --filter=next build`
-- Dev just the `next` package: `pnpm --filter=next dev`
-
-> NOTE: If a doc mentions a command that doesn’t exist in `package.json`, treat it as stale and confirm the correct script before using it.
-
-### 8.3 Testing commands (common)
-- `pnpm test-dev-turbo <path>` — dev mode with Turbopack
-- `pnpm test-dev-webpack <path>` — dev mode with Webpack
-- `pnpm test-start-turbo <path>` — production build+start with Turbopack
-- `pnpm test-start-webpack <path>` — production build+start with Webpack
-- `pnpm test-unit` — unit tests
-- `pnpm testonly <path-or-pattern>` — run jest in-band without full rebuild steps (fast iteration)
-
-### 8.4 Test utilities note (important)
-- The `check()` helper is deprecated. Prefer `retry()` + assertions.
-
-### 8.5 Lint/types
-- `pnpm lint`
-- `pnpm lint-fix`
-- `pnpm types`
+### Client-side (admin UI)
+- Use `lib/fetchWithCsrf.ts` for calls to `/api/admin/*` (it attaches CSRF token header).
+- Prefer JSON bodies unless uploading FormData; do not set `Content-Type` manually for FormData.
 
 ---
 
-## 9) Security review checklist (run mentally before finalizing)
-- [ ] Are secrets server-only (no accidental client exposure)?
-- [ ] Are authz checks enforced server-side on every protected action/route?
-- [ ] Is all untrusted input validated at the boundary?
-- [ ] Are headers/CSP configured appropriately for the feature?
-- [ ] Are errors safe (no internal leaks)?
-- [ ] Are dependencies justified and patched?
+## 8) Audit logging & transactional integrity (required for admin writes)
+This repo treats audit logs as a first-class feature (`lib/admin/audit.ts`).
+
+**Rules**
+- Any administrative write must either:
+  - be performed through `adminMutation` with audit metadata, or
+  - explicitly create an audit log via `createAuditLog()` in the same logical operation.
+- When multiple writes must succeed/fail together (e.g., versioning, restore flows), use a Prisma transaction.
+- Never store secrets in audit logs; use `redactForAudit()` patterns.
 
 ---
 
-## 10) Scalability & usability checklist
-- [ ] Does this scale with more routes/features without becoming tangled?
-- [ ] Are module boundaries clean and discoverable?
-- [ ] Would a new dev know where to add the next related change?
-- [ ] Are loading/error/empty states handled?
-- [ ] Is accessibility maintained (keyboard, labels, focus, ARIA)?
+## 9) Prisma conventions
+- Prisma client lives at `lib/prisma.ts` (singleton).
+- Validate external input with Zod at boundaries (API routes, forms).
+- Prefer explicit `select` / `include` for large objects to limit over-fetching.
+- For pagination, use `lib/api/pagination.ts` helpers (`parsePaginationParams`, `buildPaginationResult`).
 
 ---
 
-## 11) What to do when instructions conflict
-Priority order:
-1) Security requirements in this file
-2) Repo’s existing patterns + tests
-3) Official Next.js docs guidance
-4) Personal preference
+## 10) Files & uploads (security-critical)
+Uploads are stored in a **private** server directory and served via an API route (`/api/uploads/*`) with validation.
 
-When in doubt, pick the safer and simpler approach and document the tradeoff.
-
+**Rules**
+- Prevent directory traversal; never accept raw paths from users.
+- Validate mime/type/size and set `Content-Disposition` safely.
+- Do not expose the upload directory directly as static public assets.
 
 ---
 
-## 12) When to add a new dependency
-- If it’s a dev dependency, it’s fine.
-- If it’s a prod dependency, it must be justified by a clear need and be patched to the latest version.
+## 11) UI: PRISM//CORE + shadcn + Tailwind rules
+### 11.1 Design system
+- Follow `.github/design_system.md` and `app/vantus-theme.css`.
+- Prefer **semantic tokens** (e.g., `bg-background`, `text-foreground`, `border-border`) over hard-coded colors.
+- Use shadcn components in `components/ui/*` and Radix patterns already in the repo.
+
+### 11.2 Component conventions
+- Use `cn()` from `lib/utils.ts` for class merging.
+- Maintain accessibility: labels, focus states, keyboard navigation, aria attributes.
+- Don’t introduce new UI libraries without strong reason.
+
+---
+
+## 12) Performance rules
+- Avoid making pages client components. Keep server/client boundaries tight.
+- Be cautious with heavy animation libs; follow existing GSAP usage patterns.
+- Do not fetch sensitive data on the client if it can be fetched on the server.
+
+---
+
+## 13) Testing & definition of done
+Use repo scripts (truth is `package.json`):
+- `npm run lint`
+- `npm test` (Vitest)
+- `npm run test:e2e` (Playwright) for critical flows
+- `npm run build` for production build verification
+
+When you change:
+- auth/permissions/tenancy → add or update tests (see `tests/admin/*`)
+- admin API behavior → update unit tests where possible + consider Playwright coverage for user journeys
+- UI forms/validation → ensure Zod schema and server enforcement match
+
+---
+
+## 14) How to respond in chat (required format)
+When asked for changes, respond as:
+1) **Plan (brief)** — what files you’ll touch and why
+2) **Patch** — file-by-file with complete code blocks (include imports/exports)
+3) **Security/Tenancy/Audit checklist** — confirm you respected CSRF, RBAC, tenantWhere, audit log requirements
+4) **How to verify** — exact npm scripts to run + manual smoke steps if relevant
+
+---
+
+## 15) Dependency policy (tight)
+- Prefer zero new dependencies.
+- If adding one is unavoidable, justify it and confirm it’s compatible with Next.js 14 + App Router.
+- Never add packages that weaken security (unsafe HTML sanitizers, random auth libs, etc.) without explicit approval.
+
+---
+
+## 16) Red flags: stop and reassess
+Stop and reassess if you are about to:
+- bypass `adminRead/adminMutation` for admin endpoints
+- remove or weaken CSP/nonce pipeline
+- accept tenant-scoped IDs without applying tenant scoping
+- write admin mutations without an audit trail
+- expose secrets to client bundles (anything not `NEXT_PUBLIC_*`)

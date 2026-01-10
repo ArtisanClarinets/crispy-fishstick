@@ -22,14 +22,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       console.log(`
         --- [MOCK EMAIL SENT] ---
         From: ${validatedOptions.from || "system@crispy-fishstick.com"}
-        To: ${validatedOptions.to}
+        To: ${validatedOptions.to.replace(/(?<=^.{3}).*@/, "***@")}
         Subject: ${validatedOptions.subject}
         
         ${validatedOptions.html.replace(/<[^>]*>?/gm, '')} // Strip HTML for console log readability
         -------------------------
       `);
     } else {
-       console.log(`[Email Sent] To: ${validatedOptions.to}, Subject: ${validatedOptions.subject}`);
+       console.log(`[Email Sent] To: ${validatedOptions.to.replace(/(?<=^.{3}).*@/, "***@")}, Subject: ${validatedOptions.subject}`);
     }
 
     // Simulate network delay

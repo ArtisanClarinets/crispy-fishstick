@@ -35,7 +35,18 @@ function validateCsrfToken(token: string): boolean {
   const expectedSignature = hmac.digest("hex");
   
   // Constant-time comparison to prevent timing attacks
-  return signature === expectedSignature;
+  const signatureBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expectedSignature);
+  
+  if (signatureBuffer.length !== expectedBuffer.length) return false;
+  
+  try {
+    // @ts-ignore - timingSafeEqual is available in Node crypto
+    return timingSafeEqual(signatureBuffer, expectedBuffer);
+  } catch (_e) {
+    // Fallback if timingSafeEqual fails (e.g. different lengths, though checked above)
+    return false;
+  }
 }
 
 /**

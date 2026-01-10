@@ -105,9 +105,14 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return jsonNoStore({ error: "Cannot delete yourself" }, { status: 400 });
     }
 
+    const where: any = { id: params.id };
+    if (actor.tenantId) {
+      where.tenantId = actor.tenantId;
+    }
+
     // Get user state before deletion for audit
-    const userToDelete = await prisma.user.findUnique({
-        where: { id: params.id },
+    const userToDelete = await prisma.user.findFirst({
+        where,
         select: { id: true, email: true } 
     });
 

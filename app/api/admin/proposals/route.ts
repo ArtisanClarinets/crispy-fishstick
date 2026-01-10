@@ -58,14 +58,27 @@ export async function POST(req: NextRequest) {
   return adminMutation(req, { permissions: ["proposals.write"] }, async (user, body) => {
     const validatedData = createProposalSchema.parse(body);
 
-    // Validate tenant if provided
-    if (validatedData.tenantId) {
-      const tenant = await prisma.tenant.findUnique({
-        where: { id: validatedData.tenantId, deletedAt: null },
-      });
-      if (!tenant) {
-        return { error: "Invalid tenant", status: 400 };
+    // Determine final tenantId
+    let tenantId = validatedData.tenantId;
+
+    // Enforce tenant scoping
+    if (user.tenantId) {
+      if (tenantId && tenantId !== user.tenantId) {
+        return { error: "Forbidden: Cannot create proposal for another tenant", status: 403 };
       }
+      tenantId = user.tenantId;
+    }
+
+    if (!tenantId) {
+      return { error: "Tenant ID is required", status: 400 };
+    }
+
+    // Validate tenant exists
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId, deletedAt: null },
+    });
+    if (!tenant) {
+      return { error: "Invalid tenant", status: 400 };
     }
 
     const totalAmount = validatedData.items.reduce((sum, item) => sum + (item.hours * item.rate), 0);
@@ -78,6 +91,9 @@ export async function POST(req: NextRequest) {
         content: validatedData.content,
         validUntil: validatedData.validUntil ? new Date(validatedData.validUntil) : null,
         totalAmount,
+        Tenant: {
+          connect: { id: tenantId }
+        },
         ProposalItem: {
           create: validatedData.items.map(item => ({
             customName: item.description,
