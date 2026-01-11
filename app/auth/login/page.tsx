@@ -58,6 +58,13 @@ export default function LoginPage() {
             title: "Service Unavailable",
             description: "Database schema not ready; run prisma migrate deploy",
           });
+        } else if (result.error === "RATE_LIMIT_EXCEEDED") {
+          const retryAfter = result?.retryAfter || "a few minutes";
+          toast({
+            variant: "destructive",
+            title: "Too Many Attempts",
+            description: `Too many login attempts. Please try again in ${retryAfter} seconds.`,
+          });
         } else {
           // Generic error message for all authentication failures
           toast({

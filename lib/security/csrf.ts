@@ -4,7 +4,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { randomBytes, createHmac } from "crypto";
+import { randomBytes, createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 
 // Get CSRF secret with fail-fast approach in production
@@ -45,20 +45,19 @@ export function generateCsrfToken(): string {
 function validateCsrfToken(token: string): boolean {
   const parts = token.split(".");
   if (parts.length !== 2) return false;
-  
+ 
   const [random, signature] = parts;
   const hmac = createHmac("sha256", CSRF_SECRET);
   hmac.update(random);
   const expectedSignature = hmac.digest("hex");
-  
+ 
   // Constant-time comparison to prevent timing attacks
   const signatureBuffer = Buffer.from(signature);
   const expectedBuffer = Buffer.from(expectedSignature);
-  
+ 
   if (signatureBuffer.length !== expectedBuffer.length) return false;
-  
+ 
   try {
-    // @ts-ignore - timingSafeEqual is available in Node crypto
     return timingSafeEqual(signatureBuffer, expectedBuffer);
   } catch (_e) {
     // Fallback if timingSafeEqual fails (e.g. different lengths, though checked above)

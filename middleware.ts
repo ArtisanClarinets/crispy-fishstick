@@ -10,8 +10,27 @@ const SECURITY_HEADERS = [
   ["Referrer-Policy", "strict-origin-when-cross-origin"],
   ["X-Frame-Options", "DENY"],
   ["Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()"],
-  ["Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload"],
 ];
+
+// Centralized secret resolution function (same as lib/auth.ts)
+function getAuthSecret(): string {
+  // Try NEXTAUTH_SECRET first, then fall back to AUTH_SECRET for compatibility
+  const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
+
+  if (process.env.NODE_ENV === "production" && !secret) {
+    throw new Error(
+      "Auth secret is required in production. Please set NEXTAUTH_SECRET or AUTH_SECRET in your environment variables."
+    );
+  }
+
+  if (!secret) {
+    // In development, provide a fallback secret for convenience
+    console.warn("No auth secret found. Using a development fallback secret.");
+    return "dev-secret-fallback-for-development-only";
+  }
+
+  return secret;
+}
 
 export async function middleware(request: NextRequest) {
   const nonce = crypto.randomUUID().replace(/-/g, "");
@@ -25,19 +44,24 @@ export async function middleware(request: NextRequest) {
   const isProd = process.env.NODE_ENV === "production";
   const scriptSrc = `script-src 'self' 'nonce-${nonce}' ${(isDev || isProd) ? "'unsafe-eval'" : ""}`;
 
+  // Environment-specific CSP configuration
+  const connectSrc = isDev 
+    ? "connect-src 'self' ws: wss: http://localhost:* https://localhost:*" 
+    : "connect-src 'self'";
+
   const csp = [
     "default-src 'self'",
     scriptSrc,
     "style-src 'self' 'unsafe-inline'", // 'unsafe-inline' required for CSS-in-JS/Framer Motion style attributes
     "img-src 'self' data:",
     "font-src 'self' data:",
-    "connect-src 'self'",
+    connectSrc,
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
     "upgrade-insecure-requests",
-  ].join("; ");
+  ].join(" ; ");
 
   // AUTHENTICATION LOGIC
   const pathname = request.nextUrl.pathname;
@@ -58,18 +82,13 @@ export async function middleware(request: NextRequest) {
       url.searchParams.set("error", adminAccessCheck.reason || "ACCESS_DENIED");
       return NextResponse.redirect(url);
     }
-    
-    const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
+
+    // Use the same secret resolution as lib/auth.ts
+    const secret = getAuthSecret();
     console.log("[Middleware] Checking auth for:", pathname);
     console.log("[Middleware] Secret exists:", !!secret);
     console.log("[Middleware] Request URL:", request.url);
     console.log("[Middleware] Request cookies:", request.cookies.getAll());
-    
-    if (!secret) {
-      console.error("NEXTAUTH_SECRET is not set. Admin routes will not authenticate.");
-      const url = new URL("/admin/error", request.url);
-      return NextResponse.redirect(url);
-    }
     
     const token = await getToken({
       req: request,
@@ -123,6 +142,11 @@ export async function middleware(request: NextRequest) {
 
   response.headers.set("Content-Security-Policy", csp);
   SECURITY_HEADERS.forEach(([key, value]) => response.headers.set(key, value));
+
+  // Only apply HSTS in production environment
+  if (process.env.NODE_ENV === "production") {
+    response.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+  }
 
   return response;
 }

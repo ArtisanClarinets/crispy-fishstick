@@ -276,48 +276,71 @@ log_success "Node.js dependencies installed"
 
 log_section "STEP 7: Database Setup & Migrations"
 
-cd "$APP_DIR"
+cd "$APP_DIR" || {
+    log_error "Failed to cd to APP_DIR: $APP_DIR"
+    exit 1
+}
 
 # Consolidated environment variable loading with single source of truth
+ENV_SOURCE_PATH=""
 if [ -f "$APP_DIR/.env" ]; then
-    log_info "Loading environment variables from $APP_DIR/.env"
+    ENV_SOURCE_PATH="$APP_DIR/.env"
+    log_info "Loading environment variables from $ENV_SOURCE_PATH"
     # shellcheck disable=SC1090
-    source "$APP_DIR/.env"
+    source "$ENV_SOURCE_PATH"
+elif [ -n "$ENV_FILE" ] && [ -f "$ENV_FILE" ]; then
+    ENV_SOURCE_PATH="$ENV_FILE"
+    log_info "Loading environment variables from $ENV_SOURCE_PATH"
+    # shellcheck disable=SC1090
+    source "$ENV_SOURCE_PATH"
 else
-    if [ -f "$ENV_FILE" ]; then
-        log_info "Loading environment variables from $ENV_FILE"
-        # shellcheck disable=SC1090
-        source "$ENV_FILE"
-    else
-        log_error "No environment file found. Cannot proceed with database setup."
-        exit 1
-    fi
+    log_error "No environment file found (.env or ENV_FILE). Cannot proceed with database setup."
+    exit 1
 fi
 
-# Validate DATABASE_URL is set
+# Validate DATABASE_URL is set (in the current shell)
 if [ -z "$DATABASE_URL" ]; then
-    log_error "DATABASE_URL is not set in environment variables"
+    log_error "DATABASE_URL is not set in environment variables (after sourcing $ENV_SOURCE_PATH)"
     exit 1
 fi
 
 log_info "Using database: $DATABASE_URL"
 
 # If DATABASE_URL is a sqlite file:, ensure its directory exists and is owned by the app user
-if [ -n "$DATABASE_URL" ] && [[ "$DATABASE_URL" == file:* ]]; then
+if [[ "$DATABASE_URL" == file:* ]]; then
     DB_PATH="${DATABASE_URL#file:}"
+
+    # Normalize sqlite path:
+    # - If relative, treat it as relative to $APP_DIR
+    if [[ "$DB_PATH" != /* ]]; then
+        DB_PATH="$APP_DIR/$DB_PATH"
+    fi
+
     DB_DIR="$(dirname "$DB_PATH")"
+
     if [ ! -d "$DB_DIR" ]; then
         log_info "Creating database directory: $DB_DIR"
-        mkdir -p "$DB_DIR"
-        chown -R "$APP_USER:$APP_GROUP" "$DB_DIR"
-    else
-        chown -R "$APP_USER:$APP_GROUP" "$DB_DIR"
+        mkdir -p "$DB_DIR" || {
+            log_error "Failed to create database directory: $DB_DIR"
+            exit 1
+        }
     fi
+
+    chown -R "$APP_USER:$APP_GROUP" "$DB_DIR" || {
+        log_error "Failed to set ownership on database directory: $DB_DIR"
+        exit 1
+    }
 fi
+
+# Helper: run commands as app user with env exported
+run_as_app_user_with_env() {
+    # Use set -a to export ALL variables sourced from .env into the process environment
+    sudo -u "$APP_USER" -H bash -lc "set -a; source \"$APP_DIR/.env\" >/dev/null 2>&1; set +a; cd \"$APP_DIR\"; $*"
+}
 
 # Run database validation before any Prisma operations
 log_info "Running database validation..."
-if sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; bash scripts/validate-database.sh"; then
+if run_as_app_user_with_env "bash scripts/validate-database.sh"; then
     log_success "Database validation passed"
 else
     log_error "Database validation failed. Cannot proceed with database setup."
@@ -331,16 +354,16 @@ run_prisma_command() {
     local max_retries=3
     local retry_delay=5
     local attempt=1
-    
+
     log_info "Running: $command_name"
-    
+
     while [ $attempt -le $max_retries ]; do
         if eval "$command"; then
             log_success "$command_name completed successfully"
             return 0
         else
             log_error "$command_name failed (attempt $attempt/$max_retries)"
-            
+
             # Check for specific Prisma errors
             if [ $attempt -eq 1 ]; then
                 case "$command_name" in
@@ -355,23 +378,23 @@ run_prisma_command() {
                         ;;
                 esac
             fi
-            
+
             if [ $attempt -lt $max_retries ]; then
                 log_info "Retrying in $retry_delay seconds..."
                 sleep $retry_delay
             fi
-            
+
             attempt=$((attempt + 1))
         fi
     done
-    
+
     log_error "$command_name failed after $max_retries attempts"
     return 1
 }
 
 # Check migration status before deploying
 log_info "Checking migration status..."
-if sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma migrate status"; then
+if run_as_app_user_with_env "npx prisma migrate status"; then
     log_success "Migration status check completed"
 else
     log_error "Migration status check failed"
@@ -379,14 +402,16 @@ else
 fi
 
 # Generate Prisma client with explicit error handling
-run_prisma_command "prisma generate" "sudo -u \"$APP_USER\" bash -lc \"source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma generate\""
+run_prisma_command "prisma generate" \
+  "sudo -u \"$APP_USER\" -H bash -lc 'set -a; source \"$APP_DIR/.env\" >/dev/null 2>&1; set +a; cd \"$APP_DIR\"; npx prisma generate'"
 
 # Deploy migrations with explicit error handling
-run_prisma_command "prisma migrate deploy" "sudo -u \"$APP_USER\" bash -lc \"source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma migrate deploy\""
+run_prisma_command "prisma migrate deploy" \
+  "sudo -u \"$APP_USER\" -H bash -lc 'set -a; source \"$APP_DIR/.env\" >/dev/null 2>&1; set +a; cd \"$APP_DIR\"; npx prisma migrate deploy'"
 
 # Seed database with explicit error handling (fail on error)
 log_info "Seeding database with admin user..."
-if sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma db seed"; then
+if sudo -u "$APP_USER" -H bash -lc 'set -a; source "'"$APP_DIR"'/.env" >/dev/null 2>&1; set +a; cd "'"$APP_DIR"'"; npx prisma db seed'; then
     log_success "Database seeding completed"
 else
     log_error "Database seeding failed"
@@ -396,7 +421,7 @@ fi
 
 # Final schema validation
 log_info "Running final schema validation..."
-if sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma validate"; then
+if sudo -u "$APP_USER" -H bash -lc 'set -a; source "'"$APP_DIR"'/.env" >/dev/null 2>&1; set +a; cd "'"$APP_DIR"'"; npx prisma validate'; then
     log_success "Final schema validation passed"
 else
     log_error "Final schema validation failed"
@@ -404,6 +429,7 @@ else
 fi
 
 log_success "Database setup complete"
+
 
 # ═══════════════════════════════════════════════════════════════════════
 #  STEP 8: Build Application

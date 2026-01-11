@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
  *
  * Env:
  *   DEPLOY_DOMAIN  (required)
- *   DEPLOY_PORT    (default: 3000)
+ *   DEPLOY_PORT    (default: 3005)
  *   DEPLOY_ROOT    (default: /var/www/vantus)
  */
 

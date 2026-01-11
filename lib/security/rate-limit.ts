@@ -22,6 +22,11 @@ const DEFAULT_MAX_ATTEMPTS = 5;
 const DEFAULT_WINDOW_MS = 60 * 1000; // 1 minute
 const DEFAULT_KEY_PREFIX = "rl:";
 
+// Email-based rate limiting constants
+const EMAIL_MAX_ATTEMPTS = 3;
+const EMAIL_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const EMAIL_KEY_PREFIX = "rl:email:";
+
 /**
  * Redis Rate Limiter
  */
@@ -43,6 +48,13 @@ export class RateLimiter {
    */
   private getKey(ip: string): string {
     return `${this.keyPrefix}${ip}`;
+  }
+
+  /**
+   * Get rate limit key for an email address
+   */
+  private getEmailKey(email: string): string {
+    return `${EMAIL_KEY_PREFIX}${email.toLowerCase()}`;
   }
 
   /**
@@ -114,6 +126,100 @@ export class RateLimiter {
         remaining: this.maxAttempts
       };
     }
+  }
+
+  /**
+   * Check rate limit for an email address
+   */
+  async checkEmail(email: string): Promise<RateLimitResult> {
+    const key = this.getEmailKey(email);
+    const now = Date.now();
+
+    try {
+      // Get current rate limit data
+      const result = await this.redis.hgetall(key);
+      
+      if (!result || !result.count || !result.expires) {
+        // First request in this window
+        await this.redis.hmset(key, {
+          count: "1",
+          expires: String(now + EMAIL_WINDOW_MS)
+        });
+        
+        await this.redis.expireat(key, Math.floor((now + EMAIL_WINDOW_MS) / 1000));
+        
+        return {
+          success: true,
+          remaining: EMAIL_MAX_ATTEMPTS - 1
+        };
+      }
+
+      const count = parseInt(result.count);
+      const expires = parseInt(result.expires);
+
+      if (now > expires) {
+        // Window has expired, reset
+        await this.redis.hmset(key, {
+          count: "1",
+          expires: String(now + EMAIL_WINDOW_MS)
+        });
+        
+        await this.redis.expireat(key, Math.floor((now + EMAIL_WINDOW_MS) / 1000));
+        
+        return {
+          success: true,
+          remaining: EMAIL_MAX_ATTEMPTS - 1
+        };
+      }
+
+      if (count >= EMAIL_MAX_ATTEMPTS) {
+        // Rate limit exceeded
+        const retryAfter = Math.ceil((expires - now) / 1000);
+        return {
+          success: false,
+          retryAfter: retryAfter
+        };
+      }
+
+      // Increment count
+      await this.redis.hincrby(key, "count", 1);
+      
+      return {
+        success: true,
+        remaining: EMAIL_MAX_ATTEMPTS - (count + 1)
+      };
+      
+    } catch (error) {
+      console.error("Email rate limiting error:", error);
+      // Fail open if Redis is unavailable
+      return {
+        success: true,
+        remaining: EMAIL_MAX_ATTEMPTS
+      };
+    }
+  }
+
+  /**
+   * Check both IP and email rate limits
+   */
+  async checkLoginAttempt(ip: string, email: string): Promise<RateLimitResult> {
+    // Check IP-based rate limit
+    const ipResult = await this.check(ip);
+    if (!ipResult.success) {
+      return ipResult;
+    }
+
+    // Check email-based rate limit
+    const emailResult = await this.checkEmail(email);
+    if (!emailResult.success) {
+      return emailResult;
+    }
+
+    // Return the more restrictive result
+    return {
+      success: true,
+      remaining: Math.min(ipResult.remaining || this.maxAttempts, emailResult.remaining || EMAIL_MAX_ATTEMPTS)
+    };
   }
 
   /**
