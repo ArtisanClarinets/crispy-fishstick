@@ -13,12 +13,13 @@ const updateMediaSchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   return adminRead(req, { permissions: ["media.read"] }, async (user) => {
     const asset = await prisma.mediaAsset.findFirst({
       where: {
-        id: params.id,
+        id,
         ...tenantWhere(user),
       },
     });
@@ -33,14 +34,15 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   return adminMutation(req, { permissions: ["media.write"] }, async (user, body) => {
     const validated = updateMediaSchema.parse(body);
 
     const existing = await prisma.mediaAsset.findFirst({
       where: {
-        id: params.id,
+        id,
         ...tenantWhere(user),
         deletedAt: null,
       },
@@ -51,7 +53,7 @@ export async function PATCH(
     }
 
     const updated = await prisma.mediaAsset.update({
-      where: { id: params.id },
+      where: { id },
       data: validated,
     });
 
@@ -61,14 +63,15 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   return adminMutation(req, { permissions: ["media.write"] }, async (user, body) => {
     const { deleteReason } = updateMediaSchema.parse(body);
 
     const existing = await prisma.mediaAsset.findFirst({
       where: {
-        id: params.id,
+        id,
         ...tenantWhere(user),
         deletedAt: null,
       },
@@ -79,7 +82,7 @@ export async function DELETE(
     }
 
     await prisma.mediaAsset.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         deletedAt: new Date(),
         deletedBy: user.id,

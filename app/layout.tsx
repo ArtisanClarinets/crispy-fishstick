@@ -55,12 +55,13 @@ export const metadata: Metadata = {
 // required for per-request nonce
 export const dynamic = "force-dynamic";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const nonce = headers().get("x-nonce") ?? undefined;
+  const headersList = await headers();
+  const nonce = headersList.get("x-nonce") ?? undefined;
 
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">

@@ -1,0 +1,11 @@
+app/(admin)/admin/(dashboard)/content/[id]/page.tsx
+app/(admin)/admin/(dashboard)/contracts/[id]/page.tsx
+app/(admin)/admin/(dashboard)/incidents/[id]/page.tsx
+app/(admin)/admin/(dashboard)/invoices/[id]/page.tsx
+app/(admin)/admin/(dashboard)/leads/[id]/page.tsx
+app/(admin)/admin/(dashboard)/projects/[id]/page.tsx
+app/(admin)/admin/(dashboard)/proposals/[id]/page.tsx
+app/(admin)/admin/(dashboard)/services/[id]/page.tsx
+app/(admin)/admin/(dashboard)/users/[id]/page.tsx
+app/(site)/insights/[slug]/page.tsx
+app/(site)/work/[slug]/page.tsx
