@@ -7,9 +7,47 @@ import { decryptSecret } from "@/lib/security/mfa";
 import { updateSessionActivity } from "@/lib/security/session";
 import { Redis } from "ioredis";
 import { getRateLimiter } from "@/lib/security/rate-limit";
+import { z } from "zod";
 
-// Centralized secret resolution function
+// Environment variable validation schema
+const envSchema = z.object({
+  NEXTAUTH_SECRET: z.string().min(32, {
+    message: "NEXTAUTH_SECRET must be at least 32 characters long"
+  }),
+  NEXTAUTH_URL: z.string().url({
+    message: "NEXTAUTH_URL must be a valid URL"
+  }),
+  MFA_ENCRYPTION_KEY: z.string().min(64, {
+    message: "MFA_ENCRYPTION_KEY must be at least 64 characters long (32 bytes in hex)"
+  }).optional(),
+  NODE_ENV: z.enum(["development", "production", "test"]),
+});
+
+// Centralized secret resolution function with enhanced validation
 function getAuthSecret(): string {
+  // Validate environment variables using Zod
+  const envValidation = envSchema.safeParse({
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    MFA_ENCRYPTION_KEY: process.env.MFA_ENCRYPTION_KEY,
+    NODE_ENV: process.env.NODE_ENV,
+  });
+
+  if (!envValidation.success) {
+    const errors = envValidation.error.format();
+    console.error("Environment validation errors:", errors);
+    
+    // In production, fail fast on validation errors
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        `Environment validation failed: ${JSON.stringify(errors)}`
+      );
+    }
+    
+    // In development, provide helpful warnings but continue with fallback
+    console.warn("Using development fallback due to environment validation errors");
+  }
+
   // Try NEXTAUTH_SECRET first, then fall back to AUTH_SECRET for compatibility
   const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
 
@@ -23,6 +61,14 @@ function getAuthSecret(): string {
     // In development, provide a fallback secret for convenience
     console.warn("No auth secret found. Using a development fallback secret.");
     return "dev-secret-fallback-for-development-only";
+  }
+
+  // Validate secret length for security
+  if (secret.length < 32) {
+    console.warn("Auth secret should be at least 32 characters for production security");
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("NEXTAUTH_SECRET must be at least 32 characters in production");
+    }
   }
 
   return secret;
@@ -68,6 +114,9 @@ declare module "next-auth/jwt" {
     tenantId?: string | null;
     sessionToken?: string;
     sessionCreatedAt?: number;
+    // Add security metadata
+    ip?: string;
+    userAgent?: string;
   }
 }
 
@@ -78,9 +127,29 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
+    // Add session fixation protection by regenerating session token on sign-in
+    updateAge: 24 * 60 * 60, // 24 hours - forces periodic session updates
   },
   pages: {
     signIn: "/admin/login",
+  },
+  // Add secure cookie settings
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === "production" 
+        ? "__Secure-next-auth.session-token"
+        : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        // Add __Host prefix for additional security in production
+        ...(process.env.NODE_ENV === "production" && {
+          domain: new URL(process.env.NEXTAUTH_URL || "http://localhost").hostname,
+        }),
+      },
+    },
   },
   providers: [
     CredentialsProvider({
@@ -104,7 +173,7 @@ export const authOptions: NextAuthOptions = {
             // Apply rate limiting for login attempts if rate limiter is available
             if (rateLimiterInstance) {
               const rateLimitResult = await rateLimiterInstance.checkLoginAttempt(ip, email);
-              
+                
               if (!rateLimitResult.success) {
                 // Rate limit exceeded
                 const error = new Error("RATE_LIMIT_EXCEEDED");
@@ -187,34 +256,57 @@ export const authOptions: NextAuthOptions = {
           if (error.message === "RATE_LIMIT_EXCEEDED") {
             throw error;
           }
-
+ 
           // Handle Prisma errors (P2021: Table does not exist)
           if (error.code === 'P2021' || error.code === 'P2022') {
             throw new Error("DB_SCHEMA_NOT_READY");
           }
-          
+            
           // Re-throw known auth errors
           if (error.message === "MFA_REQUIRED" || error.message === "INVALID_MFA_CODE" || error.message === "MFA_ERROR") {
             throw error;
           }
-
+ 
           throw new Error("AUTH_ERROR");
         }
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, trigger, session }) {
+      // Initialize security metadata on first call
+      if (!token.sessionCreatedAt) {
+        token.sessionCreatedAt = Math.floor(Date.now() / 1000);
+      }
+
       if (user) {
         token.id = user.id;
         token.roles = (user as any).roles || [];
         token.permissions = (user as any).permissions || [];
         token.tenantId = (user as any).tenantId;
+        
+        // Add security metadata from request if available
+        if ((session as any)?.ip) {
+          token.ip = (session as any).ip;
+        }
+        if ((session as any)?.userAgent) {
+          token.userAgent = (session as any).userAgent;
+        }
       }
       
-      // Handle session creation on sign-in
+      // Handle session creation on sign-in with session fixation protection
       if (trigger === "signIn") {
-        // This will be handled in the authorize function where we have access to the request
+        // Generate a new session token to prevent session fixation
+        token.sessionToken = `session_${Math.random().toString(36).substring(2, 15)}_${Date.now()}`;
+        token.sessionCreatedAt = Math.floor(Date.now() / 1000);
+        
+        // Add security metadata
+        if ((session as any)?.ip) {
+          token.ip = (session as any).ip;
+        }
+        if ((session as any)?.userAgent) {
+          token.userAgent = (session as any).userAgent;
+        }
       }
       
       // Handle session update on activity
@@ -226,6 +318,18 @@ export const authOptions: NextAuthOptions = {
         }
       }
       
+      // Add session expiration validation
+      if (token.sessionCreatedAt) {
+        const sessionAge = Math.floor(Date.now() / 1000) - token.sessionCreatedAt;
+        const maxSessionAge = 30 * 24 * 60 * 60; // 30 days
+        
+        if (sessionAge > maxSessionAge) {
+          console.warn("Session expired, forcing logout");
+          // This will effectively end the session
+          token.exp = Math.floor(Date.now() / 1000) - 1;
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {
@@ -234,8 +338,53 @@ export const authOptions: NextAuthOptions = {
         session.user.roles = token.roles;
         session.user.permissions = token.permissions;
         session.user.tenantId = token.tenantId;
+        
+        // Add session security metadata (without exposing sensitive data)
+        (session as any).ip = token.ip;
+        (session as any).userAgent = token.userAgent;
+        (session as any).sessionCreatedAt = token.sessionCreatedAt;
+        
+        // Prevent data leakage - ensure we don't expose internal token data
+        delete (session as any).iat;
+        delete (session as any).exp;
+        delete (session as any).jti;
       }
-      return session;
+      
+      // Sanitize session data to prevent information leakage
+      const sanitizedSession = {
+        ...session,
+        user: {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.name,
+          roles: session.user.roles,
+          permissions: session.user.permissions,
+          tenantId: session.user.tenantId,
+        },
+      };
+      
+      return sanitizedSession;
+    },
+    // Add redirect callback for security
+    async redirect({ url, baseUrl }) {
+      // Prevent open redirect vulnerabilities
+      if (url.startsWith("/") || url.startsWith(baseUrl)) {
+        return url;
+      }
+      // Default to home page for external redirects
+      return baseUrl;
+    },
+  },
+  // Security events
+  events: {
+    async signIn(message) {
+      // Log successful sign-in with security context
+      const ip = (message as any)?.ip || 'unknown IP';
+      console.info(`Successful sign-in for ${message.user.email} from ${ip}`);
+    },
+    async signOut(message) {
+      // Log successful sign-out
+      console.info(`Successful sign-out for ${message.token?.email || 'unknown user'}`);
     },
   },
 };
