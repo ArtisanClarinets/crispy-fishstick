@@ -529,11 +529,15 @@ model User {
   email            String             @unique
   name             String?
   passwordHash     String?
+  mfaEnabled       Boolean            @default(false)
   mfaSecret        String?
   mfaBackupCodes   String?            // JSON array of hashed backup codes
   mfaRecoveryCode  String?            // Current recovery code (hashed)
-  mfaRecoveryCodeExpiresAt DateTime?  // When recovery code expires
-  mfaDeviceFingerprint String?        // Device fingerprint for MFA device
+  mfaRecoveryCodes String?            // Alternative field name for compatibility
+  mfaRecoveryCodeExpiresAt DateTime?
+  mfaDeviceFingerprint String?
+  mfaSetupAt       DateTime?
+  mfaLastUsedAt    DateTime?
   tenantId         String?
 
   // Password history for security

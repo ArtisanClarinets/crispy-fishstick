@@ -57,8 +57,8 @@ async function main() {
     const user = await prisma.user.findUnique({
       where: { email },
       include: {
-        roles: {
-          include: { role: true },
+        RoleAssignment: {
+          include: { Role: true },
         },
       },
     });
@@ -70,7 +70,7 @@ async function main() {
 
     console.log("✅ Admin user exists:", user.email);
 
-    const roles = user.roles.map((r) => r.role?.name).filter(Boolean) as string[];
+    const roles = user.RoleAssignment?.map((r: any) => r.Role?.name).filter(Boolean) as string[];
     console.log("✅ Assigned roles:", roles.join(", ") || "(none)");
 
     // Role checks (only if roles exist in DB)

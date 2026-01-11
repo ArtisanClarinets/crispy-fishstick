@@ -187,21 +187,33 @@ if [ -f "$APP_DIR/.env" ]; then
     chmod 600 "$APP_DIR/.env"
     # Also copy into /etc/default for systemd to read (systemd reads as root)
     cp "$APP_DIR/.env" "$ENV_FILE" 2>/dev/null || true
-    chown root:root "$ENV_FILE" 2>/dev/null || true
+    chown "$APP_USER:$APP_GROUP" "$ENV_FILE" 2>/dev/null || true
     chmod 600 "$ENV_FILE" 2>/dev/null || true
     
     # Verify environment file ownership and permissions
     if [ -f "$ENV_FILE" ]; then
         log_info "Verifying environment file security..."
-        if [ "$(stat -c %u:%g "$ENV_FILE")" != "0:0" ]; then
-            chown root:root "$ENV_FILE"
-            log_warning "Fixed ownership of $ENV_FILE to root:root"
+        if [ "$(stat -c %u:%g "$ENV_FILE")" != "$(id -u $APP_USER):$(id -g $APP_GROUP)" ]; then
+            chown "$APP_USER:$APP_GROUP" "$ENV_FILE"
+            log_warning "Fixed ownership of $ENV_FILE to $APP_USER:$APP_GROUP"
         fi
         if [ "$(stat -c %a "$ENV_FILE")" != "600" ]; then
             chmod 600 "$ENV_FILE"
             log_warning "Fixed permissions of $ENV_FILE to 600"
         fi
         log_success "Environment file security verified"
+    fi
+    
+    # Also verify the APP_DIR/.env file
+    if [ -f "$APP_DIR/.env" ]; then
+        if [ "$(stat -c %u:%g "$APP_DIR/.env")" != "$(id -u $APP_USER):$(id -g $APP_GROUP)" ]; then
+            chown "$APP_USER:$APP_GROUP" "$APP_DIR/.env"
+            log_warning "Fixed ownership of $APP_DIR/.env to $APP_USER:$APP_GROUP"
+        fi
+        if [ "$(stat -c %a "$APP_DIR/.env")" != "600" ]; then
+            chmod 600 "$APP_DIR/.env"
+            log_warning "Fixed permissions of $APP_DIR/.env to 600"
+        fi
     fi
     
     log_success "Environment file available at $APP_DIR/.env (and copied to $ENV_FILE)"
@@ -213,6 +225,37 @@ if [ ! -f "$APP_DIR/.env" ]; then
 fi
 
 log_success "Environment configuration complete"
+
+# Validate file permissions after setup
+log_section "Validating File Permissions"
+
+log_info "Running file permission validation..."
+if bash "$SCRIPT_DIR/validate-file-permissions.sh"; then
+    log_success "File permission validation passed"
+else
+    log_error "File permission validation failed"
+    log_error "Attempting to fix permissions automatically..."
+    
+    # Try to fix permissions automatically
+    if [ -f "$APP_DIR/.env" ]; then
+        chown "$APP_USER:$APP_GROUP" "$APP_DIR/.env" || log_error "Failed to fix ownership of $APP_DIR/.env"
+        chmod 600 "$APP_DIR/.env" || log_error "Failed to fix permissions of $APP_DIR/.env"
+    fi
+    
+    if [ -f "$ENV_FILE" ]; then
+        chown "$APP_USER:$APP_GROUP" "$ENV_FILE" || log_error "Failed to fix ownership of $ENV_FILE"
+        chmod 600 "$ENV_FILE" || log_error "Failed to fix permissions of $ENV_FILE"
+    fi
+    
+    # Run validation again
+    if bash "$SCRIPT_DIR/validate-file-permissions.sh"; then
+        log_success "File permission validation passed after automatic fix"
+    else
+        log_error "File permission validation still failing after automatic fix"
+        log_error "Please manually fix permissions and re-run the bootstrap script"
+        exit 1
+    fi
+fi
 
 # ═══════════════════════════════════════════════════════════════════════
 #  STEP 6: Install Node Dependencies
@@ -235,18 +278,29 @@ log_section "STEP 7: Database Setup & Migrations"
 
 cd "$APP_DIR"
 
-# Source environment for database URL from app .env (preferred)
+# Consolidated environment variable loading with single source of truth
 if [ -f "$APP_DIR/.env" ]; then
+    log_info "Loading environment variables from $APP_DIR/.env"
     # shellcheck disable=SC1090
     source "$APP_DIR/.env"
 else
     if [ -f "$ENV_FILE" ]; then
+        log_info "Loading environment variables from $ENV_FILE"
         # shellcheck disable=SC1090
         source "$ENV_FILE"
     else
-        log_warning "No environment file found; continuing without it"
+        log_error "No environment file found. Cannot proceed with database setup."
+        exit 1
     fi
 fi
+
+# Validate DATABASE_URL is set
+if [ -z "$DATABASE_URL" ]; then
+    log_error "DATABASE_URL is not set in environment variables"
+    exit 1
+fi
+
+log_info "Using database: $DATABASE_URL"
 
 # If DATABASE_URL is a sqlite file:, ensure its directory exists and is owned by the app user
 if [ -n "$DATABASE_URL" ] && [[ "$DATABASE_URL" == file:* ]]; then
@@ -261,14 +315,93 @@ if [ -n "$DATABASE_URL" ] && [[ "$DATABASE_URL" == file:* ]]; then
     fi
 fi
 
-log_info "Generating Prisma client..."
-sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma generate"
+# Run database validation before any Prisma operations
+log_info "Running database validation..."
+if sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; bash scripts/validate-database.sh"; then
+    log_success "Database validation passed"
+else
+    log_error "Database validation failed. Cannot proceed with database setup."
+    exit 1
+fi
 
-log_info "Running database migrations..."
-sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma migrate deploy"
+# Function to run Prisma commands with proper error handling
+run_prisma_command() {
+    local command_name="$1"
+    local command="$2"
+    local max_retries=3
+    local retry_delay=5
+    local attempt=1
+    
+    log_info "Running: $command_name"
+    
+    while [ $attempt -le $max_retries ]; do
+        if eval "$command"; then
+            log_success "$command_name completed successfully"
+            return 0
+        else
+            log_error "$command_name failed (attempt $attempt/$max_retries)"
+            
+            # Check for specific Prisma errors
+            if [ $attempt -eq 1 ]; then
+                case "$command_name" in
+                    "prisma generate")
+                        log_warning "Prisma client generation failed. This may indicate schema issues."
+                        ;;
+                    "prisma migrate deploy")
+                        log_warning "Migration deployment failed. Check migration files and database connectivity."
+                        ;;
+                    "prisma db seed")
+                        log_warning "Database seeding failed. This may be normal if database is already seeded."
+                        ;;
+                esac
+            fi
+            
+            if [ $attempt -lt $max_retries ]; then
+                log_info "Retrying in $retry_delay seconds..."
+                sleep $retry_delay
+            fi
+            
+            attempt=$((attempt + 1))
+        fi
+    done
+    
+    log_error "$command_name failed after $max_retries attempts"
+    return 1
+}
 
+# Check migration status before deploying
+log_info "Checking migration status..."
+if sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma migrate status"; then
+    log_success "Migration status check completed"
+else
+    log_error "Migration status check failed"
+    exit 1
+fi
+
+# Generate Prisma client with explicit error handling
+run_prisma_command "prisma generate" "sudo -u \"$APP_USER\" bash -lc \"source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma generate\""
+
+# Deploy migrations with explicit error handling
+run_prisma_command "prisma migrate deploy" "sudo -u \"$APP_USER\" bash -lc \"source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma migrate deploy\""
+
+# Seed database with explicit error handling (fail on error)
 log_info "Seeding database with admin user..."
-sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma db seed" || log_warning "Database seeding failed (may already be seeded)"
+if sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma db seed"; then
+    log_success "Database seeding completed"
+else
+    log_error "Database seeding failed"
+    log_error "This is a fatal error - the application requires a properly seeded database"
+    exit 1
+fi
+
+# Final schema validation
+log_info "Running final schema validation..."
+if sudo -u "$APP_USER" bash -lc "source \"$APP_DIR/.env\" >/dev/null 2>&1 || true; cd \"$APP_DIR\"; npx prisma validate"; then
+    log_success "Final schema validation passed"
+else
+    log_error "Final schema validation failed"
+    exit 1
+fi
 
 log_success "Database setup complete"
 
@@ -369,7 +502,7 @@ log_info "Waiting for application to become ready..."
 sleep 5
 
 # Perform HTTP health check
-HEALTH_CHECK_URL="http://localhost:3000/api/proof/headers"
+HEALTH_CHECK_URL="http://localhost:3005/api/proof/headers"
 log_info "Performing health check at $HEALTH_CHECK_URL..."
 
 if curl --fail --silent --show-error "$HEALTH_CHECK_URL" >/dev/null; then

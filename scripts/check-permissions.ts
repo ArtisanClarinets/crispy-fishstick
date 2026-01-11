@@ -52,9 +52,9 @@ async function main() {
       const user = await prisma.user.findUnique({
         where: { email: args.email },
         include: {
-          roles: {
+          RoleAssignment: {
             include: {
-              role: true,
+              Role: true,
             },
           },
         },
@@ -67,9 +67,9 @@ async function main() {
       }
 
       console.log(`\nUser: ${user.email}`);
-      console.log(`Roles: ${user.roles.map((r) => r.role.name).join(", ") || "(none)"}`);
+      console.log(`Roles: ${user.RoleAssignment?.map((r: any) => r.Role.name).join(", ") || "(none)"}`);
 
-      for (const assignment of user.roles) {
+      for (const assignment of user.RoleAssignment || []) {
         const role = await prisma.role.findUnique({ where: { id: assignment.roleId } });
         if (!role) continue;
         let perms: unknown = role.permissions;

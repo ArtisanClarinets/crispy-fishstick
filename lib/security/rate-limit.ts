@@ -1,0 +1,192 @@
+/**
+ * Redis-backed Rate Limiting System
+ * @module lib/security/rate-limit
+ */
+
+import { Redis } from "ioredis";
+import { NextRequest, NextResponse } from "next/server";
+
+interface RateLimitOptions {
+  maxAttempts?: number;
+  windowMs?: number;
+  keyPrefix?: string;
+}
+
+interface RateLimitResult {
+  success: boolean;
+  retryAfter?: number;
+  remaining?: number;
+}
+
+const DEFAULT_MAX_ATTEMPTS = 5;
+const DEFAULT_WINDOW_MS = 60 * 1000; // 1 minute
+const DEFAULT_KEY_PREFIX = "rl:";
+
+/**
+ * Redis Rate Limiter
+ */
+export class RateLimiter {
+  private redis: Redis;
+  private maxAttempts: number;
+  private windowMs: number;
+  private keyPrefix: string;
+
+  constructor(redisClient: Redis, options: RateLimitOptions = {}) {
+    this.redis = redisClient;
+    this.maxAttempts = options.maxAttempts || DEFAULT_MAX_ATTEMPTS;
+    this.windowMs = options.windowMs || DEFAULT_WINDOW_MS;
+    this.keyPrefix = options.keyPrefix || DEFAULT_KEY_PREFIX;
+  }
+
+  /**
+   * Get rate limit key for an IP address
+   */
+  private getKey(ip: string): string {
+    return `${this.keyPrefix}${ip}`;
+  }
+
+  /**
+   * Check rate limit for an IP address
+   */
+  async check(ip: string): Promise<RateLimitResult> {
+    const key = this.getKey(ip);
+    const now = Date.now();
+
+    try {
+      // Get current rate limit data
+      const result = await this.redis.hgetall(key);
+      
+      if (!result || !result.count || !result.expires) {
+        // First request in this window
+        await this.redis.hmset(key, {
+          count: "1",
+          expires: String(now + this.windowMs)
+        });
+        
+        await this.redis.expireat(key, Math.floor((now + this.windowMs) / 1000));
+        
+        return {
+          success: true,
+          remaining: this.maxAttempts - 1
+        };
+      }
+
+      const count = parseInt(result.count);
+      const expires = parseInt(result.expires);
+
+      if (now > expires) {
+        // Window has expired, reset
+        await this.redis.hmset(key, {
+          count: "1",
+          expires: String(now + this.windowMs)
+        });
+        
+        await this.redis.expireat(key, Math.floor((now + this.windowMs) / 1000));
+        
+        return {
+          success: true,
+          remaining: this.maxAttempts - 1
+        };
+      }
+
+      if (count >= this.maxAttempts) {
+        // Rate limit exceeded
+        const retryAfter = Math.ceil((expires - now) / 1000);
+        return {
+          success: false,
+          retryAfter: retryAfter
+        };
+      }
+
+      // Increment count
+      await this.redis.hincrby(key, "count", 1);
+      
+      return {
+        success: true,
+        remaining: this.maxAttempts - (count + 1)
+      };
+      
+    } catch (error) {
+      console.error("Rate limiting error:", error);
+      // Fail open if Redis is unavailable
+      return {
+        success: true,
+        remaining: this.maxAttempts
+      };
+    }
+  }
+
+  /**
+   * Middleware for rate limiting
+   */
+  async middleware(req: NextRequest): Promise<NextResponse | null> {
+    const ip = this.getClientIp(req);
+    const result = await this.check(ip);
+
+    if (!result.success) {
+      const response = NextResponse.json(
+        { error: "Too many requests" },
+        { status: 429 }
+      );
+      
+      if (result.retryAfter) {
+        response.headers.set("Retry-After", result.retryAfter.toString());
+      }
+      
+      return response;
+    }
+
+    return null; // Continue processing
+  }
+
+  /**
+   * Get client IP address from request
+   */
+  private getClientIp(req: NextRequest): string {
+    // Try to get IP from various headers
+    const xForwardedFor = req.headers.get("x-forwarded-for");
+    const xRealIp = req.headers.get("x-real-ip");
+    const remoteAddr = req.ip;
+
+    // x-forwarded-for can contain multiple IPs, take the first one
+    if (xForwardedFor) {
+      return xForwardedFor.split(",")[0].trim();
+    }
+
+    if (xRealIp) {
+      return xRealIp;
+    }
+
+    if (remoteAddr) {
+      return remoteAddr;
+    }
+
+    // Fallback to localhost
+    return "127.0.0.1";
+  }
+
+  /**
+   * Exponential backoff calculation
+   */
+  static calculateExponentialBackoff(attempts: number, baseDelay: number = 1000): number {
+    return Math.min(baseDelay * Math.pow(2, attempts - 1), 60000); // Cap at 1 minute
+  }
+}
+
+/**
+ * Global rate limiter instance
+ */
+let globalRateLimiter: RateLimiter | null = null;
+
+/**
+ * Get or create global rate limiter
+ */
+export function getRateLimiter(redisClient: Redis): RateLimiter {
+  if (!globalRateLimiter) {
+    globalRateLimiter = new RateLimiter(redisClient, {
+      maxAttempts: 5,
+      windowMs: 60 * 1000 // 1 minute
+    });
+  }
+  return globalRateLimiter;
+}

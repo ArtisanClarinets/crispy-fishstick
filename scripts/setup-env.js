@@ -83,7 +83,7 @@ async function main() {
     { 
       key: 'PORT', 
       description: 'Port for Next.js server', 
-      default: '3000'
+      default: '3005'
     },
     { 
       key: 'DEPLOY_DOMAIN', 

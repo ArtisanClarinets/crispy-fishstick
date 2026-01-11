@@ -1,20 +1,14 @@
 {
-  "commit": "dd0a9c2041c8",
-  "builtAt": "2026-01-10T19:14:11.174Z",
+  "commit": "e63c74251a32",
+  "builtAt": "2026-01-10T22:30:26.131Z",
   "depsSha256": "0b8fae2b6f3929be375fdc8e96fb5c3952417f3068c132b3e5397191e98cfdef",
   "generated": true,
   "gatesConfigured": [
-    "TypeScript strict",
     "ESLint enforced",
     "Vitest unit suite",
-    "Playwright e2e suite",
-    "Security headers active"
+    "Playwright e2e suite"
   ],
   "gatesRan": [
-    {
-      "name": "TypeScript strict",
-      "ran": false
-    },
     {
       "name": "ESLint enforced",
       "ran": false
@@ -25,10 +19,6 @@
     },
     {
       "name": "Playwright e2e suite",
-      "ran": false
-    },
-    {
-      "name": "Security headers active",
       "ran": false
     }
   ]
