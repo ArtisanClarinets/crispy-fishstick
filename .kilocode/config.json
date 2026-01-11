@@ -1,0 +1,8 @@
+{
+	"project": {
+		"id": "vantus-app",
+		"baseBranch": "main",
+		"managedIndexingEnabled": true
+
+	}
+}

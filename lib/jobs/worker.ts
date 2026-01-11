@@ -132,4 +132,15 @@ export async function startWorker() {
   // - Implement proper error handling and retries
   
   console.log("[Worker] Worker started (mock mode - jobs execute synchronously)");
+  
+  return {
+    close: async () => {
+      console.log("[Worker] Shutting down gracefully...");
+      // In production, this would:
+      // - Close all queue connections
+      // - Wait for in-progress jobs to complete
+      // - Clean up resources
+      console.log("[Worker] Worker stopped");
+    }
+  };
 }

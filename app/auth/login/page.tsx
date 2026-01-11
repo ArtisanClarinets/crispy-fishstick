@@ -22,7 +22,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      router.push('/admin');
+      console.log("[Login] User already authenticated, redirecting to /admin");
+      // Small delay to ensure session is properly established
+      const timer = setTimeout(() => {
+        router.push('/admin');
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [status, router]);
 
@@ -31,6 +36,10 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
 
+    console.log("[Login] Attempting login for:", email);
+    console.log("[Login] Current URL:", window.location.href);
+    console.log("[Login] Callback URL param:", new URLSearchParams(window.location.search).get("callbackUrl"));
+    
     try {
       const result = await signIn('credentials', {
         email,
@@ -41,34 +50,48 @@ export default function LoginPage() {
 
       if (result?.error) {
         console.error("Authentication error:", result.error, result);
-        if (result.error === "MFA_REQUIRED") {
-          setShowMFA(true);
-          toast({
-            title: "MFA Required",
-            description: "Please enter your 2FA code.",
-          });
-        } else if (result.error === "INVALID_MFA_CODE") {
-          setShowMFA(true); // Ensure input is shown
-          toast({
-            variant: "destructive",
-            title: "Invalid Code",
-            description: "The 2FA code provided is invalid.",
-          });
-        } else if (result.error === "DB_SCHEMA_NOT_READY") {
+        
+        // Standardize error messages to prevent information leakage
+        if (result.error === "DB_SCHEMA_NOT_READY") {
           toast({
             variant: "destructive",
             title: "Service Unavailable",
             description: "Database schema not ready; run prisma migrate deploy",
           });
+        } else if (result.error === "RATE_LIMIT_EXCEEDED") {
+          const retryAfter = result?.retryAfter || "a few minutes";
+          toast({
+            variant: "destructive",
+            title: "Too Many Attempts",
+            description: `Too many login attempts. Please try again in ${retryAfter} seconds.`,
+          });
         } else {
+          // Generic error message for all authentication failures
           toast({
             variant: "destructive",
             title: "Authentication Failed",
-            description: "Invalid email or password. Please try again.",
+            description: "Invalid credentials. Please try again.",
           });
         }
+        
+        // Always show MFA input after first failed attempt to prevent MFA status leakage
+        setShowMFA(true);
       } else {
-        router.push('/admin');
+        console.log("[Login] Authentication successful, redirecting to /admin");
+        const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl");
+        if (callbackUrl) {
+          console.log("[Login] Found callback URL:", callbackUrl);
+          try {
+            const decodedUrl = decodeURIComponent(decodeURIComponent(callbackUrl));
+            console.log("[Login] Decoded callback URL:", decodedUrl);
+            router.push(decodedUrl);
+          } catch (e) {
+            console.error("[Login] Error decoding callback URL:", e);
+            router.push('/admin');
+          }
+        } else {
+          router.push('/admin');
+        }
         router.refresh();
       }
     } catch (_error) {

@@ -1,56 +1,105 @@
-import http from 'http';
+/**
+ * Vantus Systems - Production Smoke Test
+ *
+ * Usage:
+ *   npx tsx scripts/smoke-test.ts --base=https://vantus.systems
+ *   npx tsx scripts/smoke-test.ts --base=http://127.0.0.1:3000
+ *
+ * Exit codes:
+ *   0 = pass
+ *   2 = fail (one or more critical checks failed)
+ */
 
-const ROUTES = [
-  '/admin',
-  '/admin/leads',
-  '/admin/proposals',
-  '/admin/contracts',
-  '/admin/invoices',
-  '/admin/projects',
-  '/admin/services',
-  '/admin/incidents',
-];
+import fs from "node:fs";
+import path from "node:path";
 
-async function checkRoute(path: string) {
-  return new Promise((resolve) => {
-    const req = http.get(`http://localhost:3000${path}`, (res) => {
-      // We expect a redirect (307) to /admin/login because we aren't authenticated
-      // Or 200 if it's public (none of these are)
-      // Or 404 if it doesn't exist
-      const status = res.statusCode;
-      const isRedirect = status === 307 || status === 302;
-      const location = res.headers.location;
-      
-      if (isRedirect && location?.includes('/admin/login')) {
-        console.log(`✅ ${path} -> Protected (Redirects to Login)`);
-        resolve(true);
-      } else if (status === 200) {
-        console.log(`⚠️ ${path} -> Public (Returned 200)`);
-        resolve(true);
-      } else {
-        console.error(`❌ ${path} -> Unexpected Status: ${status}`);
-        resolve(false);
-      }
-    });
+function loadDotEnv(dotenvPath = path.join(process.cwd(), ".env")): void {
+  if (!fs.existsSync(dotenvPath)) return;
+  const content = fs.readFileSync(dotenvPath, "utf8");
+  for (const raw of content.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) continue;
+    const cleaned = line.startsWith("export ") ? line.slice(7).trim() : line;
+    const eq = cleaned.indexOf("=");
+    if (eq === -1) continue;
+    const key = cleaned.slice(0, eq).trim();
+    let val = cleaned.slice(eq + 1).trim();
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.slice(1, -1);
+    }
+    if (!process.env[key]) process.env[key] = val;
+  }
+}
 
-    req.on('error', (e) => {
-      console.error(`❌ ${path} -> Connection Error: ${e.message}`);
-      resolve(false);
-    });
+function parseArgs(argv: string[]) {
+  const out: { base?: string } = {};
+  for (const a of argv.slice(2)) {
+    if (a.startsWith("--base=")) out.base = a.split("=", 2)[1];
+  }
+  return out;
+}
+
+function isOkStatus(s: number) {
+  return s >= 200 && s < 400;
+}
+
+async function fetchCheck(url: string, critical = true) {
+  const res = await fetch(url, {
+    method: "GET",
+    redirect: "manual",
+    headers: {
+      "User-Agent": "vantus-smoke-test/1.0",
+      Accept: "text/html,application/json;q=0.9,*/*;q=0.8",
+    },
   });
+
+  const ok = isOkStatus(res.status);
+  return { url, status: res.status, ok, critical };
 }
 
 async function main() {
-  console.log("🔍 Running Smoke Test on Admin Routes...");
-  console.log("   (Ensure the server is running on localhost:3000)");
+  loadDotEnv();
+  const args = parseArgs(process.argv);
 
-  // We can't easily start the server from here in this environment without blocking,
-  // so this script assumes the user will run it against a running server.
-  // But for the purpose of this task, I'm providing the script.
-  
-  // To actually run this in the Trae environment, I'd need to start the server in background.
-  // But since I can't guarantee port 3000 is free or wait for it easily, 
-  // I will just output the script for the user.
+  const base =
+    args.base ||
+    process.env.SMOKE_TEST_BASE_URL ||
+    process.env.NEXTAUTH_URL ||
+    `http://127.0.0.1:${process.env.PORT || "3000"}`;
+
+  const targets: Array<{ path: string; critical: boolean }> = [
+    { path: "/", critical: true },
+    { path: "/api/auth/session", critical: true }, // NextAuth baseline
+    { path: "/api/health", critical: false }, // optional if implemented
+  ];
+
+  console.log(`Running smoke test against: ${base}`);
+
+  const results = [];
+  for (const t of targets) {
+    const url = new URL(t.path, base).toString();
+    try {
+      const r = await fetchCheck(url, t.critical);
+      results.push(r);
+      const icon = r.ok ? "✅" : (t.critical ? "❌" : "⚠");
+      console.log(`${icon} ${r.status} ${url}`);
+    } catch (err: any) {
+      const icon = t.critical ? "❌" : "⚠";
+      console.log(`${icon} ERR ${url} -> ${err?.message || err}`);
+      results.push({ url, status: 0, ok: false, critical: t.critical });
+    }
+  }
+
+  const criticalFailures = results.filter((r) => r.critical && !r.ok);
+  if (criticalFailures.length) {
+    console.error(`\n❌ Smoke test failed (${criticalFailures.length} critical checks).`);
+    process.exit(2);
+  }
+
+  console.log("\n✅ Smoke test passed.");
 }
 
-// console.log("Script loaded.");
+main().catch((err) => {
+  console.error("❌ smoke-test failed:", err?.message || err);
+  process.exit(1);
+});

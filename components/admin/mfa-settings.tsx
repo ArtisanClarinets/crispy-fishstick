@@ -7,16 +7,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Copy } from 'lucide-react';
 import QRCode from 'qrcode';
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/fetchWithCsrf';
 
 interface MFASettingsProps {
   initialEnabled: boolean;
+  initialBackupCodes?: string[];
+  initialRecoveryCode?: string;
+  initialRecoveryCodeExpiresAt?: Date | null;
+  initialDeviceFingerprint?: string;
 }
 
-export function MFASettings({ initialEnabled }: MFASettingsProps) {
+export function MFASettings({
+  initialEnabled,
+  initialBackupCodes = [],
+  initialRecoveryCode = '',
+  initialRecoveryCodeExpiresAt = null,
+  initialDeviceFingerprint = ''
+}: MFASettingsProps) {
   const router = useRouter();
   const [isEnabled, setIsEnabled] = useState(initialEnabled);
   const [isSetupOpen, setIsSetupOpen] = useState(false);
@@ -24,6 +34,12 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [secret, setSecret] = useState('');
   const [token, setToken] = useState('');
+  const [backupCodes, setBackupCodes] = useState<string[]>(initialBackupCodes);
+  const [recoveryCode, setRecoveryCode] = useState<string>(initialRecoveryCode);
+  const [recoveryCodeExpiresAt, setRecoveryCodeExpiresAt] = useState<Date | null>(initialRecoveryCodeExpiresAt);
+  const [deviceFingerprint, setDeviceFingerprint] = useState<string>(initialDeviceFingerprint);
+  const [showBackupCodes, setShowBackupCodes] = useState(false);
+  const [showRecoveryCode, setShowRecoveryCode] = useState(false);
 
   const startSetup = async () => {
     setIsLoading(true);
@@ -61,15 +77,23 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
         throw new Error(error.message || 'Failed to verify token');
       }
 
+      const data = await res.json();
+      
       setIsEnabled(true);
       setIsSetupOpen(false);
       setToken('');
       setSecret('');
       setQrCodeUrl('');
       
+      // Update state with new security features
+      if (data.backupCodes) setBackupCodes(data.backupCodes);
+      if (data.recoveryCode) setRecoveryCode(data.recoveryCode);
+      if (data.recoveryCodeExpiresAt) setRecoveryCodeExpiresAt(new Date(data.recoveryCodeExpiresAt));
+      if (data.deviceFingerprint) setDeviceFingerprint(data.deviceFingerprint);
+      
       toast({
         title: "MFA Enabled",
-        description: "Two-factor authentication has been successfully enabled.",
+        description: "Two-factor authentication has been successfully enabled with enhanced security features.",
       });
       router.refresh();
     } catch (_error) {
@@ -102,6 +126,32 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
         variant: "destructive",
         title: "Error",
         description: "Failed to disable MFA",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateNewRecoveryCode = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetchWithCsrf('/api/admin/auth/mfa/recovery', { method: 'POST' });
+      if (!res.ok) throw new Error('Failed to generate recovery code');
+      
+      const data = await res.json();
+      setRecoveryCode(data.recoveryCode);
+      setRecoveryCodeExpiresAt(new Date(data.recoveryCodeExpiresAt));
+      setShowRecoveryCode(true);
+      
+      toast({
+        title: "Recovery Code Generated",
+        description: "A new recovery code has been generated and will expire in 7 days.",
+      });
+    } catch (_error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to generate recovery code",
       });
     } finally {
       setIsLoading(false);
@@ -141,10 +191,16 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
             </Button>
           )}
           {isEnabled && (
-            <Button variant="destructive" onClick={disableMFA} disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Disable MFA
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="destructive" onClick={disableMFA} disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Disable MFA
+              </Button>
+              <Button variant="secondary" onClick={generateNewRecoveryCode} disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Rotate Recovery Code
+              </Button>
+            </div>
           )}
         </div>
 
@@ -197,6 +253,94 @@ export function MFASettings({ initialEnabled }: MFASettingsProps) {
             </div>
           </div>
         )}
+      
+      {isEnabled && (
+        <div className="mt-6 space-y-6">
+          {/* Backup Codes Section */}
+          {backupCodes.length > 0 && (
+            <div className="rounded-lg border p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-medium">Backup Codes</h3>
+                <Button variant="ghost" size="sm" onClick={() => setShowBackupCodes(!showBackupCodes)}>
+                  {showBackupCodes ? 'Hide' : 'Show'} Codes
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                These backup codes can be used to access your account if you lose access to your authenticator app.
+              </p>
+              {showBackupCodes && (
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {backupCodes.map((code, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="font-mono bg-muted px-2 py-1 rounded text-sm">{code}</span>
+                      <Button variant="ghost" size="icon" className="h-6 w-6"
+                        onClick={() => navigator.clipboard.writeText(code)}>
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Store these codes securely. Each code can only be used once.
+              </p>
+            </div>
+          )}
+
+          {/* Recovery Code Section */}
+          {recoveryCode && (
+            <div className="rounded-lg border p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-medium">Recovery Code</h3>
+                <Button variant="ghost" size="sm" onClick={() => setShowRecoveryCode(!showRecoveryCode)}>
+                  {showRecoveryCode ? 'Hide' : 'Show'} Code
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                This recovery code can be used to access your account if you lose access to your authenticator app.
+              </p>
+              {showRecoveryCode && (
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="font-mono bg-muted px-3 py-2 rounded text-lg font-bold">{recoveryCode}</span>
+                  <Button variant="ghost" size="icon"
+                    onClick={() => navigator.clipboard.writeText(recoveryCode)}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Expires:</span>
+                <span className="font-medium">
+                  {recoveryCodeExpiresAt ? recoveryCodeExpiresAt.toLocaleDateString() : 'Unknown'}
+                </span>
+                <Button variant="ghost" size="sm" onClick={generateNewRecoveryCode} disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                  Rotate Code
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Device Fingerprint Section */}
+          {deviceFingerprint && (
+            <div className="rounded-lg border p-4">
+              <h3 className="font-medium mb-2">Device Fingerprint</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                This device has been registered for MFA with a unique fingerprint for enhanced security.
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono bg-muted px-2 py-1 rounded break-all">
+                  {deviceFingerprint}
+                </span>
+                <Button variant="ghost" size="icon" className="h-6 w-6"
+                  onClick={() => navigator.clipboard.writeText(deviceFingerprint)}>
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
       </CardContent>
     </Card>
   );

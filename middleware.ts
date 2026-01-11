@@ -1,14 +1,36 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
+import { validateSession, updateSessionActivity } from "@/lib/security/session";
+import { checkAdminAccess } from "@/lib/security/admin-protection";
+import { getSecurityConfig } from "@/config/security";
 
 const SECURITY_HEADERS = [
   ["X-Content-Type-Options", "nosniff"],
   ["Referrer-Policy", "strict-origin-when-cross-origin"],
   ["X-Frame-Options", "DENY"],
   ["Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()"],
-  ["Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload"],
 ];
+
+// Centralized secret resolution function (same as lib/auth.ts)
+function getAuthSecret(): string {
+  // Try NEXTAUTH_SECRET first, then fall back to AUTH_SECRET for compatibility
+  const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
+
+  if (process.env.NODE_ENV === "production" && !secret) {
+    throw new Error(
+      "Auth secret is required in production. Please set NEXTAUTH_SECRET or AUTH_SECRET in your environment variables."
+    );
+  }
+
+  if (!secret) {
+    // In development, provide a fallback secret for convenience
+    console.warn("No auth secret found. Using a development fallback secret.");
+    return "dev-secret-fallback-for-development-only";
+  }
+
+  return secret;
+}
 
 export async function middleware(request: NextRequest) {
   const nonce = crypto.randomUUID().replace(/-/g, "");
@@ -17,9 +39,15 @@ export async function middleware(request: NextRequest) {
 
   // Note: 'unsafe-eval' is often required for development (HMR) and some libraries.
   // We remove 'unsafe-inline' for scripts to strictly enforce nonce usage.
-  // In production, we strictly forbid 'unsafe-eval'.
+  // In production, we allow 'unsafe-eval' for Next.js client modules.
   const isDev = process.env.NODE_ENV === "development";
-  const scriptSrc = `script-src 'self' 'nonce-${nonce}' ${isDev ? "'unsafe-eval'" : ""}`;
+  const isProd = process.env.NODE_ENV === "production";
+  const scriptSrc = `script-src 'self' 'nonce-${nonce}' ${(isDev || isProd) ? "'unsafe-eval'" : ""}`;
+
+  // Environment-specific CSP configuration
+  const connectSrc = isDev 
+    ? "connect-src 'self' ws: wss: http://localhost:* https://localhost:*" 
+    : "connect-src 'self'";
 
   const csp = [
     "default-src 'self'",
@@ -27,39 +55,82 @@ export async function middleware(request: NextRequest) {
     "style-src 'self' 'unsafe-inline'", // 'unsafe-inline' required for CSS-in-JS/Framer Motion style attributes
     "img-src 'self' data:",
     "font-src 'self' data:",
-    "connect-src 'self'",
+    connectSrc,
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
     "upgrade-insecure-requests",
-  ].join("; ");
+  ].join(" ; ");
 
   // AUTHENTICATION LOGIC
   const pathname = request.nextUrl.pathname;
-  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
-    console.log("[Middleware] Checking auth for:", pathname);
-    console.log("[Middleware] Secret exists:", !!secret);
+  const config = getSecurityConfig();
+  
+  // Check if this is an admin route that needs protection
+  const isAdminRoute = config.adminRoutes.protectedPaths.some(path => pathname.startsWith(path));
+  const isLoginRoute = pathname.startsWith(config.adminRoutes.loginPath);
+  const isErrorRoute = pathname.startsWith(config.adminRoutes.errorPath);
+  
+  if (isAdminRoute && !isLoginRoute && !isErrorRoute) {
+    // First, check admin access restrictions (IP, geo, time)
+    const adminAccessCheck = await checkAdminAccess(request);
     
-    if (!secret) {
-      console.error("NEXTAUTH_SECRET is not set. Admin routes will not authenticate.");
-      const url = new URL("/admin/login", request.url);
-      url.searchParams.set("callbackUrl", encodeURIComponent(encodeURIComponent(pathname + request.nextUrl.search)));
+    if (!adminAccessCheck.allowed) {
+      console.log(`[Middleware] Admin access denied: ${adminAccessCheck.reason}`);
+      const url = new URL(config.adminRoutes.errorPath, request.url);
+      url.searchParams.set("error", adminAccessCheck.reason || "ACCESS_DENIED");
       return NextResponse.redirect(url);
     }
+
+    // Use the same secret resolution as lib/auth.ts
+    const secret = getAuthSecret();
+    console.log("[Middleware] Checking auth for:", pathname);
+    console.log("[Middleware] Secret exists:", !!secret);
+    console.log("[Middleware] Request URL:", request.url);
+    console.log("[Middleware] Request cookies:", request.cookies.getAll());
     
-    const token = await getToken({ 
-      req: request, 
-      secret 
+    const token = await getToken({
+      req: request,
+      secret
     });
     console.log("[Middleware] Token found:", !!token);
+    console.log("[Middleware] Token details:", token ? { id: token.id, email: token.email } : null);
+    console.log("[Middleware] Request has session cookie:", request.cookies.has('next-auth.session-token'));
 
     if (!token) {
       console.log("[Middleware] No token, redirecting to login");
       const url = new URL("/admin/login", request.url);
-      url.searchParams.set("callbackUrl", encodeURIComponent(encodeURIComponent(pathname + request.nextUrl.search)));
+      const callbackUrl = pathname + request.nextUrl.search;
+      console.log("[Middleware] Original callback URL:", callbackUrl);
+      url.searchParams.set("callbackUrl", encodeURIComponent(encodeURIComponent(callbackUrl)));
+      console.log("[Middleware] Encoded callback URL:", url.searchParams.get("callbackUrl"));
       return NextResponse.redirect(url);
+    }
+
+    // Validate session if token has session information
+    if (token.sessionToken) {
+      try {
+        const validationResult = await validateSession(token.sessionToken);
+        console.log("[Middleware] Session validation result:", validationResult);
+        
+        if (!validationResult.valid) {
+          console.log("[Middleware] Invalid session:", validationResult.error);
+          const url = new URL("/admin/login", request.url);
+          url.searchParams.set("error", validationResult.error || "SESSION_INVALID");
+          return NextResponse.redirect(url);
+        }
+        
+        // Update session activity timestamp
+        if (validationResult.session) {
+          await updateSessionActivity(token.sessionToken);
+        }
+      } catch (error) {
+        console.error("[Middleware] Session validation error:", error);
+        const url = new URL("/admin/login", request.url);
+        url.searchParams.set("error", "SESSION_VALIDATION_ERROR");
+        return NextResponse.redirect(url);
+      }
     }
   }
 
@@ -71,6 +142,11 @@ export async function middleware(request: NextRequest) {
 
   response.headers.set("Content-Security-Policy", csp);
   SECURITY_HEADERS.forEach(([key, value]) => response.headers.set(key, value));
+
+  // Only apply HSTS in production environment
+  if (process.env.NODE_ENV === "production") {
+    response.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+  }
 
   return response;
 }

@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import { SAFE_USER_WITH_ROLES_SELECT } from "@/lib/security/safe-user";
 import { jsonNoStore } from "@/lib/security/response";
 import { assertSameOrigin } from "@/lib/security/origin";
-import { validatePassword } from "@/lib/security/password";
+import { validatePasswordEnhanced } from "@/lib/security/password-enhanced";
 
 const createUserSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -55,8 +55,8 @@ export async function POST(req: NextRequest) {
 
     let passwordHash: string;
 
-    // Phase 7: Strict password policy
-    const passwordError = validatePassword(password);
+    // Enhanced password validation with entropy, breach detection, and history prevention
+    const passwordError = await validatePasswordEnhanced(password);
     if (passwordError) {
       return jsonNoStore({ error: passwordError }, { status: 400 });
     }
@@ -72,6 +72,12 @@ export async function POST(req: NextRequest) {
             Role: { connect: { id: roleId } },
           })),
         } : undefined,
+        // Add initial password to history
+        passwordHistory: {
+          create: {
+            passwordHash: passwordHash,
+          }
+        }
       },
       select: SAFE_USER_WITH_ROLES_SELECT,
     });

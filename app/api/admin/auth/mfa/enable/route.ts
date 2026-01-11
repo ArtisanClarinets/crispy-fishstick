@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { authenticator } from "otplib";
 import { z } from "zod";
 import { rateLimit } from "@/lib/rate-limit";
-import { encryptSecret } from "@/lib/security/mfa";
+import { encryptSecret, generateBackupCodes, generateRecoveryCode, generateDeviceFingerprint } from "@/lib/security/mfa";
 import { assertSameOrigin } from "@/lib/security/origin";
 
 export const dynamic = "force-dynamic";
@@ -48,12 +48,35 @@ export async function POST(req: NextRequest) {
 
     const encryptedSecret = await encryptSecret(secret);
 
+    // Generate backup codes
+    const { codes: backupCodes, hashedCodes: hashedBackupCodes } = await generateBackupCodes();
+
+    // Generate recovery code
+    const { code: recoveryCode, hashedCode: hashedRecoveryCode, expiresAt: recoveryCodeExpiresAt } = await generateRecoveryCode();
+
+    // Generate device fingerprint
+    const userAgent = req.headers.get('user-agent') || 'unknown';
+    const ipAddress = req.ip || req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const deviceFingerprint = generateDeviceFingerprint(userAgent, ipAddress);
+
     await prisma.user.update({
       where: { email: session.user.email },
-      data: { mfaSecret: encryptedSecret },
+      data: {
+        mfaSecret: encryptedSecret,
+        mfaBackupCodes: JSON.stringify(hashedBackupCodes),
+        mfaRecoveryCode: hashedRecoveryCode,
+        mfaRecoveryCodeExpiresAt: recoveryCodeExpiresAt,
+        mfaDeviceFingerprint: deviceFingerprint
+      },
     });
 
-    return NextResponse.json({ success: true }, {
+    return NextResponse.json({
+      success: true,
+      backupCodes,
+      recoveryCode,
+      recoveryCodeExpiresAt,
+      deviceFingerprint
+    }, {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {

@@ -4,13 +4,47 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
 import { decryptSecret } from "@/lib/security/mfa";
+import { updateSessionActivity } from "@/lib/security/session";
+import { Redis } from "ioredis";
+import { getRateLimiter } from "@/lib/security/rate-limit";
 
-// Enforce NEXTAUTH_SECRET in production; fail fast if missing
-const nextAuthSecret = process.env.NEXTAUTH_SECRET;
-if (process.env.NODE_ENV === "production" && !nextAuthSecret) {
-  throw new Error(
-    "NEXTAUTH_SECRET is required in production. Please set it in your environment variables."
-  );
+// Centralized secret resolution function
+function getAuthSecret(): string {
+  // Try NEXTAUTH_SECRET first, then fall back to AUTH_SECRET for compatibility
+  const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
+
+  if (process.env.NODE_ENV === "production" && !secret) {
+    throw new Error(
+      "Auth secret is required in production. Please set NEXTAUTH_SECRET or AUTH_SECRET in your environment variables."
+    );
+  }
+
+  if (!secret) {
+    // In development, provide a fallback secret for convenience
+    console.warn("No auth secret found. Using a development fallback secret.");
+    return "dev-secret-fallback-for-development-only";
+  }
+
+  return secret;
+}
+
+// Get the secret once and enforce requirements
+const nextAuthSecret = getAuthSecret();
+
+// Create Redis client for rate limiting
+let rateLimiterInstance: any = null;
+
+try {
+  const Redis = require('ioredis');
+  const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
+  rateLimiterInstance = getRateLimiter(redis);
+} catch (error) {
+  console.warn('Redis not available, rate limiting will be disabled');
+  // Create a mock rate limiter for testing/fallback
+  rateLimiterInstance = {
+    checkLoginAttempt: async () => ({ success: true, remaining: 5 }),
+    getClientIp: () => '127.0.0.1',
+  };
 }
 
 declare module "next-auth" {
@@ -32,6 +66,8 @@ declare module "next-auth/jwt" {
     roles: string[];
     permissions: string[];
     tenantId?: string | null;
+    sessionToken?: string;
+    sessionCreatedAt?: number;
   }
 }
 
@@ -42,17 +78,6 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
-  cookies: {
-    sessionToken: {
-      name: `${process.env.NODE_ENV === "production" ? "__Secure-" : ""}next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
   },
   pages: {
     signIn: "/admin/login",
@@ -65,12 +90,28 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
         code: { label: "2FA Code", type: "text" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
         try {
+            // Extract IP address from request context
+            const ip = req?.ip || "127.0.0.1";
+            const email = credentials.email;
+            
+            // Apply rate limiting for login attempts if rate limiter is available
+            if (rateLimiterInstance) {
+              const rateLimitResult = await rateLimiterInstance.checkLoginAttempt(ip, email);
+              
+              if (!rateLimitResult.success) {
+                // Rate limit exceeded
+                const error = new Error("RATE_LIMIT_EXCEEDED");
+                (error as any).retryAfter = rateLimitResult.retryAfter;
+                throw error;
+              }
+            }
+
             const user = await prisma.user.findUnique({
              where: { email: credentials.email },
              include: {
@@ -81,6 +122,11 @@ export const authOptions: NextAuthOptions = {
                },
              },
            });
+
+           // Check if user is soft-deleted
+           if (user?.deletedAt) {
+             return null;
+           }
 
           if (!user || !user.passwordHash) {
             return null;
@@ -136,6 +182,11 @@ export const authOptions: NextAuthOptions = {
             tenantId: user.tenantId,
           };
         } catch (error: any) {
+          // Handle rate limit errors
+          if (error.message === "RATE_LIMIT_EXCEEDED") {
+            throw error;
+          }
+
           // Handle Prisma errors (P2021: Table does not exist)
           if (error.code === 'P2021' || error.code === 'P2022') {
             throw new Error("DB_SCHEMA_NOT_READY");
@@ -152,13 +203,28 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.roles = (user as any).roles || [];
         token.permissions = (user as any).permissions || [];
         token.tenantId = (user as any).tenantId;
       }
+      
+      // Handle session creation on sign-in
+      if (trigger === "signIn") {
+        // This will be handled in the authorize function where we have access to the request
+      }
+      
+      // Handle session update on activity
+      if (trigger === "update" && token.sessionToken) {
+        try {
+          await updateSessionActivity(token.sessionToken);
+        } catch (error) {
+          console.error("Failed to update session activity:", error);
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {

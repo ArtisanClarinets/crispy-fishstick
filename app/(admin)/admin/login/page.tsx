@@ -1,8 +1,9 @@
 'use client';
 
+import type React from 'react';
 import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +13,7 @@ import { Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,15 +24,37 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      router.push('/admin');
+      console.log("[Admin Login] User already authenticated, redirecting to /admin");
+      // Small delay to ensure session is properly established
+      const timer = setTimeout(() => {
+        const callbackUrl = searchParams.get('callbackUrl');
+        if (callbackUrl) {
+          console.log("[Admin Login] Found callback URL:", callbackUrl);
+          try {
+            const decodedUrl = decodeURIComponent(decodeURIComponent(callbackUrl));
+            console.log("[Admin Login] Decoded callback URL:", decodedUrl);
+            router.replace(decodedUrl);
+          } catch (e) {
+            console.error("[Admin Login] Error decoding callback URL:", e);
+            router.replace('/admin');
+          }
+        } else {
+          router.replace('/admin');
+        }
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [status, router]);
+  }, [status, router, searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
+    console.log("[Admin Login] Attempting login for:", email);
+    console.log("[Admin Login] Current URL:", window.location.href);
+    console.log("[Admin Login] Callback URL param:", searchParams.get("callbackUrl"));
+    
     try {
       const result = await signIn('credentials', {
         email,
@@ -60,6 +84,13 @@ export default function LoginPage() {
             title: "Service Unavailable",
             description: "Database schema not ready; run prisma migrate deploy",
           });
+        } else if (result.error === "RATE_LIMIT_EXCEEDED") {
+          const retryAfter = result?.retryAfter || "a few minutes";
+          toast({
+            variant: "destructive",
+            title: "Too Many Attempts",
+            description: `Too many login attempts. Please try again in ${retryAfter} seconds.`,
+          });
         } else {
           toast({
             variant: "destructive",
@@ -68,7 +99,21 @@ export default function LoginPage() {
           });
         }
       } else {
-        router.push('/admin');
+        console.log("[Admin Login] Authentication successful, redirecting to /admin");
+        const callbackUrl = searchParams.get("callbackUrl");
+        if (callbackUrl) {
+          console.log("[Admin Login] Found callback URL:", callbackUrl);
+          try {
+            const decodedUrl = decodeURIComponent(decodeURIComponent(callbackUrl));
+            console.log("[Admin Login] Decoded callback URL:", decodedUrl);
+            router.replace(decodedUrl);
+          } catch (e) {
+            console.error("[Admin Login] Error decoding callback URL:", e);
+            router.replace('/admin');
+          }
+        } else {
+          router.replace('/admin');
+        }
         router.refresh();
       }
     } catch (_error) {
