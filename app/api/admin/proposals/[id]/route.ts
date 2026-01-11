@@ -19,10 +19,8 @@ const updateProposalSchema = z.object({
   })).optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminRead(req, { permissions: ["proposals.read"] }, async (user) => {
     const proposal = await prisma.proposal.findFirst({
       where: {
@@ -52,10 +50,8 @@ export async function GET(
   });
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["proposals.write"] }, async (user, body) => {
     const validatedData = updateProposalSchema.parse(body);
 
@@ -150,10 +146,8 @@ export async function PATCH(
   });
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["proposals.write"] }, async (user, body) => {
     const { deleteReason } = updateProposalSchema.parse(body);
 

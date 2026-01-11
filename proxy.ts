@@ -32,7 +32,7 @@ function getAuthSecret(): string {
   return secret;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const nonce = crypto.randomUUID().replace(/-/g, "");
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
@@ -77,7 +77,7 @@ export async function middleware(request: NextRequest) {
     const adminAccessCheck = await checkAdminAccess(request);
     
     if (!adminAccessCheck.allowed) {
-      console.log(`[Middleware] Admin access denied: ${adminAccessCheck.reason}`);
+      console.log("[Proxy] Admin access denied: [REDACTED]");
       const url = new URL(config.adminRoutes.errorPath, request.url);
       url.searchParams.set("error", adminAccessCheck.reason || "ACCESS_DENIED");
       return NextResponse.redirect(url);
@@ -85,26 +85,19 @@ export async function middleware(request: NextRequest) {
 
     // Use the same secret resolution as lib/auth.ts
     const secret = getAuthSecret();
-    console.log("[Middleware] Checking auth for:", pathname);
-    console.log("[Middleware] Secret exists:", !!secret);
-    console.log("[Middleware] Request URL:", request.url);
-    console.log("[Middleware] Request cookies:", request.cookies.getAll());
-    
+    console.log("[Proxy] Processing request for:", pathname);
+
     const token = await getToken({
       req: request,
       secret
     });
-    console.log("[Middleware] Token found:", !!token);
-    console.log("[Middleware] Token details:", token ? { id: token.id, email: token.email } : null);
-    console.log("[Middleware] Request has session cookie:", request.cookies.has('next-auth.session-token'));
+    console.log("[Proxy] Authentication check completed");
 
     if (!token) {
-      console.log("[Middleware] No token, redirecting to login");
+      console.log("[Proxy] No valid session, redirecting to login");
       const url = new URL("/admin/login", request.url);
       const callbackUrl = pathname + request.nextUrl.search;
-      console.log("[Middleware] Original callback URL:", callbackUrl);
       url.searchParams.set("callbackUrl", encodeURIComponent(encodeURIComponent(callbackUrl)));
-      console.log("[Middleware] Encoded callback URL:", url.searchParams.get("callbackUrl"));
       return NextResponse.redirect(url);
     }
 
@@ -112,10 +105,10 @@ export async function middleware(request: NextRequest) {
     if (token.sessionToken) {
       try {
         const validationResult = await validateSession(token.sessionToken);
-        console.log("[Middleware] Session validation result:", validationResult);
+        console.log("[Proxy] Session validation completed");
         
         if (!validationResult.valid) {
-          console.log("[Middleware] Invalid session:", validationResult.error);
+          console.log("[Proxy] Invalid session, redirecting to login");
           const url = new URL("/admin/login", request.url);
           url.searchParams.set("error", validationResult.error || "SESSION_INVALID");
           return NextResponse.redirect(url);
@@ -126,7 +119,7 @@ export async function middleware(request: NextRequest) {
           await updateSessionActivity(token.sessionToken);
         }
       } catch (error) {
-        console.error("[Middleware] Session validation error:", error);
+        console.error("[Proxy] Session validation error: [REDACTED]");
         const url = new URL("/admin/login", request.url);
         url.searchParams.set("error", "SESSION_VALIDATION_ERROR");
         return NextResponse.redirect(url);

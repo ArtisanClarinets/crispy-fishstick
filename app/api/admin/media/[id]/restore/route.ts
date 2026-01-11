@@ -4,10 +4,8 @@ import { adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
 import { tenantWhere } from "@/lib/admin/guards";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["media.write"] }, async (user) => {
     const asset = await prisma.mediaAsset.findFirst({
       where: {

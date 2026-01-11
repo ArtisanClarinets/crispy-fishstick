@@ -24,10 +24,8 @@ const SAFE_USER_WITH_ROLES_SELECT = {
   },
 };
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // CSRF protection
     try {

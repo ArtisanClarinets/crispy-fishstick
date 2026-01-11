@@ -6,11 +6,12 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export default async function EditProjectPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function EditProjectPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   await requireAdmin({ permissions: ["projects.write"] });
 
   const project = await prisma.project.findUnique({

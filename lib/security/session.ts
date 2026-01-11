@@ -36,7 +36,7 @@ export interface DeviceInfo {
  * Extract device information from request
  */
 export function extractDeviceInfo(request: NextRequest): DeviceInfo {
-  const ipAddress = request.ip || request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+  const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
   const userAgent = request.headers.get('user-agent') || 'unknown';
   
   // Simple device detection

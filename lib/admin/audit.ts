@@ -63,12 +63,12 @@ export async function createAuditLog(params: CreateAuditLogParams) {
   }
 
   // Get IP, User Agent, Origin, Referer, Request ID from headers
-  const headersList = headers();
+  const headersList = await headers();
   const ip = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown";
   const userAgent = headersList.get("user-agent") || "unknown";
   const origin = headersList.get("origin") || null;
   const referer = headersList.get("referer") || null;
-  const requestId = getRequestId();
+  const requestId = await getRequestId();
 
   try {
     const safeBefore = params.before ? redactForAudit(params.before) : null;

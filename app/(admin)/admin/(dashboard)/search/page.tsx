@@ -13,39 +13,40 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function SearchPage(
+  props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   await requireAdmin({ permissions: ["admin.search"] });
 
   const query = (searchParams.q as string) || "";
-  
+
   // Reuse the search logic from the API route for server-side rendering
   // or just implement a simple search here.
   // Since we need pagination, we should probably stick to one entity type at a time or just show a summary.
   // However, the task implies "Search Results" list with pagination. 
   // Given the API route `app/api/admin/search/route.ts` does multi-entity search without cursor pagination (it uses simple limit),
   // we might need to adapt.
-  
+
   // For this page, let's implement a UI that calls the API or just renders results if query is present.
   // Since the requirement is "Implement cursor pagination & skeletons", we should probably target a primary entity
   // or just show a list of mixed results if possible, but cursor pagination across mixed tables is hard.
-  
+
   // Let's assume this page is primarily for "Global Search" and we will just display what we can.
   // The API `GET /api/admin/search` supports `limit` but not `cursor`.
-  
+
   // To strictly follow "Implement cursor pagination", let's create a specialized view.
   // But since "Search Results" is usually a mixed bag, maybe we just search Projects for now as a primary example, 
   // or we can implement a proper client-side search wrapper.
-  
+
   // However, if we look at the requirements, it says "Search Results (/admin/search) - Implement cursor pagination".
   // This might imply a specific "Search Logs" or just the search interface.
   // Let's implement the Search Interface that uses the URL params.
-  
+
   // We will fetch projects matching the query as a demonstration of paginated search results.
-  
+
   const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
   const prismaParams = getPrismaParams(params);
 

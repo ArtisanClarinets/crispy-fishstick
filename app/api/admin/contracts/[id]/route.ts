@@ -18,10 +18,8 @@ const updateContractSchema = z.object({
   deleteReason: z.string().optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminRead(req, { permissions: ["contracts.read"] }, async (user) => {
     const contract = await prisma.contract.findFirst({
       where: {
@@ -42,10 +40,8 @@ export async function GET(
   });
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["contracts.write"] }, async (user, body) => {
     const validatedData = updateContractSchema.parse(body);
 
@@ -89,10 +85,8 @@ export async function PATCH(
   });
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["contracts.write"] }, async (user, body) => {
     const { deleteReason } = updateContractSchema.parse(body);
 

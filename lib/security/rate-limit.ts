@@ -252,7 +252,6 @@ export class RateLimiter {
     // Try to get IP from various headers
     const xForwardedFor = req.headers.get("x-forwarded-for");
     const xRealIp = req.headers.get("x-real-ip");
-    const remoteAddr = req.ip;
 
     // x-forwarded-for can contain multiple IPs, take the first one
     if (xForwardedFor) {
@@ -263,12 +262,8 @@ export class RateLimiter {
       return xRealIp;
     }
 
-    if (remoteAddr) {
-      return remoteAddr;
-    }
-
-    // Fallback to localhost
-    return "127.0.0.1";
+    // Fallback to unknown
+    return "unknown";
   }
 
   /**

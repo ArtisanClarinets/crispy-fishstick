@@ -14,10 +14,8 @@ const contentSchema = z.object({
   deleteReason: z.string().optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminRead(req, { permissions: ["content.read"] }, async (_user) => {
     const item = await prisma.content.findUnique({
       where: {
@@ -36,10 +34,8 @@ export async function GET(
   });
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["content.write"] }, async (user, body) => {
     const validated = contentSchema.parse(body);
 
@@ -76,10 +72,8 @@ export async function PATCH(
   });
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["content.write"] }, async (user, body) => {
     const { deleteReason } = contentSchema.parse(body);
 

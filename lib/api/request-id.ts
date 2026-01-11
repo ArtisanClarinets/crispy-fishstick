@@ -16,8 +16,8 @@ export function generateRequestId(): string {
 /**
  * Get or generate request ID from headers
  */
-export function getRequestId(): string {
-  const headersList = headers();
+export async function getRequestId(): Promise<string> {
+  const headersList = await headers();
   const existing = headersList.get("x-request-id");
   return existing || generateRequestId();
 }
@@ -35,12 +35,12 @@ export interface RequestMetadata {
   path: string;
 }
 
-export function getRequestMetadata(req: Request): RequestMetadata {
-  const headersList = headers();
+export async function getRequestMetadata(req: Request): Promise<RequestMetadata> {
+  const headersList = await headers();
   const url = new URL(req.url);
   
   return {
-    requestId: getRequestId(),
+    requestId: await getRequestId(),
     ip: (headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown").split(',')[0].trim(),
     userAgent: headersList.get("user-agent") || "unknown",
     origin: headersList.get("origin"),

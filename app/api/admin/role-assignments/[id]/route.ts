@@ -11,7 +11,8 @@ const updateRoleAssignmentSchema = z.object({
 });
 
 // Get role assignment by ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminRead(req, { permissions: ["roles.read"] }, async () => {
     const assignment = await prisma.roleAssignment.findUnique({
       where: { id: params.id },
@@ -34,7 +35,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // Update role assignment
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["roles.write"] }, async (user, body) => {
     const validatedData = updateRoleAssignmentSchema.parse(body);
 
@@ -64,7 +66,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // Delete role assignment
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["roles.write"] }, async () => {
     const assignment = await prisma.roleAssignment.findUnique({
       where: { id: params.id },

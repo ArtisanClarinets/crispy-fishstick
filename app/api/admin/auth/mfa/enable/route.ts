@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     // Generate device fingerprint
     const userAgent = req.headers.get('user-agent') || 'unknown';
-    const ipAddress = req.ip || req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
     const deviceFingerprint = generateDeviceFingerprint(userAgent, ipAddress);
 
     await prisma.user.update({

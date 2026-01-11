@@ -254,7 +254,7 @@ async function isTimeAccessAllowed(config: any): Promise<boolean> {
 // Main admin protection middleware function
 async function checkAdminAccess(request: NextRequest): Promise<{ allowed: boolean; reason?: string }> {
   const config = getSecurityConfig();
-  const ip = request.ip || request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
+  const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
   
   logger.info(`[AdminProtection] Checking access for IP: ${ip}`);
   

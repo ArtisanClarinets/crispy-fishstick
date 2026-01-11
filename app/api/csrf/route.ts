@@ -5,6 +5,6 @@ import { issueCsrfCookie } from "@/lib/security/csrf";
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const token = issueCsrfCookie();
+  const token = await issueCsrfCookie();
   return NextResponse.json({ csrfToken: token });
 }

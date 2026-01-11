@@ -7,7 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { InvoiceActions } from "@/components/admin/invoices/invoice-actions";
 
-export default async function InvoiceDetailsPage({ params }: { params: { id: string } }) {
+export default async function InvoiceDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await requireAdmin({ permissions: ["invoices.read"] });
 
   const invoice = await prisma.invoice.findUnique({

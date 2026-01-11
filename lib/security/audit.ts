@@ -348,7 +348,6 @@ export class SecurityAuditLogger {
   getClientIp(req: NextRequest): string {
     const xForwardedFor = req.headers.get('x-forwarded-for');
     const xRealIp = req.headers.get('x-real-ip');
-    const remoteAddr = req.ip;
 
     if (xForwardedFor) {
       return xForwardedFor.split(',')[0].trim();
@@ -358,11 +357,7 @@ export class SecurityAuditLogger {
       return xRealIp;
     }
 
-    if (remoteAddr) {
-      return remoteAddr;
-    }
-
-    return '127.0.0.1';
+    return 'unknown';
   }
 
   /**

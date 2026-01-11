@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { ServiceForm } from "@/components/admin/services/service-form";
 import { notFound } from "next/navigation";
 
-export default async function ServicePage({ params }: { params: { id: string } }) {
+export default async function ServicePage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await requireAdmin({ permissions: ["services.read"] });
 
   const service = await prisma.service.findUnique({

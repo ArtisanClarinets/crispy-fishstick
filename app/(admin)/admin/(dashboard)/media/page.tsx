@@ -8,11 +8,12 @@ import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminMediaPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function AdminMediaPage(
+  props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   await requireAdmin({ permissions: ["media.read"] });
 
   const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));

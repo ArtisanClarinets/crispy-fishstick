@@ -112,7 +112,7 @@ export function adminRead(
     const handler = inlineHandler!;
     
     return (async () => {
-      const requestId = getRequestId();
+      const requestId = await getRequestId();
       
       try {
         const user = await requireAdmin(options);
@@ -151,7 +151,7 @@ export function adminRead(
   const handler = optionsOrHandler as AdminReadHandler;
   
   return async (req: NextRequest, context: any): Promise<NextResponse> => {
-    const requestId = getRequestId();
+    const requestId = await getRequestId();
     
     try {
       // Require admin authentication and permissions
@@ -219,7 +219,7 @@ export function adminMutation(
     const handler = inlineHandler!;
     
     return (async () => {
-      const requestId = getRequestId();
+      const requestId = await getRequestId();
       
       try {
         // 1. Enforce same-origin (CSRF defense layer 1)
@@ -302,7 +302,7 @@ export function adminMutation(
   const handler = optionsOrHandler as AdminMutationHandler;
   
   return async (req: NextRequest, context: any): Promise<NextResponse> => {
-    const requestId = getRequestId();
+    const requestId = await getRequestId();
     
     try {
       // 1. Enforce same-origin (CSRF defense layer 1)

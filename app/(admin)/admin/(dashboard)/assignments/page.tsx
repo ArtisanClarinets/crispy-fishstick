@@ -8,11 +8,12 @@ import { PaginationControls } from "@/components/ui/pagination-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function AssignmentsPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function AssignmentsPage(
+  props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   await requireAdmin({ permissions: ["projects.read"] });
 
   const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));

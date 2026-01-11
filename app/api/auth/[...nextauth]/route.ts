@@ -5,6 +5,7 @@ import { Redis } from "ioredis";
 import { getRateLimiter } from "@/lib/security/rate-limit";
 import { getAuditLogger } from "@/lib/security/audit";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getClientIp } from "@/lib/security/request";
 
 // Create Redis client for rate limiting and audit logging
 const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
@@ -31,13 +32,20 @@ async function rateLimitedHandler(req: NextRequest) {
     ...authOptions,
     providers: [
       CredentialsProvider({
-        ...authOptions.providers[0],
+        name: "Credentials",
+        credentials: {
+          email: { label: "Email", type: "email" },
+          password: { label: "Password", type: "password" },
+          code: { label: "2FA Code", type: "text" },
+        },
         async authorize(credentials, req) {
-          // Get the original authorize function
-          const originalAuthorize = authOptions.providers[0].options.authorize;
+          // Get the original authorize function from the base authOptions
+          // Type cast to access the authorize method safely
+          const originalProvider = authOptions.providers[0] as any;
+          const originalAuthorize = originalProvider.authorize || originalProvider.options?.authorize;
           
-          // Extract IP address from the request
-          const ip = rateLimiter.getClientIp(currentRequest || req);
+          // Extract IP address from the stored request
+          const ip = currentRequest ? getClientIp(currentRequest) : "unknown";
           
           // Call the original authorize function with additional context
           if (typeof originalAuthorize === 'function') {
@@ -47,7 +55,7 @@ async function rateLimitedHandler(req: NextRequest) {
               // Handle rate limit errors specifically
               if (error.message === "RATE_LIMIT_EXCEEDED") {
                 const response = NextResponse.json(
-                  { error: "Too many login attempts. Please try again later." },
+                  { error: "RATE_LIMIT_EXCEEDED", retryAfter: error.retryAfter || 60 },
                   { status: 429 }
                 );
                 

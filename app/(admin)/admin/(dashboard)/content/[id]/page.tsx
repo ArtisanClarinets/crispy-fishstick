@@ -3,14 +3,15 @@ import { ContentForm } from "@/components/admin/content/content-form";
 import { notFound } from "next/navigation";
 
 interface EditContentPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function EditContentPage({ params }: EditContentPageProps) {
+export default async function EditContentPage(props: EditContentPageProps) {
+  const params = await props.params;
   const item = await prisma.content.findUnique({
     where: { id: params.id },
   });

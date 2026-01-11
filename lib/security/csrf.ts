@@ -68,9 +68,9 @@ function validateCsrfToken(token: string): boolean {
 /**
  * Issue a CSRF token cookie (call from layout or middleware on GET requests)
  */
-export function issueCsrfCookie(): string {
+export async function issueCsrfCookie(): Promise<string> {
   const token = generateCsrfToken();
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   
   cookieStore.set(CSRF_COOKIE_NAME, token, {
     httpOnly: true,
@@ -98,7 +98,7 @@ export async function verifyCsrfToken(req: NextRequest): Promise<void> {
     return; // Not a mutation, no CSRF required
   }
   
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const cookieToken = cookieStore.get(CSRF_COOKIE_NAME)?.value;
   const headerToken = req.headers.get(CSRF_HEADER_NAME);
   
@@ -123,8 +123,8 @@ export async function verifyCsrfToken(req: NextRequest): Promise<void> {
  * Get current CSRF token (for use in client-side forms)
  * Returns the token from cookie or generates a new one
  */
-export function getCsrfToken(): string {
-  const cookieStore = cookies();
+export async function getCsrfToken(): Promise<string> {
+  const cookieStore = await cookies();
   const existing = cookieStore.get(CSRF_COOKIE_NAME)?.value;
   
   if (existing && validateCsrfToken(existing)) {

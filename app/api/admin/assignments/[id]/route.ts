@@ -13,7 +13,8 @@ const updateAssignmentSchema = z.object({
 });
 
 // Get assignment by ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminRead(req, { permissions: ["assignments.read"] }, async (user) => {
     const assignment = await prisma.assignment.findFirst({
       where: { id: params.id },
@@ -49,7 +50,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // Update assignment
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["assignments.write"] }, async (user, body) => {
     const validatedData = updateAssignmentSchema.parse(body);
 
@@ -88,7 +90,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // Delete assignment
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["assignments.write"] }, async (user) => {
     const assignment = await prisma.assignment.findFirst({
       where: { id: params.id },

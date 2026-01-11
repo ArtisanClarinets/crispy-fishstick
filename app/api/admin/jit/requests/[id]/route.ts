@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 // Get JIT access request by ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminRead(req, { permissions: ["jit.read"] }, async () => {
     const request = await prisma.jitAccessRequest.findUnique({
       where: { id: params.id },

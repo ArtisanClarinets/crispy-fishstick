@@ -14,7 +14,8 @@ const updateWebhookSchema = z.object({
 });
 
 // Get webhook endpoint by ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminRead(req, { permissions: ["webhooks.read"] }, async (user) => {
     const endpoint = await prisma.webhookEndpoint.findFirst({
       where: {
@@ -37,7 +38,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // Update webhook endpoint
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["webhooks.write"] }, async (user, body) => {
     const validatedData = updateWebhookSchema.parse(body);
 
@@ -62,7 +64,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // Delete webhook endpoint
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["webhooks.write"] }, async (user) => {
     const endpoint = await prisma.webhookEndpoint.findFirst({
       where: {

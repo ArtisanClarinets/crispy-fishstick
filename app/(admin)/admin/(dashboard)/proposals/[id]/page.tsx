@@ -10,7 +10,8 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default async function ProposalPage({ params }: { params: { id: string } }) {
+export default async function ProposalPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await requireAdmin({ permissions: ["proposals.read"] });
 
   const proposal = await prisma.proposal.findUnique({

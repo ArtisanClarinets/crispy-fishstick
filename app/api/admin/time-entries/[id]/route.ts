@@ -14,7 +14,8 @@ const updateTimeEntrySchema = z.object({
 });
 
 // Get time entry by ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminRead(req, { permissions: ["time.read"] }, async (user) => {
     const entry = await prisma.timeEntry.findFirst({
       where: { id: params.id, deletedAt: null },
@@ -50,7 +51,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // Update time entry
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["time.write"] }, async (user, body) => {
     const validatedData = updateTimeEntrySchema.parse(body);
 
@@ -92,7 +94,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // Delete time entry (soft delete)
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["time.write"] }, async (user, body) => {
     const entry = await prisma.timeEntry.findFirst({
       where: { id: params.id, deletedAt: null },

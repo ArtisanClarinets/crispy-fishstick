@@ -3,10 +3,8 @@ import { NextRequest } from "next/server";
 import { adminMutation } from "@/lib/admin/route";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["content.write"] }, async (_user) => {
     const item = await prisma.content.findFirst({
       where: {

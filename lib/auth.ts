@@ -97,7 +97,8 @@ export const authOptions: NextAuthOptions = {
 
         try {
             // Extract IP address from request context
-            const ip = req?.ip || "127.0.0.1";
+            // The req object may have an extended context with IP injected from the route handler
+            const ip = (req as any)?.ip || "unknown";
             const email = credentials.email;
             
             // Apply rate limiting for login attempts if rate limiter is available

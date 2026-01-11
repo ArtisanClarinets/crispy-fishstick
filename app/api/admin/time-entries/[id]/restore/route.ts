@@ -6,7 +6,8 @@ import { tenantWhere } from "@/lib/admin/guards";
 export const dynamic = "force-dynamic";
 
 // Restore soft-deleted time entry
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(
     request,
     { permissions: ["time.write"] },

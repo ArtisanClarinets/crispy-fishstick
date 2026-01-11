@@ -5,10 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { tenantWhere } from "@/lib/admin/guards";
 import { sendEmail } from "@/lib/email";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["proposals.write"] }, async (user) => {
     const proposal = await prisma.proposal.findFirst({
       where: {

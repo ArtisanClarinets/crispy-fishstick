@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { LeadForm } from "@/components/admin/leads/lead-form";
 import { notFound } from "next/navigation";
 
-export default async function EditLeadPage({ params }: { params: { id: string } }) {
+export default async function EditLeadPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await requireAdmin({ permissions: ["leads.write"] });
 
   const lead = await prisma.lead.findUnique({

@@ -4,7 +4,8 @@ import { UserForm } from "@/components/admin/users/user-form";
 import { notFound } from "next/navigation";
 import { SAFE_USER_WITH_ROLES_SELECT } from "@/lib/security/safe-user";
 
-export default async function EditUserPage({ params }: { params: { id: string } }) {
+export default async function EditUserPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await requireAdmin({ permissions: ["users.write"] });
 
   const user = await prisma.user.findUnique({

@@ -16,16 +16,17 @@ import { parsePaginationParams, getPrismaParams, buildPaginationResult } from "@
 
 export const dynamic = "force-dynamic";
 
-export default async function ProposalsPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function ProposalsPage(
+  props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   await requireAdmin({ permissions: ["proposals.read"] });
 
   const search = typeof searchParams.search === "string" ? searchParams.search : undefined;
   const status = typeof searchParams.status === "string" ? searchParams.status : undefined;
-  
+
   const params = parsePaginationParams(new URLSearchParams(searchParams as Record<string, string>));
   const prismaParams = getPrismaParams(params);
 

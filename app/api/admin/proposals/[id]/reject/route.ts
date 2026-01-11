@@ -9,10 +9,8 @@ const rejectSchema = z.object({
   comment: z.string().min(1, "Rejection reason is required"),
 });
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(req, { permissions: ["proposals.approve"] }, async (user, body) => {
     const { comment } = rejectSchema.parse(body);
 

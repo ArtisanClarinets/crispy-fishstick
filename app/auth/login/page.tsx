@@ -59,7 +59,7 @@ export default function LoginPage() {
             description: "Database schema not ready; run prisma migrate deploy",
           });
         } else if (result.error === "RATE_LIMIT_EXCEEDED") {
-          const retryAfter = result?.retryAfter || "a few minutes";
+          const retryAfter = (result as any)?.retryAfter || "a few minutes";
           toast({
             variant: "destructive",
             title: "Too Many Attempts",

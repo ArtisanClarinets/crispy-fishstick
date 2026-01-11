@@ -6,12 +6,13 @@ import { ContractVersions } from "@/components/admin/contracts/contract-versions
 import { ContractSignature } from "@/components/admin/contracts/contract-signature";
 
 interface ContractPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default async function ContractPage({ params }: ContractPageProps) {
+export default async function ContractPage(props: ContractPageProps) {
+  const params = await props.params;
   await requireAdmin({ permissions: ["contracts.read"] });
 
   const contract = await prisma.contract.findUnique({

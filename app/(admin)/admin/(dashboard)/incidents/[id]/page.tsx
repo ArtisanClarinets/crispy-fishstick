@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { IncidentForm } from "@/components/admin/incidents/incident-form";
 import { notFound } from "next/navigation";
 
-export default async function EditIncidentPage({ params }: { params: { id: string } }) {
+export default async function EditIncidentPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await requireAdmin({ permissions: ["incidents.write"] });
 
   const incident = await prisma.incident.findUnique({

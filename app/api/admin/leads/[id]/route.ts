@@ -17,7 +17,8 @@ const updateLeadSchema = z.object({
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminRead(request, { permissions: ["leads.read"] }, async (user) => {
     const lead = await prisma.lead.findFirst({
       where: {
@@ -35,7 +36,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   });
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(
     req,
     { 
@@ -64,7 +66,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   );
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return adminMutation(
     request,
     { 
