@@ -8,6 +8,8 @@ import { AuthProvider } from "@/components/auth-provider";
 import { PointerSignalProvider } from "@/components/pointer-signal-provider";
 import { VisitedPathProvider } from "@/components/visited-path-provider";
 import { AppMotionConfig } from "@/components/motion-config";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -62,6 +64,7 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? undefined;
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
@@ -69,7 +72,7 @@ export default async function RootLayout({
         inter.variable,
         "font-sans antialiased min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary"
       )}>
-        <AuthProvider>
+        <AuthProvider session={session}>
             <ThemeProvider
             attribute="class"
             defaultTheme="dark"

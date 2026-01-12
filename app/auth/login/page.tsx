@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { Lock } from 'lucide-react';
+import { loginAction } from '@/lib/actions/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,18 +40,17 @@ export default function LoginPage() {
     console.log("[Login] Attempting login for:", email);
     console.log("[Login] Current URL:", window.location.href);
     console.log("[Login] Callback URL param:", new URLSearchParams(window.location.search).get("callbackUrl"));
-    
+
     try {
-      const result = await signIn('credentials', {
+      const result = await loginAction({
         email,
         password,
         code: showMFA ? code : undefined,
-        redirect: false,
       });
 
       if (result?.error) {
         console.error("Authentication error:", result.error, result);
-        
+
         // Standardize error messages to prevent information leakage
         if (result.error === "DB_SCHEMA_NOT_READY") {
           toast({
@@ -73,7 +73,7 @@ export default function LoginPage() {
             description: "Invalid credentials. Please try again.",
           });
         }
-        
+
         // Always show MFA input after first failed attempt to prevent MFA status leakage
         setShowMFA(true);
       } else {
