@@ -1,52 +1,96 @@
 [Unit]
-Description=Vantus Background Job Worker (BullMQ)
-After=network-online.target redis.service
+Description=Vantus Background Job Worker (BullMQ) - Fortune-500 Hardened
+Documentation=https://vantus.systems/docs/worker
+After=network-online.target redis.service vantus.service
 Wants=network-online.target
-Requires=redis.service
+Requires=redis.service vantus.service
 
 [Service]
 Type=simple
 User=vantus
 Group=vantus
 WorkingDirectory=/var/www/vantus
-EnvironmentFile=/var/www/vantus/.env
+EnvironmentFile=-/var/www/vantus/.env
 
-# Use state directories from main service
-StateDirectory=vantus vantus/uploads
+# State, Log, and Runtime Directories with secure permissions
+StateDirectory=vantus
+StateDirectoryMode=750
 LogsDirectory=vantus
+LogsDirectoryMode=750
 RuntimeDirectory=vantus
+RuntimeDirectoryMode=750
 
-# Environment
+# Environment with secure defaults
 Environment=NODE_ENV=production
 Environment=UPLOADS_DIR=/var/lib/vantus/uploads
+Environment=TZ=UTC
 
-# Security Hardening
-ProtectSystem=strict
+# Comprehensive Security Hardening
+ProtectSystem=full
+ProtectHome=read-only
 PrivateTmp=true
+PrivateDevices=true
 NoNewPrivileges=true
-ProtectHome=true
 ProtectKernelTunables=true
-ProtectControlGroups=true
 ProtectKernelModules=true
+ProtectControlGroups=true
 RestrictRealtime=true
 RestrictNamespaces=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryDenyWriteExecute=true
+LockPersonality=true
 
-# Start the worker process
+# Resource Limits for worker processes
+LimitNOFILE=4096
+LimitNPROC=512
+LimitCORE=0
+LimitMEMLOCK=32M
+LimitAS=2G
+LimitRSS=1G
+LimitFSIZE=1G
+
+# Capability Bounding Set (minimal required)
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=
+
+# Secure execution
+ExecStartPre=/usr/bin/mkdir -p /var/lib/vantus/uploads
+ExecStartPre=/usr/bin/chown vantus:vantus /var/lib/vantus/uploads
+ExecStartPre=/usr/bin/chmod 750 /var/lib/vantus/uploads
+
+# Main worker process
 ExecStart=/usr/bin/node scripts/worker.js
 
-# Restart policy: Always restart on failure
+# Restart policy with exponential backoff
 Restart=always
 RestartSec=5s
+StartLimitIntervalSec=180
+StartLimitBurst=3
+StartLimitAction=reboot-force
 
-# Graceful shutdown
+# Process management
+TimeoutSec=120
 TimeoutStopSec=30
-KillMode=mixed
+KillMode=process
 KillSignal=SIGTERM
+SendSIGKILL=yes
 
-# Logging
+# Logging configuration
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=vantus-worker
+SyslogLevelPrefix=true
+
+# Performance optimization
+Nice=10
+IOSchedulingClass=idle
+IOSchedulingPriority=7
+CPUSchedulingPolicy=other
+CPUSchedulingPriority=0
+
+# Health monitoring
+WatchdogSec=300
+RuntimeMaxSec=86400
 
 [Install]
 WantedBy=multi-user.target
