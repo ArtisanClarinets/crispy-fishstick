@@ -114,7 +114,7 @@ export async function proxy(request: NextRequest) {
         if (validationResult.session) {
           await updateSessionActivity(token.sessionToken);
         }
-      } catch (error) {
+      } catch (_error) {
         console.error("[Proxy] Session validation error: [REDACTED]");
         const url = new URL("/admin/login", request.url);
         url.searchParams.set("error", "SESSION_VALIDATION_ERROR");

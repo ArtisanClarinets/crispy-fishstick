@@ -64,7 +64,7 @@ export function MediaItem({ asset }: MediaItemProps) {
       <CardContent className="p-0 aspect-square relative bg-muted flex items-center justify-center">
         {isImage ? (
           <div className="relative w-full h-full">
-             {/* eslint-disable-next-line @next/next/no-img-element */}
+             {/* eslint-disable-next-line */}
              <img 
                src={asset.url} 
                alt={asset.key} 

@@ -55,3 +55,4 @@ data/uploads/
 uploads/
 server.log
 test_results.txt
+dev.db

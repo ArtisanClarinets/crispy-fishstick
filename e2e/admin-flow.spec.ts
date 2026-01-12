@@ -41,7 +41,7 @@ test.describe('Admin Flow', () => {
       await page.getByRole('link', { name: module.name }).click();
       await expect(page).toHaveURL(new RegExp(module.url));
       
-      const options = 'roleOptions' in module ? module.roleOptions : {};
+      const options = 'roleOptions' in module ? (module as any).roleOptions : {};
       const locator = page.getByRole('heading', { 
         name: module.heading, 
         exact: true,
