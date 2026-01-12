@@ -1,0 +1,38 @@
+---
+title: "vCPU vs. Core: The Performance Illusion"
+description: "The performance difference they don't want you to measure."
+date: "2024-03-22"
+readTime: "6 min read"
+tags: ["cpu", "hardware", "performance"]
+---
+
+# vCPU vs. Core
+
+One of the greatest marketing tricks of the decade was redefining a "CPU" as a "vCPU."
+
+A vCPU is typically a single **hardware hyperthread**. A physical Core typically has 2 hyperthreads.
+
+So, when you buy "2 vCPU", you are buying **one physical core**... that you might have to share with a neighbor.
+
+<VcpuCoreExplainer />
+
+## The Noisy Neighbor Problem
+
+In a multi-tenant cloud, your vCPU is a timeslice. If your neighbor decides to mine crypto or compile the Linux kernel, the CPU cache (L1/L2/L3) gets thrashed. Your application slows down, but your CPU usage metric might still look low because you are "waiting" for memory access.
+
+## Truth in Advertising
+
+When we say "Core" in our Infrastructure Hub, we mean a **Physical Core**. Dedicated. Yours.
+
+<EvidencePanel
+  claim="2 vCPUs = 1 Physical Core"
+  verdict="true"
+  dataPoint="On Intel Xeon and AMD EPYC, 1 physical core supports 2 threads (vCPUs). Cloud providers sell threads, not cores."
+  source="Intel Architecture Manuals / AWS Documentation"
+/>
+
+## Why it matters
+
+For consistent latency (jitter), you want dedicated cores. Jitter kills user experience more than low average speed.
+
+[Build a Spec](/infrastructure/configurator) with real cores and see the difference in predicted throughput.

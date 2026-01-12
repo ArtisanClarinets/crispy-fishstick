@@ -649,6 +649,7 @@ model WebhookEndpoint {
   Tenant          Tenant            @relation(fields: [tenantId], references: [id])
 }
 
+// Infrastructure Module Models
 model InfraSku {
   id          String   @id @default(cuid())
   slug        String   @unique

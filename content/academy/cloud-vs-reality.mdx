@@ -1,0 +1,42 @@
+---
+title: "Cloud vs. Reality: The Rent Premium"
+description: "Why you are paying a 40% premium for flexibility you don't use."
+date: "2024-03-20"
+readTime: "5 min read"
+tags: ["economics", "cloud", "tco"]
+---
+
+# The Cloud Rent Premium
+
+Marketing tells you that the cloud is "pay for what you use." In reality, for steady-state workloads, it is "pay for the option to leave."
+
+When you reserve an instance for 1 year or 3 years, you are admitting that your workload is stable. Yet, even with a Reserved Instance (RI), you are paying for the *virtualization overhead* and the *managed service margin*.
+
+<CloudTaxCalculator />
+
+## The Math of Ownership
+
+Owning hardware (or leasing dedicated metal) removes the "multi-tenancy tax." You aren't paying for the hypervisor to manage 50 other neighbors. You aren't paying for the cloud provider's R&D on features you don't use.
+
+### When Cloud Wins
+- **Burst workloads:** You need 1000 cores for 2 hours, then 0.
+- **Micro-scale:** You spend less than $500/mo total.
+- **Global Edge:** You need presence in 20 cities instantly.
+
+### When Metal Wins
+- **Databases:** Steady IOPS, high RAM requirements.
+- **AI Training:** Long-running GPU tasks where vGPU overhead hurts.
+- **Core Business Logic:** Anything that runs 24/7.
+
+<EvidencePanel
+  claim="Cloud is cheaper because of economies of scale."
+  verdict="false"
+  dataPoint="At >50% utilization, dedicated hardware is consistently 40-60% cheaper than AWS EC2 (even with savings plans)."
+  source="Internal Benchmarks 2024 / CloudZero Report"
+/>
+
+## What to do next
+
+Don't blindly lift-and-shift. Audit your utilization. If your CPU graph looks like a flat line, you are donating money to Amazon/Google/Microsoft.
+
+[Run the Estimator](/infrastructure/estimator) to see what your workload would cost on bare metal.

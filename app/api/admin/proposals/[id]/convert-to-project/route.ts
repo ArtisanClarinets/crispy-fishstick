@@ -93,9 +93,14 @@ export const POST = adminMutation(
       }
       
       if (assignments.length > 0) {
-        await tx.roleAssignment.createMany({
-          data: assignments,
-        });
+        // SQLite does not support createMany
+        await Promise.all(
+          assignments.map((assignment) =>
+            tx.roleAssignment.create({
+              data: assignment,
+            })
+          )
+        );
       }
       
       // Update proposal status

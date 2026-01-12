@@ -111,15 +111,20 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
         // Create new items
         if (validatedData.items.length > 0) {
-          await tx.proposalItem.createMany({
-            data: validatedData.items.map((item) => ({
-              proposalId: params.id,
-              customName: item.description,
-              hours: item.hours,
-              rate: item.rate,
-              amount: item.hours * item.rate,
-            })),
-          });
+          // SQLite does not support createMany in this Prisma version
+          await Promise.all(
+            validatedData.items.map((item) =>
+              tx.proposalItem.create({
+                data: {
+                  proposalId: params.id,
+                  customName: item.description,
+                  hours: item.hours,
+                  rate: item.rate,
+                  amount: item.hours * item.rate,
+                },
+              })
+            )
+          );
         }
       }
 
