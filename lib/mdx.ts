@@ -6,6 +6,11 @@ import { ShopifySyncDiagram } from "@/components/mdx/ShopifySyncDiagram";
 import { RedactionNote } from "@/components/mdx/RedactionNote";
 import { SystemSpec } from "@/components/mdx/SystemSpec";
 
+// Infrastructure Academy Widgets
+import { CloudTaxCalculator } from "@/components/infrastructure/academy/cloud-tax-calculator";
+import { VcpuCoreExplainer } from "@/components/infrastructure/academy/vcpu-core-explainer";
+import { EvidencePanel } from "@/components/infrastructure/academy/evidence-panel";
+
 const root = process.cwd();
 const contentRoot = path.resolve(root, "content") + path.sep;
 
@@ -14,7 +19,6 @@ export async function getMdxFiles(dir: string) {
     const joinedPath = path.resolve(contentRoot, dir);
     const targetPath = path.normalize(joinedPath);
 
-    // Ensure the resolved path stays within the intended content directory
     if (!targetPath.startsWith(contentRoot)) {
       throw new Error("Invalid directory path");
     }
@@ -29,7 +33,6 @@ export async function getMdxContent(dir: string, slug: string) {
   const joinedPath = path.resolve(contentRoot, dir, `${slug}.mdx`);
   const filePath = path.normalize(joinedPath);
 
-  // Ensure the resulting path is within the intended content directory
   if (!filePath.startsWith(contentRoot)) {
     throw new Error("Invalid path specified!");
   }
@@ -41,6 +44,9 @@ export async function getMdxContent(dir: string, slug: string) {
     ShopifySyncDiagram,
     RedactionNote,
     SystemSpec,
+    CloudTaxCalculator,
+    VcpuCoreExplainer,
+    EvidencePanel,
   };
 
   const { content, frontmatter } = await compileMDX<{
@@ -61,7 +67,7 @@ export async function getMdxContent(dir: string, slug: string) {
 
   return {
     slug,
-    content, // This is a React Element
+    content,
     frontmatter,
   };
 }

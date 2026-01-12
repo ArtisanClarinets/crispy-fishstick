@@ -1,0 +1,34 @@
+---
+title: "The Latency Tax"
+description: "Why your cloud bills are really about network hops."
+date: "2024-03-21"
+readTime: "4 min read"
+tags: ["performance", "network", "latency"]
+---
+
+# The Latency Tax
+
+Speed is feature number one. But in the cloud, "speed" is often sold as bandwidth (Gbps), while the real killer is latency (ms).
+
+## Physics doesn't negotiate
+
+Every time your application talks to a database, a cache, or a microservice, you pay a "latency tax." In a public cloud, these components might be in different racks, different availability zones, or even different datacenters, all connected by software-defined networking (SDN) that adds overhead.
+
+<EvidencePanel
+  claim="Microservices are always better."
+  verdict="nuanced"
+  dataPoint="Each network hop adds 0.5-2ms in cloud environments. 10 serial hops = 20ms delay before processing even starts."
+  source="Google SRE Book / Uber Engineering"
+/>
+
+## The "Localhost" Effect
+
+The fastest network call is the one you don't make. Or, the one that happens over a PCIe bus instead of a fiber optic cable.
+
+On bare metal infrastructure, you can often colocate your app and database on the same switch, or even the same machine (for smaller deployments), achieving microsecond-level latency that is impossible in the cloud.
+
+## Actionable Advice
+
+1. **Measure your round-trip times (RTT).** Don't just look at CPU.
+2. **Consolidate where possible.** Do you really need that Redis instance to be a separate managed service, or can it run on the same node?
+3. **Check the Configurator.** Our recommendations prioritize locality.

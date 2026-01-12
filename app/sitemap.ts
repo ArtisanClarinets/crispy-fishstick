@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/process',
     '/trust',
     '/contact',
-    '/infrastructure',
+    '/infrastructure', // Hub
     '/infrastructure/academy',
     '/infrastructure/estimator',
     '/infrastructure/configurator',

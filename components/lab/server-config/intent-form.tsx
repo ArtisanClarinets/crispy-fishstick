@@ -59,9 +59,13 @@ export function IntentForm({ onSubmit }: IntentFormProps) {
       await onSubmit(validData);
     } catch (error) {
       console.error("Validation failed", error);
-      // In a real app, set form errors here. For now, we rely on browser validation + console.
       if (error instanceof z.ZodError) {
-        alert("Please fix the errors: " + error.errors.map(e => e.message).join(", "));
+        const message = error.errors.map(e => `${e.path.join(".")}: ${e.message}`).join("\n");
+        alert("Please fix the following errors:\n" + message);
+      } else if (error instanceof Error) {
+        alert("An error occurred: " + error.message);
+      } else {
+        alert("An unknown error occurred. Please try again.");
       }
     } finally {
       setIsSubmitting(false);

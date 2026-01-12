@@ -56,12 +56,17 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
 
       // Add new roles
       if (validatedData.roleIds.length > 0) {
-        await tx.roleAssignment.createMany({
-          data: validatedData.roleIds.map((roleId) => ({
-            userId: params.id,
-            roleId: roleId,
-          })),
-        });
+        // SQLite does not support createMany in this Prisma version
+        await Promise.all(
+          validatedData.roleIds.map((roleId) =>
+            tx.roleAssignment.create({
+              data: {
+                userId: params.id,
+                roleId: roleId,
+              },
+            })
+          )
+        );
       }
     });
 

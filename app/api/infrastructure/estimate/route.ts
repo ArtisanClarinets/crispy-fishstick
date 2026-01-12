@@ -1,27 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { WorkloadIntentSchema } from "@/lib/server-config/schema";
-import { recommendServer } from "@/lib/server-config/engine";
+import { EstimatorWizardSchema } from "@/lib/infrastructure/estimator/schema";
+import { calculateEstimate } from "@/lib/infrastructure/estimator/math";
 import { normalizeError, createErrorResponse } from "@/lib/api/errors";
 import { rateLimit } from "@/lib/rate-limit";
 
-// Rate limit configuration
 const RATE_LIMIT = {
-  key: (ip: string) => `rate-limit:recommend:${ip}`,
-  limit: 20, // 20 requests
-  windowMs: 60 * 1000, // per minute
+  key: (ip: string) => `rate-limit:estimate:${ip}`,
+  limit: 20,
+  windowMs: 60 * 1000,
 };
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Origin Check (Hardened)
+    // 1. Origin Check
     const origin = req.headers.get("origin");
     const host = req.headers.get("host");
-
-    // In strict production, allow only same-origin
     if (origin) {
        const originUrl = new URL(origin);
        if (!host || originUrl.host !== host) {
-          // Allow localhost in dev
           if (process.env.NODE_ENV !== "development") {
             return createErrorResponse("FORBIDDEN", "Invalid origin");
           }
@@ -29,7 +25,6 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Rate Limiting
-    // Use IP or a fallback for anonymous users
     const ip = req.headers.get("x-forwarded-for") || "anonymous";
     const { success, remaining, reset } = await rateLimit({
       key: RATE_LIMIT.key(ip),
@@ -38,36 +33,22 @@ export async function POST(req: NextRequest) {
     });
 
     if (!success) {
-      return createErrorResponse(
-        "RATE_LIMIT_EXCEEDED",
-        "Too many recommendation requests. Please wait.",
-        undefined,
-        undefined
-      );
-    }
-
-    // 3. Content-Type Check
-    const contentType = req.headers.get("content-type");
-    if (!contentType?.includes("application/json")) {
-      return createErrorResponse("BAD_REQUEST", "Content-Type must be application/json");
+      return createErrorResponse("RATE_LIMIT_EXCEEDED", "Too many requests.");
     }
 
     const body = await req.json();
 
-    // 4. Validation (Zod)
-    const intent = WorkloadIntentSchema.parse(body);
+    // 3. Validation
+    const state = EstimatorWizardSchema.parse(body);
 
-    // 5. Logic
-    const recommendation = recommendServer(intent);
+    // 4. Logic
+    const estimate = calculateEstimate(state);
 
-    // 6. Response
-    const response = NextResponse.json(recommendation);
-
-    // Security Headers
+    // 5. Response
+    const response = NextResponse.json(estimate);
     response.headers.set("Cache-Control", "no-store, max-age=0");
     response.headers.set("X-RateLimit-Limit", RATE_LIMIT.limit.toString());
     response.headers.set("X-RateLimit-Remaining", remaining.toString());
-    response.headers.set("X-RateLimit-Reset", reset.getTime().toString());
 
     return response;
 
