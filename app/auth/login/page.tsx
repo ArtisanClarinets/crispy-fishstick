@@ -77,16 +77,16 @@ export default function LoginPage() {
         // Always show MFA input after first failed attempt to prevent MFA status leakage
         setShowMFA(true);
       } else {
-        console.log("[Login] Authentication successful, redirecting to /admin");
         const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl");
         if (callbackUrl) {
-          console.log("[Login] Found callback URL:", callbackUrl);
           try {
-            const decodedUrl = decodeURIComponent(decodeURIComponent(callbackUrl));
-            console.log("[Login] Decoded callback URL:", decodedUrl);
-            router.push(decodedUrl);
+            // Ensure relative path only for security
+            if (callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')) {
+              router.push(callbackUrl);
+            } else {
+              router.push('/admin');
+            }
           } catch (e) {
-            console.error("[Login] Error decoding callback URL:", e);
             router.push('/admin');
           }
         } else {

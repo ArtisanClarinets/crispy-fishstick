@@ -126,6 +126,7 @@ export function MediaManager() {
                       src={asset.url}
                       alt={asset.key}
                       fill
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                       className="object-cover"
                       unoptimized // For local uploads
                     />

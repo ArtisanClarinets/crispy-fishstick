@@ -91,13 +91,11 @@ export async function proxy(request: NextRequest) {
       req: request,
       secret
     });
-    console.log("[Proxy] Authentication check completed");
 
     if (!token) {
-      console.log("[Proxy] No valid session, redirecting to login");
       const url = new URL("/admin/login", request.url);
       const callbackUrl = pathname + request.nextUrl.search;
-      url.searchParams.set("callbackUrl", encodeURIComponent(encodeURIComponent(callbackUrl)));
+      url.searchParams.set("callbackUrl", callbackUrl);
       return NextResponse.redirect(url);
     }
 
@@ -105,10 +103,8 @@ export async function proxy(request: NextRequest) {
     if (token.sessionToken) {
       try {
         const validationResult = await validateSession(token.sessionToken);
-        console.log("[Proxy] Session validation completed");
         
         if (!validationResult.valid) {
-          console.log("[Proxy] Invalid session, redirecting to login");
           const url = new URL("/admin/login", request.url);
           url.searchParams.set("error", validationResult.error || "SESSION_INVALID");
           return NextResponse.redirect(url);
@@ -145,5 +141,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)"],
 };

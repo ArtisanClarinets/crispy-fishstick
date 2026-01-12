@@ -4,7 +4,8 @@
 **Crispy-Fishstick** is a comprehensive **Agency Admin Portal** and **Internal Developer Platform (IDP)**. It serves as the central nervous system for Vantus Systems, bridging commercial operations (CRM, Billing) with technical execution (DevOps, Project Management).
 
 ## 2. Technology Stack
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 16 (App Router)
+- **Core**: React 19
 - **Language**: TypeScript
 - **Database**: PostgreSQL (Production), SQLite (Dev)
 - **ORM**: Prisma

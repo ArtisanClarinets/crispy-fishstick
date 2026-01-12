@@ -6,7 +6,7 @@ Thompson Systems is a specialized engineering studio for founders who demand pro
 
 ## ⚡ Key Features
 
-- **Server-First Architecture:** Leverages Next.js 14 App Router and React Server Components for optimal performance and minimal client-side JavaScript.
+- **Server-First Architecture:** Leverages Next.js 16 App Router and React Server Components for optimal performance and minimal client-side JavaScript.
 - **MDX Content Pipeline:** Custom MDX implementation for 'Work' case studies and 'Insights', featuring specialized components like `Callout`, `MetricGrid`, and `Figure`.
 - **Revenue Leak Detector:** An interactive client-side lab (`/lab/revenue-leak`) featuring custom SVG projection charts and technical remediation logic.
 - **Trust-First Design:**
@@ -20,12 +20,13 @@ Thompson Systems is a specialized engineering studio for founders who demand pro
 
 ## 🛠 Tech Stack
 
-- **Framework:** [Next.js 14](https://nextjs.org/) (App Router)
-- **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Animation:** [Framer Motion](https://www.framer.com/motion/)
-- **UI Primitives:** [Radix UI](https://www.radix-ui.com/) (via shadcn/ui patterns)
-- **Icons:** [Lucide React](https://lucide.dev/)
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript 5.x
+- **Styling**: Tailwind CSS
+- **Database**: Prisma ORM (PostgreSQL)
+- **Auth**: NextAuth.js v5 (Beta)
+- **UI Components**: Radix UI / Shadcn
+- **React**: React 19
 - **Security:**
   - AES-256-GCM Encryption for secrets (MFA)
   - Strict Content Security Policy (CSP)

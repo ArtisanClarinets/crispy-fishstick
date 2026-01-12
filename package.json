@@ -2,15 +2,16 @@
   "name": "crispy-fishstick",
   "version": "0.1.0",
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "node scripts/generate-build-proof.mjs && next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:ci": "eslint . --max-warnings=0",
     "postinstall": "node scripts/postinstall.js",
     "setup": "node scripts/setup-env.js",
     "test": "vitest run",

@@ -27,16 +27,17 @@ async function handleAuthRequest(
 ): Promise<Response | void> {
   try {
     // Extract the nextauth segments from the dynamic route
-    const { nextauth } = await context.params;
+    const params = await context.params;
+    const resolvedContext = { params };
     
     // Call the appropriate HTTP method handler based on the request method
     if (req.method === "GET") {
-      return authHandler.GET?.(req, context) ?? NextResponse.json(
+      return authHandler.GET?.(req, resolvedContext) ?? NextResponse.json(
         { error: "Method Not Allowed" },
         { status: 405 }
       );
     } else if (req.method === "POST") {
-      return authHandler.POST?.(req, context) ?? NextResponse.json(
+      return authHandler.POST?.(req, resolvedContext) ?? NextResponse.json(
         { error: "Method Not Allowed" },
         { status: 405 }
       );

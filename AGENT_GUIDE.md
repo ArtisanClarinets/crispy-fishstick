@@ -5,13 +5,12 @@ Before modifying any code, you must identify which **Domain** your change affect
 
 ---
 
-## 1. High-Level Architecture
-*   **Framework:** Next.js 14 (App Router)
-*   **Language:** TypeScript
-*   **Database:** PostgreSQL (Production) / SQLite (Dev) via Prisma ORM
-*   **Auth:** NextAuth.js (v4) with JWT strategy
-*   **Styling:** Tailwind CSS + Shadcn UI + GSAP
-*   **Testing:** Vitest (Unit), Playwright (E2E)
+## 1. Project Overview
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State**: React Server Components (RSC) + Server Actions
+- **React**: React 19
 
 ---
 
@@ -19,7 +18,7 @@ Before modifying any code, you must identify which **Domain** your change affect
 Refactors in these areas require comprehensive regression testing.
 
 ### A. Authentication & Security (The Gatekeeper)
-*   **File:** `middleware.ts`
+*   **File:** `proxy.ts`
     *   **Vital Function:** CSP Header Generation (Nonce-based).
     *   **Vital Function:** Route Protection (`/admin` checks).
 *   **File:** `lib/admin/guards.ts`
@@ -92,7 +91,7 @@ model AuditLog {
 
 **Flow 1: The Admin Login**
 1.  User hits `/admin`.
-2.  `middleware.ts` intercepts.
+2.  `proxy.ts` intercepts.
 3.  Checks for `next-auth.session-token`.
 4.  If missing -> Redirect to `/admin/login`.
 

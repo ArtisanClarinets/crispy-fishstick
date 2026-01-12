@@ -5,9 +5,14 @@
 ---
 
 ## 1. Executive Summary
-Thompson Systems is built on a robust, modern Next.js 14+ architecture (App Router) with a focus on engineering rigor, performance, and transparency. The application is highly structured, separating concern between the public-facing site (`app/(site)`), the administrative operation (`app/(admin)`), and backend services (`app/api`).
+The application is a modern **Next.js 16+** enterprise platform utilizing the **App Router** architecture. It adheres to **SOLID** principles and separates concerns between Server Components (data fetching/logic) and Client Components (interactivity).
 
-The integration between components is generally well-established, leveraging Prisma for data persistence, NextAuth for security, and Framer Motion for high-fidelity UI.
+### Key Technologies
+- **Next.js 16** (App Router, Server Actions)
+- **React 19**
+- **TypeScript 5.x**
+- **Prisma ORM**
+- **NextAuth.js v5**
 
 ---
 

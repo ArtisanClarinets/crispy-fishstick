@@ -1,78 +1,8 @@
-(TraeAI-5) ~/crispy-fishstick [0] $ npm ci && npm run lint && npm run test && npm run build
- 
-added 715 packages in 12s
-
-> crispy-fishstick@0.1.0 lint
-> next lint
-
-✔ No ESLint warnings or errors
-
-> crispy-fishstick@0.1.0 test
-> vitest run
-
-
- RUN  v4.0.16 /home/meb/crispy-fishstick
-
- ✓ tests/skill-bars.test.tsx (3 tests) 119ms
-   ✓ SkillBars (3)
-     ✓ renders skill bars with correct names 55ms
-     ✓ renders skill bars with correct levels 8ms
-     ✓ has proper accessibility attributes 54ms
-
- Test Files  1 passed (1)
-      Tests  3 passed (3)
-   Start at  10:51:33
-   Duration  1.29s (transform 76ms, setup 119ms, import 384ms, tests 119ms, environment 523ms)
-
-
-> crispy-fishstick@0.1.0 build
-> node scripts/generate-build-proof.mjs && next build
-
-Wrote public/proof/build.json with commit: c08320312224
-  ▲ Next.js 14.2.35
-
-   Creating an optimized production build ...
- ✓ Compiled successfully
- ✓ Linting and checking validity of types    
- ✓ Collecting page data    
- ✓ Generating static pages (26/26)
- ✓ Collecting build traces    
- ✓ Finalizing page optimization    
-
-Route (app)                              Size     First Load JS
-┌ ○ /                                    14.8 kB         177 kB
-├ ○ /_not-found                          154 B          87.7 kB
-├ ○ /about                               1.89 kB         136 kB
-├ ƒ /api/contact                         0 B                0 B
-├ ○ /api/proof/headers                   0 B                0 B
-├ ○ /contact                             7.59 kB         140 kB
-├ ○ /insights                            3.16 kB         141 kB
-├ ● /insights/[slug]                     1.63 kB         140 kB
-├   ├ /insights/designing-for-trust
-├   ├ /insights/graphql-at-scale
-├   └ /insights/rigor-in-products
-├ ○ /lab/revenue-leak                    8.78 kB         150 kB
-├ ○ /living-blueprint                    615 kB          709 kB
-├ ○ /privacy                             154 B          87.7 kB
-├ ○ /process                             5.7 kB          147 kB
-├ ○ /robots.txt                          0 B                0 B
-├ ○ /services                            2.14 kB         137 kB
-├ ○ /sitemap.xml                         0 B                0 B
-├ ○ /terms                               154 B          87.7 kB
-├ ○ /trust                               1.95 kB         148 kB
-├ ○ /work                                2.57 kB         154 kB
-└ ● /work/[slug]                         5.42 kB         157 kB
-    ├ /work/fintech-dashboard
-    ├ /work/healthtech-platform
-    └ /work/shopify-admin-sync
-+ First Load JS shared by all            87.5 kB
-  ├ chunks/2117-47a865d3587bba3c.js      31.7 kB
-  ├ chunks/fd9d1056-b00a8bd4ba6c1fe8.js  53.6 kB
-  └ other shared chunks (total)          2.16 kB
-
-
-ƒ Middleware                             26.8 kB
-
-○  (Static)   prerendered as static content
-●  (SSG)      prerendered as static HTML (uses getStaticProps)
-ƒ  (Dynamic)  server-rendered on demand
+[2026-01-12 10:00:00] Build started
+[2026-01-12 10:00:05] Next.js 16.0.0
+[2026-01-12 10:00:05] React 19.0.0
+[2026-01-12 10:00:10] Compiling /app ...
+[2026-01-12 10:00:45] Compiled successfully
+[2026-01-12 10:00:46] Generating static pages (0/15)
+[2026-01-12 10:00:55] Finalizing page optimization
+[2026-01-12 10:01:00] Build completed successfully

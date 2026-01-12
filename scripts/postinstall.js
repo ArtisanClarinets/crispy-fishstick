@@ -13,14 +13,15 @@ function run(cmd) {
 }
 
 function semverMajor(v) {
-  const m = String(v).match(/^v?(\d+)/);
-  return m ? Number(m[1]) : null;
+  const m = String(v).match(/^v?(\d+)\.(\d+)/);
+  if (!m) return null;
+  return { major: Number(m[1]), minor: Number(m[2]) };
 }
 
 try {
-  const major = semverMajor(process.version);
-  if (major && major < 18) {
-    console.warn(`⚠ Node ${process.version} detected. Recommended Node 18+ (prefer 20 LTS).`);
+  const version = semverMajor(process.version);
+  if (version && (version.major < 20 || (version.major === 20 && version.minor < 9))) {
+    console.warn(`⚠ Node ${process.version} detected. Recommended Node 20.9+ for Next.js 16.`);
   }
 
   // Generate build proof if script exists (do not hard-fail install if missing)

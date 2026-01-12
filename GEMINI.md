@@ -4,20 +4,17 @@ This document provides context for AI assistants to understand and interact with
 
 ## Project Overview
 
-This is a Next.js 14 web application for Thompson Systems, a specialized engineering studio. It serves as a portfolio and showcase of their work and capabilities. The project is built with a "Server-First Architecture" using React Server Components, TypeScript, and Prisma for database interaction. Content is managed through MDX files.
+This is a Next.js 16 web application for Thompson Systems, a specialized engineering studio. It serves as a portfolio and showcase of their work and capabilities. The project is built with a "Server-First Architecture" using React Server Components, TypeScript, and Prisma for database interaction. Content is managed through MDX files.
 
 The application features a sophisticated and highly-branded "Engineered Hardware" aesthetic, with a strong emphasis on security, performance, and trust. Key features include a portfolio of work, an interactive "Revenue Leak Detector" lab, and a comprehensive admin area for managing clients, projects, and content.
 
 ### Key Technologies
 
-*   **Framework:** Next.js 14 (App Router)
-*   **Language:** TypeScript (Strict Mode)
-*   **Styling:** Tailwind CSS
-*   **Database:** Prisma with a SQLite provider
-*   **Authentication:** NextAuth.js
-*   **Animation:** Framer Motion
-*   **Content:** MDX
-*   **Testing:** Vitest (unit), Playwright (E2E)
+- **Framework**: Next.js 16
+- **UI Library**: React 19
+- **Styling**: Tailwind CSS
+- **Type System**: TypeScript
+- **Component Library**: shadcn/ui (Radix UI)
 
 ## Building and Running
 

@@ -24,18 +24,18 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      console.log("[Admin Login] User already authenticated, redirecting to /admin");
       // Small delay to ensure session is properly established
       const timer = setTimeout(() => {
         const callbackUrl = searchParams.get('callbackUrl');
         if (callbackUrl) {
-          console.log("[Admin Login] Found callback URL:", callbackUrl);
           try {
-            const decodedUrl = decodeURIComponent(decodeURIComponent(callbackUrl));
-            console.log("[Admin Login] Decoded callback URL:", decodedUrl);
-            router.replace(decodedUrl);
+            // Ensure relative path only for security
+            if (callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')) {
+              router.replace(callbackUrl);
+            } else {
+              router.replace('/admin');
+            }
           } catch (e) {
-            console.error("[Admin Login] Error decoding callback URL:", e);
             router.replace('/admin');
           }
         } else {
@@ -51,10 +51,6 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
 
-    console.log("[Admin Login] Attempting login for:", email);
-    console.log("[Admin Login] Current URL:", window.location.href);
-    console.log("[Admin Login] Callback URL param:", searchParams.get("callbackUrl"));
-    
     try {
       const result = await signIn('credentials', {
         email,
@@ -64,7 +60,6 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        console.error("Authentication error:", result.error, result);
         if (result.error === "MFA_REQUIRED") {
           setShowMFA(true);
           toast({
@@ -99,16 +94,17 @@ export default function LoginPage() {
           });
         }
       } else {
-        console.log("[Admin Login] Authentication successful, redirecting to /admin");
         const callbackUrl = searchParams.get("callbackUrl");
         if (callbackUrl) {
-          console.log("[Admin Login] Found callback URL:", callbackUrl);
           try {
-            const decodedUrl = decodeURIComponent(decodeURIComponent(callbackUrl));
-            console.log("[Admin Login] Decoded callback URL:", decodedUrl);
-            router.replace(decodedUrl);
+            const decodedUrl = decodeURIComponent(callbackUrl);
+            // Ensure relative path only for security
+            if (decodedUrl.startsWith('/') && !decodedUrl.startsWith('//')) {
+              router.replace(decodedUrl);
+            } else {
+              router.replace('/admin');
+            }
           } catch (e) {
-            console.error("[Admin Login] Error decoding callback URL:", e);
             router.replace('/admin');
           }
         } else {
