@@ -10,8 +10,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/process',
     '/trust',
     '/contact',
+    '/infrastructure',
+    '/infrastructure/academy',
+    '/infrastructure/estimator',
+    '/infrastructure/configurator',
     '/lab/revenue-leak',
-    '/lab/server-config',
   ];
 
   const workRoutes = siteConfig.featuredWork.map((project) => `/work/${project.slug}`);

@@ -11,6 +11,7 @@ import {
 const HEADROOM_MULTIPLIERS: Record<TrafficPattern, number> = {
   constant: 1.3, // 30% safety margin
   bursty: 2.0,   // 100% safety margin for spikes
+  predictable_spikes: 1.5, // 50% safety margin
 };
 
 const WEB_SERVER_HEURISTICS = {

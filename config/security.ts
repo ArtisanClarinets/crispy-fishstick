@@ -1,47 +1,97 @@
 import { z } from "zod";
 
-// Define the schema for security configuration
-const SecurityConfigSchema = z.object({
-  // IP Allowlist configuration
-  ipAllowlist: z.object({
-    enabled: z.boolean().default(false),
-    allowedIPs: z.array(z.string()).default([]),
-    allowedCIDRs: z.array(z.string()).default([]),
-  }),
-  
-  // Geographic restrictions configuration
-  geographicRestrictions: z.object({
-    enabled: z.boolean().default(false),
-    allowedCountries: z.array(z.string()).default([]),
-    blockedCountries: z.array(z.string()).default([]),
-  }),
-  
-  // Time-based access controls
-  timeBasedAccess: z.object({
-    enabled: z.boolean().default(false),
-    businessHours: z.object({
-      startTime: z.string().default("09:00"),
-      endTime: z.string().default("17:00"),
-      timezone: z.string().default("UTC"),
-      days: z.array(z.number().min(0).max(6)).default([1, 2, 3, 4, 5]), // Monday-Friday
-    }),
-    maintenanceWindows: z.array(z.object({
-      startTime: z.string(),
-      endTime: z.string(),
-      timezone: z.string(),
-      days: z.array(z.number().min(0).max(6)),
-    })).default([]),
-  }),
-  
-  // Admin route specific settings
-  adminRoutes: z.object({
-    protectedPaths: z.array(z.string()).default(["/admin"]),
-    loginPath: z.string().default("/admin/login"),
-    errorPath: z.string().default("/admin/error"),
-  }),
+// Define explicit TypeScript interfaces to avoid recursive type inference issues
+interface IpAllowlistConfig {
+  enabled: boolean;
+  allowedIPs: string[];
+  allowedCIDRs: string[];
+}
+
+interface GeographicRestrictionsConfig {
+  enabled: boolean;
+  allowedCountries: string[];
+  blockedCountries: string[];
+}
+
+interface BusinessHoursConfig {
+  startTime: string;
+  endTime: string;
+  timezone: string;
+  days: number[];
+}
+
+interface MaintenanceWindow {
+  startTime: string;
+  endTime: string;
+  timezone: string;
+  days: number[];
+}
+
+interface TimeBasedAccessConfig {
+  enabled: boolean;
+  businessHours: BusinessHoursConfig;
+  maintenanceWindows: MaintenanceWindow[];
+}
+
+interface AdminRoutesConfig {
+  protectedPaths: string[];
+  loginPath: string;
+  errorPath: string;
+}
+
+interface SecurityConfig {
+  ipAllowlist: IpAllowlistConfig;
+  geographicRestrictions: GeographicRestrictionsConfig;
+  timeBasedAccess: TimeBasedAccessConfig;
+  adminRoutes: AdminRoutesConfig;
+}
+
+// Simple validation schemas without complex type inference
+const ipAllowlistSchema = z.object({
+  enabled: z.boolean(),
+  allowedIPs: z.array(z.string()),
+  allowedCIDRs: z.array(z.string()),
 });
 
-type SecurityConfig = z.infer<typeof SecurityConfigSchema>;
+const geographicRestrictionsSchema = z.object({
+  enabled: z.boolean(),
+  allowedCountries: z.array(z.string()),
+  blockedCountries: z.array(z.string()),
+});
+
+const businessHoursSchema = z.object({
+  startTime: z.string(),
+  endTime: z.string(),
+  timezone: z.string(),
+  days: z.array(z.number()),
+});
+
+const maintenanceWindowSchema = z.object({
+  startTime: z.string(),
+  endTime: z.string(),
+  timezone: z.string(),
+  days: z.array(z.number()),
+});
+
+const timeBasedAccessSchema = z.object({
+  enabled: z.boolean(),
+  businessHours: businessHoursSchema,
+  maintenanceWindows: z.array(maintenanceWindowSchema),
+});
+
+const adminRoutesSchema = z.object({
+  protectedPaths: z.array(z.string()),
+  loginPath: z.string(),
+  errorPath: z.string(),
+});
+
+// Minimal Zod schema that just validates structure
+const SecurityConfigSchema = z.object({
+  ipAllowlist: ipAllowlistSchema,
+  geographicRestrictions: geographicRestrictionsSchema,
+  timeBasedAccess: timeBasedAccessSchema,
+  adminRoutes: adminRoutesSchema,
+});
 
 // Default security configuration
 const defaultSecurityConfig: SecurityConfig = {
@@ -63,7 +113,7 @@ const defaultSecurityConfig: SecurityConfig = {
       startTime: "09:00",
       endTime: "17:00",
       timezone: "UTC",
-      days: [1, 2, 3, 4, 5], // Monday-Friday
+      days: [1, 2, 3, 4, 5],
     },
     maintenanceWindows: [],
   },
@@ -78,7 +128,7 @@ const defaultSecurityConfig: SecurityConfig = {
 // Load configuration from environment variables
 function loadSecurityConfigFromEnv(): SecurityConfig {
   try {
-    const config: Partial<SecurityConfig> = {
+    const config: SecurityConfig = {
       ipAllowlist: {
         enabled: process.env.ADMIN_IP_ALLOWLIST_ENABLED === "true",
         allowedIPs: process.env.ADMIN_ALLOWED_IPS?.split(",").map(ip => ip.trim()) || [],
@@ -114,14 +164,21 @@ function loadSecurityConfigFromEnv(): SecurityConfig {
       try {
         const windows = JSON.parse(process.env.ADMIN_MAINTENANCE_WINDOWS);
         if (Array.isArray(windows)) {
-          config.timeBasedAccess!.maintenanceWindows = windows;
+          config.timeBasedAccess.maintenanceWindows = windows;
         }
       } catch (error) {
         console.warn("Failed to parse maintenance windows from environment:", error);
       }
     }
     
-    return SecurityConfigSchema.parse(config);
+    // Validate the configuration
+    const result = SecurityConfigSchema.safeParse(config);
+    if (!result.success) {
+      console.error("Invalid security configuration from environment:", result.error);
+      return defaultSecurityConfig;
+    }
+    
+    return config;
   } catch (error) {
     console.error("Invalid security configuration from environment, using defaults:", error);
     return defaultSecurityConfig;

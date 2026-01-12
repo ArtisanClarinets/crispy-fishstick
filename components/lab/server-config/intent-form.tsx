@@ -102,7 +102,7 @@ export function IntentForm({ onSubmit }: IntentFormProps) {
               >
                 <option value="production">Production</option>
                 <option value="staging">Staging / QA</option>
-                <option value="development">Development</option>
+                <option value="dev">Development</option>
               </select>
             </div>
 

@@ -1,64 +1,151 @@
+// --- TypeScript Interface Definitions ---
+// Defined explicitly to avoid recursive z.infer<> calls that cause stack overflow
+
+export type WorkloadType = 
+  | "web_server" 
+  | "database" 
+  | "ai_ml" 
+  | "storage_node" 
+  | "general_compute";
+
+export type TrafficPattern = "constant" | "bursty" | "predictable_spikes";
+
+export interface BaseIntent {
+  workloadType: WorkloadType;
+  trafficPattern: TrafficPattern;
+  userCount: number;
+  environment: "production" | "staging" | "dev";
+}
+
+export interface WebServerIntent extends BaseIntent {
+  workloadType: "web_server";
+  requestsPerSecond: number;
+  concurrentConnections: number;
+}
+
+export interface DatabaseIntent extends BaseIntent {
+  workloadType: "database";
+  datasetSizeGB: number;
+  readWriteRatio: "read_heavy" | "write_heavy" | "balanced";
+}
+
+export interface AiMlIntent extends BaseIntent {
+  workloadType: "ai_ml";
+  modelSizeParams: "small" | "medium" | "large" | "xlarge";
+  batchSize: number;
+  trainingOrInference: "training" | "inference";
+}
+
+export interface StorageNodeIntent extends BaseIntent {
+  workloadType: "storage_node";
+  storageCapacityTB: number;
+  accessFrequency: "hot" | "warm" | "cold";
+}
+
+export interface GeneralComputeIntent extends BaseIntent {
+  workloadType: "general_compute";
+  concurrentJobs: number;
+}
+
+export type WorkloadIntent = 
+  | WebServerIntent 
+  | DatabaseIntent 
+  | AiMlIntent 
+  | StorageNodeIntent 
+  | GeneralComputeIntent;
+
+export interface ResourceRequirements {
+  cpuCores: number;
+  ramGB: number;
+  storageGB: number;
+  storageType: "NVMe" | "SSD" | "HDD";
+  gpuCount?: number;
+  gpuVramGB?: number;
+  networkSpeedGbps: number;
+}
+
+export interface ServerSku {
+  id: string;
+  name: string;
+  description: string;
+  specs: ResourceRequirements;
+  priceMonthly: number;
+  stockStatus: "in_stock" | "low_stock" | "backorder";
+}
+
+export interface RecommendationExplanation {
+  bottleneck: string;
+  headroomFactor: number;
+  notes: string[];
+}
+
+export interface RecommendationResult {
+  requirements: ResourceRequirements;
+  primarySku: ServerSku;
+  alternativeSkus: ServerSku[];
+  explanation: RecommendationExplanation;
+}
+
+// --- Runtime Validation Schemas ---
+// Using minimal Zod schemas to avoid complex type inference
+
 import { z } from "zod";
 
-// --- Input Schema (Workload Intent) ---
+// Create schemas with minimal complexity to avoid stack overflow
+// Use z.record() and basic types instead of complex nested structures
 
-export const WorkloadTypeSchema = z.enum([
-  "web_server",
-  "database",
-  "ai_ml",
-  "storage_node",
-  "general_compute"
-]);
-
-export const TrafficPatternSchema = z.enum([
-  "constant", // Steady load
-  "bursty",   // Spiky load (needs higher headroom)
-]);
-
-// Base intent fields shared by all workloads
 const BaseIntentSchema = z.object({
-  workloadType: WorkloadTypeSchema,
-  trafficPattern: TrafficPatternSchema,
-  userCount: z.coerce.number().min(1).max(1000000).default(100),
-  environment: z.enum(["production", "staging", "dev"]).default("production"),
+  workloadType: z.string(),
+  trafficPattern: z.string(),
+  userCount: z.number(),
+  environment: z.string(),
 });
 
-// Discriminated Union for specific workload details
-export const WorkloadIntentSchema = z.discriminatedUnion("workloadType", [
-  BaseIntentSchema.extend({
-    workloadType: z.literal("web_server"),
-    requestsPerSecond: z.coerce.number().min(1).default(50),
-    concurrentConnections: z.coerce.number().min(1).default(20),
-  }),
-  BaseIntentSchema.extend({
-    workloadType: z.literal("database"),
-    datasetSizeGB: z.coerce.number().min(1).default(10),
-    readWriteRatio: z.enum(["read_heavy", "write_heavy", "balanced"]).default("balanced"),
-  }),
-  BaseIntentSchema.extend({
-    workloadType: z.literal("ai_ml"),
-    modelSizeParams: z.enum(["small", "medium", "large", "xlarge"]).default("medium"), // e.g., 7B, 13B, 70B
-    batchSize: z.coerce.number().min(1).default(1),
-    trainingOrInference: z.enum(["training", "inference"]).default("inference"),
-  }),
-  BaseIntentSchema.extend({
-    workloadType: z.literal("storage_node"),
-    storageCapacityTB: z.coerce.number().min(1).default(1),
-    accessFrequency: z.enum(["hot", "warm", "cold"]).default("hot"),
-  }),
-  BaseIntentSchema.extend({
-    workloadType: z.literal("general_compute"),
-    concurrentJobs: z.coerce.number().min(1).default(1),
-  }),
-]);
+// Individual workload schemas - simple and flat
+const WebServerSchema = z.object({
+  workloadType: z.literal("web_server"),
+  requestsPerSecond: z.number(),
+  concurrentConnections: z.number(),
+});
 
-// --- Output Schema (Requirements & Recommendation) ---
+const DatabaseSchema = z.object({
+  workloadType: z.literal("database"),
+  datasetSizeGB: z.number(),
+  readWriteRatio: z.string(),
+});
+
+const AiMlSchema = z.object({
+  workloadType: z.literal("ai_ml"),
+  modelSizeParams: z.string(),
+  batchSize: z.number(),
+  trainingOrInference: z.string(),
+});
+
+const StorageNodeSchema = z.object({
+  workloadType: z.literal("storage_node"),
+  storageCapacityTB: z.number(),
+  accessFrequency: z.string(),
+});
+
+const GeneralComputeSchema = z.object({
+  workloadType: z.literal("general_compute"),
+  concurrentJobs: z.number(),
+});
+
+// Union schema for runtime validation
+export const WorkloadIntentSchema = z.union([
+  BaseIntentSchema.merge(WebServerSchema),
+  BaseIntentSchema.merge(DatabaseSchema),
+  BaseIntentSchema.merge(AiMlSchema),
+  BaseIntentSchema.merge(StorageNodeSchema),
+  BaseIntentSchema.merge(GeneralComputeSchema),
+]);
 
 export const ResourceRequirementsSchema = z.object({
   cpuCores: z.number(),
   ramGB: z.number(),
   storageGB: z.number(),
-  storageType: z.enum(["NVMe", "SSD", "HDD"]),
+  storageType: z.string(),
   gpuCount: z.number().optional(),
   gpuVramGB: z.number().optional(),
   networkSpeedGbps: z.number(),
@@ -70,7 +157,7 @@ export const ServerSkuSchema = z.object({
   description: z.string(),
   specs: ResourceRequirementsSchema,
   priceMonthly: z.number(),
-  stockStatus: z.enum(["in_stock", "low_stock", "backorder"]),
+  stockStatus: z.string(),
 });
 
 export const RecommendationResultSchema = z.object({
@@ -78,15 +165,18 @@ export const RecommendationResultSchema = z.object({
   primarySku: ServerSkuSchema,
   alternativeSkus: z.array(ServerSkuSchema),
   explanation: z.object({
-    bottleneck: z.string(), // What resource drove the sizing?
-    headroomFactor: z.number(), // The multiplier applied
+    bottleneck: z.string(),
+    headroomFactor: z.number(),
     notes: z.array(z.string()),
   }),
 });
 
-export type WorkloadType = z.infer<typeof WorkloadTypeSchema>;
-export type TrafficPattern = z.infer<typeof TrafficPatternSchema>;
-export type WorkloadIntent = z.infer<typeof WorkloadIntentSchema>;
-export type ResourceRequirements = z.infer<typeof ResourceRequirementsSchema>;
-export type ServerSku = z.infer<typeof ServerSkuSchema>;
-export type RecommendationResult = z.infer<typeof RecommendationResultSchema>;
+// Validator function for WorkloadIntent
+export function validateWorkloadIntent(data: unknown): data is WorkloadIntent {
+  try {
+    WorkloadIntentSchema.parse(data);
+    return true;
+  } catch {
+    return false;
+  }
+}

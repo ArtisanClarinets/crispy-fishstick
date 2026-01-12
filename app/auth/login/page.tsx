@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,93 +12,71 @@ import { Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [showMFA, setShowMFA] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [_error, setError] = useState<string | null>(null);
 
+  // Check if already authenticated and redirect
   useEffect(() => {
-    if (status === 'authenticated') {
-      console.log("[Login] User already authenticated, redirecting to /admin");
-      // Small delay to ensure session is properly established
-      const timer = setTimeout(() => {
-        router.push('/admin');
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [status, router]);
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/session');
+        if (res.ok) {
+          const session = await res.json();
+          if (session?.user) {
+            router.push('/admin');
+          }
+        }
+      } catch {
+        // Session check failed, user not authenticated
+      }
+    };
+    checkAuth();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
 
-    console.log("[Login] Attempting login for:", email);
-    console.log("[Login] Current URL:", window.location.href);
-    console.log("[Login] Callback URL param:", new URLSearchParams(window.location.search).get("callbackUrl"));
-    
     try {
       const result = await signIn('credentials', {
+        redirect: false,
         email,
         password,
         code: showMFA ? code : undefined,
-        redirect: false,
       });
 
       if (result?.error) {
-        console.error("Authentication error:", result.error, result);
-        
-        // Standardize error messages to prevent information leakage
-        if (result.error === "DB_SCHEMA_NOT_READY") {
+        // Handle specific NextAuth error codes
+        if (result.error === 'MFA_REQUIRED') {
+          setShowMFA(true);
           toast({
-            variant: "destructive",
-            title: "Service Unavailable",
-            description: "Database schema not ready; run prisma migrate deploy",
-          });
-        } else if (result.error === "RATE_LIMIT_EXCEEDED") {
-          const retryAfter = (result as any)?.retryAfter || "a few minutes";
-          toast({
-            variant: "destructive",
-            title: "Too Many Attempts",
-            description: `Too many login attempts. Please try again in ${retryAfter} seconds.`,
+            variant: 'default',
+            title: 'Two-Factor Required',
+            description: 'Please enter your 2FA code to continue.',
           });
         } else {
           // Generic error message for all authentication failures
           toast({
-            variant: "destructive",
-            title: "Authentication Failed",
-            description: "Invalid credentials. Please try again.",
+            variant: 'destructive',
+            title: 'Authentication Failed',
+            description: 'Invalid credentials. Please try again.',
           });
+          // Always show MFA input after failed attempt to prevent MFA status leakage
+          setShowMFA(true);
         }
-        
-        // Always show MFA input after first failed attempt to prevent MFA status leakage
-        setShowMFA(true);
       } else {
-        const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl");
-        if (callbackUrl) {
-          try {
-            // Ensure relative path only for security
-            if (callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')) {
-              router.push(callbackUrl);
-            } else {
-              router.push('/admin');
-            }
-          } catch (e) {
-            router.push('/admin');
-          }
-        } else {
-          router.push('/admin');
-        }
+        // Successful login
+        router.push('/admin');
         router.refresh();
       }
-    } catch (_error) {
+    } catch {
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred.",
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An unexpected error occurred.',
       });
     } finally {
       setIsLoading(false);
