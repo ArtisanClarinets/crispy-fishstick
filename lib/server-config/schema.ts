@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 // --- TypeScript Interface Definitions ---
 // Defined explicitly to avoid recursive z.infer<> calls that cause stack overflow
 
@@ -88,90 +86,90 @@ export interface RecommendationResult {
   explanation: RecommendationExplanation;
 }
 
-// --- Zod Schemas (Runtime Validation) ---
+// --- Runtime Validation Schemas ---
+// Using minimal Zod schemas to avoid complex type inference
 
-export const WorkloadTypeSchema = z.enum([
-  "web_server",
-  "database",
-  "ai_ml",
-  "storage_node",
-  "general_compute"
-]);
+import { z } from "zod";
 
-export const TrafficPatternSchema = z.enum([
-  "constant", // Steady load
-  "bursty",   // Spiky load (needs higher headroom)
-  "predictable_spikes", // Scheduled or known spikes
-]);
+// Simple schema types - avoid discriminatedUnion and complex unions
+const StringSchema = z.string();
+const NumberSchema = z.number();
+const BooleanSchema = z.boolean();
+const ArraySchema = <T>(itemSchema: z.ZodType<T>) => z.array(itemSchema);
+const OptionalSchema = <T>(schema: z.ZodType<T>) => schema.optional();
 
-// Base schema for shared fields
-const BaseIntentSchema = z.object({
-  workloadType: WorkloadSchema,
-  trafficPattern: TrafficPatternSchema,
-  userCount: z.coerce.number().min(1).max(1000000).default(100),
-  environment: z.enum(["production", "staging", "dev"]).default("production"),
-});
+// Build workload intent schema dynamically
+const BaseIntentFields = {
+  workloadType: StringSchema,
+  trafficPattern: StringSchema,
+  userCount: NumberSchema,
+  environment: StringSchema,
+};
 
-// Simplified Zod schemas - use simple object schemas instead of discriminatedUnion
-// to avoid TypeScript stack overflow during type checking
-const WebServerSchema = z.object({
+// Workload-specific schemas
+const WebServerFields = {
   workloadType: z.literal("web_server"),
-  requestsPerSecond: z.coerce.number().min(1).default(50),
-  concurrentConnections: z.coerce.number().min(1).default(20),
-});
+  requestsPerSecond: NumberSchema,
+  concurrentConnections: NumberSchema,
+};
 
-const DatabaseSchema = z.object({
+const DatabaseFields = {
   workloadType: z.literal("database"),
-  datasetSizeGB: z.coerce.number().min(1).default(10),
-  readWriteRatio: z.enum(["read_heavy", "write_heavy", "balanced"]).default("balanced"),
-});
+  datasetSizeGB: NumberSchema,
+  readWriteRatio: StringSchema,
+};
 
-const AiMlSchema = z.object({
+const AiMlFields = {
   workloadType: z.literal("ai_ml"),
-  modelSizeParams: z.enum(["small", "medium", "large", "xlarge"]).default("medium"),
-  batchSize: z.coerce.number().min(1).default(1),
-  trainingOrInference: z.enum(["training", "inference"]).default("inference"),
-});
+  modelSizeParams: StringSchema,
+  batchSize: NumberSchema,
+  trainingOrInference: StringSchema,
+};
 
-const StorageNodeSchema = z.object({
+const StorageNodeFields = {
   workloadType: z.literal("storage_node"),
-  storageCapacityTB: z.coerce.number().min(1).default(1),
-  accessFrequency: z.enum(["hot", "warm", "cold"]).default("hot"),
-});
+  storageCapacityTB: NumberSchema,
+  accessFrequency: StringSchema,
+};
 
-const GeneralComputeSchema = z.object({
+const GeneralComputeFields = {
   workloadType: z.literal("general_compute"),
-  concurrentJobs: z.coerce.number().min(1).default(1),
-});
+  concurrentJobs: NumberSchema,
+};
 
-// Union of all workload schemas - using z.union instead of discriminatedUnion
-export const WorkloadIntentSchema = z.union([
-  BaseIntentSchema.merge(WebServerSchema),
-  BaseIntentSchema.merge(DatabaseSchema),
-  BaseIntentSchema.merge(AiMlSchema),
-  BaseIntentSchema.merge(StorageNodeSchema),
-  BaseIntentSchema.merge(GeneralComputeSchema),
-]);
+// Simple object schemas without discriminatedUnion
+const WebServerSchema = z.object(WebServerFields);
+const DatabaseSchema = z.object(DatabaseFields);
+const AiMlSchema = z.object(AiMlFields);
+const StorageNodeSchema = z.object(StorageNodeFields);
+const GeneralComputeSchema = z.object(GeneralComputeFields);
 
-// --- Output Schema (Requirements & Recommendation) ---
+// Export schemas for runtime validation
+export const WorkloadIntentSchema = {
+  webServer: WebServerSchema,
+  database: DatabaseSchema,
+  aiMl: AiMlSchema,
+  storageNode: StorageNodeSchema,
+  generalCompute: GeneralComputeSchema,
+} as const;
 
 export const ResourceRequirementsSchema = z.object({
-  cpuCores: z.number(),
-  ramGB: z.number(),
-  storageGB: z.number(),
-  storageType: z.enum(["NVMe", "SSD", "HDD"]),
-  gpuCount: z.number().optional(),
-  gpuVramGB: z.number().optional(),
-  networkSpeedGbps: z.number(),
+  cpuCores: NumberSchema,
+  ramGB: NumberSchema,
+  storageGB: NumberSchema,
+  storageType: StringSchema,
+  gpuCount: NumberSchema.optional(),
+  gpuVramGB: NumberSchema.optional(),
+  networkSpeedGbps: NumberSchema,
 });
 
 export const ServerSkuSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
+  id: StringSchema,
+  name: StringSchema,
+  description: StringSchema,
   specs: ResourceRequirementsSchema,
-  priceMonthly: z.number(),
-  stockStatus: z.enum(["in_stock", "low_stock", "backorder"]),
+  priceMonthly: NumberSchema,
+  stockStatus: StringSchema,
 });
 
 export const RecommendationResultSchema = z.object({
@@ -179,11 +177,40 @@ export const RecommendationResultSchema = z.object({
   primarySku: ServerSkuSchema,
   alternativeSkus: z.array(ServerSkuSchema),
   explanation: z.object({
-    bottleneck: z.string(),
-    headroomFactor: z.number(),
-    notes: z.array(z.string()),
+    bottleneck: StringSchema,
+    headroomFactor: NumberSchema,
+    notes: z.array(StringSchema),
   }),
 });
 
-// WorkloadTypeSchema alias for internal use
-const WorkloadSchema = WorkloadTypeSchema;
+// Validator function for WorkloadIntent
+export function validateWorkloadIntent(data: unknown): data is WorkloadIntent {
+  if (!data || typeof data !== "object") return false;
+  const obj = data as Record<string, unknown>;
+  
+  // Check base fields
+  const validWorkloadTypes = ["web_server", "database", "ai_ml", "storage_node", "general_compute"];
+  const validTrafficPatterns = ["constant", "bursty", "predictable_spikes"];
+  const validEnvironments = ["production", "staging", "dev"];
+  
+  if (!validWorkloadTypes.includes(obj.workloadType as string)) return false;
+  if (!validTrafficPatterns.includes(obj.trafficPattern as string)) return false;
+  if (typeof obj.userCount !== "number") return false;
+  if (!validEnvironments.includes(obj.environment as string)) return false;
+  
+  // Check workload-specific fields
+  switch (obj.workloadType) {
+    case "web_server":
+      return typeof obj.requestsPerSecond === "number" && typeof obj.concurrentConnections === "number";
+    case "database":
+      return typeof obj.datasetSizeGB === "number" && typeof obj.readWriteRatio === "string";
+    case "ai_ml":
+      return typeof obj.modelSizeParams === "string" && typeof obj.batchSize === "number" && typeof obj.trainingOrInference === "string";
+    case "storage_node":
+      return typeof obj.storageCapacityTB === "number" && typeof obj.accessFrequency === "string";
+    case "general_compute":
+      return typeof obj.concurrentJobs === "number";
+    default:
+      return false;
+  }
+}
