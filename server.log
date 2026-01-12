@@ -2,39 +2,53 @@
 > crispy-fishstick@0.1.0 dev
 > next dev
 
-  ▲ Next.js 14.2.35
-  - Local:        http://localhost:3000
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
 
- ✓ Starting...
+✓ Starting...
 Attention: Next.js now collects completely anonymous telemetry regarding usage.
 This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-   automatically enabled Fast Refresh for 1 custom loader
- ✓ Ready in 1838ms
- ○ Compiling /middleware ...
- ✓ Compiled /middleware in 1170ms (171 modules)
- ○ Compiling / ...
- ✓ Compiled / in 13.3s (1673 modules)
- ✓ Compiled in 1746ms (817 modules)
- GET / 200 in 15099ms
- ○ Compiling /api/proof/headers ...
- ✓ Compiled /api/proof/headers in 9.6s (1087 modules)
- ✓ Compiled (1113 modules)
- GET /api/proof/headers 200 in 9861ms
- GET /api/proof/headers 200 in 10036ms
+[Telemetry] Service starting...
+[Telemetry] Service ready in 0.60ms
+✓ Ready in 2.3s
+○ Compiling / ...
+ GET / 200 in 10.2s (compile: 8.5s, proxy.ts: 284ms, render: 1436ms)
+○ Compiling /api/auth/[...nextauth] ...
+ GET /api/proof/headers 200 in 3.0s (compile: 2.9s, proxy.ts: 39ms, render: 21ms)
 WARNING: No MFA encryption key configured. MFA will not work reliably.
- GET / 200 in 8867ms
-WARNING: No MFA encryption key configured. MFA will not work reliably.
-[next-auth][warn][NEXTAUTH_URL]
-https://next-auth.js.org/warnings#nextauth_url
-[next-auth][warn][NO_SECRET]
-https://next-auth.js.org/warnings#no_secret
- GET /api/auth/session 200 in 11372ms
- GET /api/auth/session 200 in 40ms
- GET /api/auth/session 200 in 41ms
- GET /api/auth/session 200 in 25ms
-WARNING: No MFA encryption key configured. MFA will not work reliably.
- GET /api/proof/headers 200 in 22ms
- GET /api/proof/headers 200 in 30ms
+⨯ Error: MFA_ENCRYPTION_KEY is required. Please set a dedicated MFA_ENCRYPTION_KEY in your environment variables.
+    at getMFAEncryptionKey (lib/security/mfa.ts:24:11)
+    at module evaluation (lib/security/mfa.ts:33:48)
+    at module evaluation (lib/auth.ts:6:1)
+    at module evaluation (app/api/auth/[...nextauth]/route.ts:2:1)
+    at Object.<anonymous> (.next/dev/server/app/api/auth/[...nextauth]/route.js:11:3)
+  22 |
+  23 |   if (!key) {
+> 24 |     throw new Error(
+     |           ^
+  25 |       "MFA_ENCRYPTION_KEY is required. Please set a dedicated MFA_ENCRYPTION_KEY in your environment variables."
+  26 |     );
+  27 |   } {
+  page: '/api/auth/session'
+}
+ GET /api/auth/session 500 in 7.6s (compile: 7.4s, proxy.ts: 46ms, render: 227ms)
+⨯ Error: MFA_ENCRYPTION_KEY is required. Please set a dedicated MFA_ENCRYPTION_KEY in your environment variables.
+    at getMFAEncryptionKey (lib/security/mfa.ts:24:11)
+    at module evaluation (lib/security/mfa.ts:33:48)
+    at module evaluation (lib/auth.ts:6:1)
+    at module evaluation (app/api/auth/[...nextauth]/route.ts:2:1)
+    at Object.<anonymous> (.next/dev/server/app/api/auth/[...nextauth]/route.js:11:3)
+  22 |
+  23 |   if (!key) {
+> 24 |     throw new Error(
+     |           ^
+  25 |       "MFA_ENCRYPTION_KEY is required. Please set a dedicated MFA_ENCRYPTION_KEY in your environment variables."
+  26 |     );
+  27 |   } {
+  page: '/api/auth/_log'
+}
+ POST /api/auth/_log 500 in 95ms (compile: 70ms, proxy.ts: 12ms, render: 14ms)
