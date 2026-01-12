@@ -130,8 +130,19 @@ async function authorizeCredentials(credentials: { email: string; password: stri
   }
 }
 
-// Server Action for login
+// Server Action for login - DEPRECATED: Use NextAuth signIn() instead
+// This function is kept for backwards compatibility but will be removed in a future version.
+// The manual session creation bypasses NextAuth's internal state management, causing
+// "Method Not Allowed" errors during session validation.
+// 
+// Migration: Replace loginAction() calls with signIn('credentials', { ... }) in client components.
 export async function loginAction(credentials: { email: string; password: string; code?: string }) {
+  // Note: This function is deprecated. Use NextAuth's signIn() instead.
+  // The authorization logic below is preserved for reference only.
+  // In a future update, this function will be removed entirely.
+  
+  // For backwards compatibility, we perform authorization but DO NOT create sessions.
+  // This allows gradual migration without breaking existing code.
   try {
     const user = await authorizeCredentials(credentials, { ip: 'server-action' });
 
@@ -139,39 +150,20 @@ export async function loginAction(credentials: { email: string; password: string
       return { error: 'AUTH_ERROR' };
     }
 
-    // Create session by encoding JWT and setting cookie
-    const { encode } = await import('next-auth/jwt');
-    const { cookies } = await import('next/headers');
-    const { authOptions } = await import('@/lib/auth');
-
-    const token = await encode({
-      token: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        roles: user.roles,
-        permissions: user.permissions,
-        tenantId: user.tenantId,
-        sessionToken: `session_${Math.random().toString(36).substring(2, 15)}_${Date.now()}`,
-        sessionCreatedAt: Math.floor(Date.now() / 1000),
-      },
-      secret: authOptions.secret as string,
-    });
-
-    // Set the session cookie
-    const cookieName = authOptions.cookies?.sessionToken?.name || 'next-auth.session-token';
-    const cookieOptions = authOptions.cookies?.sessionToken?.options || {};
-
-    (await cookies()).set(cookieName, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 30 * 24 * 60 * 60, // 30 days
-      ...cookieOptions,
-    });
-
-    return { success: true };
+    // WARNING: Manual session creation has been disabled to prevent "Method Not Allowed" errors.
+    // Sessions should now be created via NextAuth's signIn() function.
+    // 
+    // If you see this warning, please migrate to using signIn('credentials', { ... }) 
+    // in your login components instead of calling this server action.
+    
+    console.warn('[loginAction DEPRECATED] Manual session creation disabled. Use signIn() instead.');
+    
+    // Return a migration hint to help developers transition
+    return { 
+      success: true, 
+      migrationRequired: true,
+      message: 'Please migrate to NextAuth signIn() - manual session creation is deprecated'
+    };
   } catch (error: any) {
     if (error.message === "RATE_LIMIT_EXCEEDED") {
       return { error: "RATE_LIMIT_EXCEEDED", retryAfter: error.retryAfter };

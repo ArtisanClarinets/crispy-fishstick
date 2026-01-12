@@ -648,3 +648,68 @@ model WebhookEndpoint {
   WebhookDelivery WebhookDelivery[]
   Tenant          Tenant            @relation(fields: [tenantId], references: [id])
 }
+
+model InfraSku {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  basePriceMonthlyCents Int
+  currency    String   @default("USD")
+  specsJson   String   // JSON containing cpu/ram/storage/network/etc
+  lifecycle   String   @default("active") // active, retiring, retired
+  
+  // Relations
+  options     InfraOption[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model InfraOption {
+  id              String   @id @default(cuid())
+  skuId           String
+  groupKey        String   // ram, storage, ha
+  label           String
+  priceDeltaCents Int
+  constraintsJson String?  // simple gating rules
+  
+  InfraSku        InfraSku @relation(fields: [skuId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([skuId])
+}
+
+model InfraBuild {
+  id                  String   @id @default(cuid())
+  code                String   @unique // shortlink code
+  expiresAt           DateTime
+  skuSnapshotJson     String   // Full snapshot of SKU at time of build
+  optionsSnapshotJson String   // Full snapshot of selected options
+  computedTotalsJson  String   // JSON with total price, power, specs
+  leadId              String?
+  
+  // Relations
+  reservations        InfraReservation[]
+  
+  createdAt           DateTime @default(now())
+  
+  @@index([code])
+  @@index([expiresAt])
+}
+
+model InfraReservation {
+  id        String   @id @default(cuid())
+  buildId   String
+  expiresAt DateTime
+  status    String   // active, expired, converted
+  
+  InfraBuild InfraBuild @relation(fields: [buildId], references: [id])
+  
+  createdAt DateTime @default(now())
+  
+  @@index([buildId])
+  @@index([expiresAt])
+}
