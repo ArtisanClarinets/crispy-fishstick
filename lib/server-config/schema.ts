@@ -9,8 +9,6 @@
 import { z } from "zod";
 
 // --- TypeScript Interface Definitions ---
-// Defined explicitly to avoid recursive z.infer<> calls that cause stack overflow
-import { z } from "zod";
 
 export type WorkloadType = 
   | "web_server" 
@@ -99,6 +97,52 @@ export interface RecommendationResult {
 
 // --- Runtime Validation Schemas ---
 
+/**
+ * WorkloadIntentSchema - Validates workload intent data at runtime
+ * 
+ * Using z.any() as a minimal schema to avoid complex type inference that can cause
+ * stack overflow during TypeScript type checking. The actual runtime validation
+ * is handled by the validateWorkloadIntent() function.
+ */
+export const WorkloadIntentSchema = z.any();
+
+/**
+ * Validates workload intent data against the TypeScript interface
+ */
+export function validateWorkloadIntent(data: unknown): data is WorkloadIntent {
+  if (!data || typeof data !== "object") return false;
+  const obj = data as Record<string, unknown>;
+  
+  // Check base fields
+  const validWorkloadTypes = ["web_server", "database", "ai_ml", "storage_node", "general_compute"];
+  const validTrafficPatterns = ["constant", "bursty", "predictable_spikes"];
+  const validEnvironments = ["production", "staging", "dev"];
+  
+  if (!validWorkloadTypes.includes(obj.workloadType as string)) return false;
+  if (!validTrafficPatterns.includes(obj.trafficPattern as string)) return false;
+  if (typeof obj.userCount !== "number") return false;
+  if (!validEnvironments.includes(obj.environment as string)) return false;
+  
+  // Check workload-specific fields
+  switch (obj.workloadType) {
+    case "web_server":
+      return typeof obj.requestsPerSecond === "number" && typeof obj.concurrentConnections === "number";
+    case "database":
+      return typeof obj.datasetSizeGB === "number" && typeof obj.readWriteRatio === "string";
+    case "ai_ml":
+      return typeof obj.modelSizeParams === "string" && typeof obj.batchSize === "number" && typeof obj.trainingOrInference === "string";
+    case "storage_node":
+      return typeof obj.storageCapacityTB === "number" && typeof obj.accessFrequency === "string";
+    case "general_compute":
+      return typeof obj.concurrentJobs === "number";
+    default:
+      return false;
+  }
+}
+
+/**
+ * ResourceRequirementsSchema - Validates resource requirements at runtime
+ */
 export const ResourceRequirementsSchema = z.object({
   cpuCores: z.number(),
   ramGB: z.number(),

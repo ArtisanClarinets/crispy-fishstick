@@ -1,13 +1,11 @@
 {
-<<<<<<< HEAD
+  "commit": "ccb6ba7f11ff",
+  "builtAt": "2026-01-13T04:48:47.040Z",
+  "depsSha256": "c29a50e3e457ed6b8f1aa510d8493e2a6233ec2931f1236ad5180a4a67651f62",
   "commit": "7486b18b14f2",
   "builtAt": "2026-01-12T22:37:12.990Z",
   "depsSha256": "0d8da7253c2fa838a04a63d44301d6d31fed1ee1a2e749505b12ad9888a705db",
-=======
-  "commit": "ca07ef4b99b5",
-  "builtAt": "2026-01-13T02:42:33.253Z",
-  "depsSha256": "1cd7b5fd0507016f46d388a949513b65d8a867be2652683fce61d664e6057a45",
->>>>>>> ccb6ba7 (Updated a lot of stuff)
+
   "generated": true,
   "gatesConfigured": [
     "ESLint enforced",
