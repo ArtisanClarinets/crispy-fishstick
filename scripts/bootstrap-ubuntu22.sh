@@ -658,9 +658,9 @@ generate_error_summary() {
     
     # Count steps from log file
     if [ -f "$LOG_FILE" ]; then
-        total_steps=$(grep -c "Executing:" "$LOG_FILE" || echo "0")
-        completed_steps=$(grep -c "✓.*completed successfully" "$LOG_FILE" || echo "0")
-        failed_steps=$(grep -c "✗.*failed" "$LOG_FILE" || echo "0")
+        total_steps=$(grep -c "Executing:" "$LOG_FILE" 2>/dev/null || echo 0)
+        completed_steps=$(grep -c "✓.*completed successfully" "$LOG_FILE" 2>/dev/null || echo 0)
+        failed_steps=$(grep -c "✗.*failed" "$LOG_FILE" 2>/dev/null || echo 0)
     fi
     
     echo "" | tee -a "$LOG_FILE"
@@ -672,7 +672,7 @@ generate_error_summary() {
     echo "  Steps Completed:        $completed_steps" | tee -a "$LOG_FILE"
     echo "  Steps Failed:           $failed_steps" | tee -a "$LOG_FILE"
     
-    if [ $total_steps -gt 0 ]; then
+    if [ "$total_steps" -gt 0 ]; then
         local success_rate=$((completed_steps * 100 / total_steps))
         echo "  Success Rate:           ${success_rate}%" | tee -a "$LOG_FILE"
     fi
@@ -684,7 +684,7 @@ generate_error_summary() {
     echo "" | tee -a "$LOG_FILE"
     
     # List failed operations
-    if [ $failed_steps -gt 0 ]; then
+    if [ "$failed_steps" -gt 0 ]; then
         echo "  ❌ FAILED OPERATIONS:" | tee -a "$LOG_FILE"
         grep "✗.*failed" "$LOG_FILE" | sed 's/^\[.*\] //' | while read -r line; do
             echo "    • $line" | tee -a "$LOG_FILE"
@@ -693,12 +693,12 @@ generate_error_summary() {
     fi
     
     # List completed operations
-    if [ $completed_steps -gt 0 ]; then
+    if [ "$completed_steps" -gt 0 ]; then
         echo "  ✅ COMPLETED OPERATIONS:" | tee -a "$LOG_FILE"
         grep "✓.*completed successfully" "$LOG_FILE" | sed 's/^\[.*\] //' | head -10 | while read -r line; do
             echo "    • $line" | tee -a "$LOG_FILE"
         done
-        if [ $completed_steps -gt 10 ]; then
+        if [ "$completed_steps" -gt 10 ]; then
             echo "    • ... and $((completed_steps - 10)) more operations" | tee -a "$LOG_FILE"
         fi
         echo "" | tee -a "$LOG_FILE"
@@ -707,7 +707,7 @@ generate_error_summary() {
     echo "═══════════════════════════════════════════════════════════════" | tee -a "$LOG_FILE"
     
     # Final status
-    if [ $failed_steps -eq 0 ] && [ $completed_steps -gt 0 ]; then
+    if [ "$failed_steps" -eq 0 ] && [ "$completed_steps" -gt 0 ]; then
         log_success "🎉 Bootstrap completed successfully!"
         echo "" | tee -a "$LOG_FILE"
         echo "  Next steps:" | tee -a "$LOG_FILE"
@@ -726,6 +726,213 @@ generate_error_summary() {
     fi
     
     echo "═══════════════════════════════════════════════════════════════" | tee -a "$LOG_FILE"
+}
+
+# ============================================================================
+#  PACKAGE & DEPENDENCY INSTALLATION FUNCTIONS
+# ============================================================================
+
+# Secure package installation with retry and idempotency
+secure_install_packages() {
+    local packages=("$@")
+    local failed_packages=()
+    
+    log_info "Installing system packages: ${packages[*]}"
+    
+    # Update package list
+    if ! apt-get update >/dev/null 2>&1; then
+        log_error "Failed to update package list"
+        return 1
+    fi
+    
+    # Install each package
+    for pkg in "${packages[@]}"; do
+        if dpkg -l | grep -q "^ii  $pkg"; then
+            log_success "✓ Package already installed: $pkg"
+        else
+            log_info "Installing: $pkg"
+            if apt-get install -y "$pkg" >/dev/null 2>&1; then
+                log_success "✓ Installed: $pkg"
+            else
+                log_error "✗ Failed to install: $pkg"
+                failed_packages+=("$pkg")
+            fi
+        fi
+    done
+    
+    if [ ${#failed_packages[@]} -gt 0 ]; then
+        log_error "Failed to install packages: ${failed_packages[*]}"
+        return 1
+    fi
+    
+    log_success "✓ All packages installed successfully"
+    return 0
+}
+
+# Install Node.js if not present
+secure_install_nodejs() {
+    log_info "Checking Node.js installation..."
+    
+    if command -v node >/dev/null 2>&1; then
+        local node_version=$(node --version)
+        log_success "✓ Node.js already installed: $node_version"
+        return 0
+    fi
+    
+    log_info "Installing Node.js 22 (LTS)..."
+    
+    # Use NodeSource repository for Node.js 22
+    if curl -fsSL https://deb.nodesource.com/setup_22.x | bash - >/dev/null 2>&1; then
+        if apt-get install -y nodejs >/dev/null 2>&1; then
+            log_success "✓ Node.js installed successfully"
+            log_info "Node.js version: $(node --version)"
+            log_info "npm version: $(npm --version)"
+            return 0
+        fi
+    fi
+    
+    log_error "Failed to install Node.js"
+    return 1
+}
+
+# Install application dependencies
+secure_install_app_dependencies() {
+    log_info "Installing application dependencies..."
+    
+    if [ ! -d "$APP_DIR" ]; then
+        log_error "Application directory not found: $APP_DIR"
+        return 1
+    fi
+    
+    cd "$APP_DIR" || return 1
+    
+    if [ ! -f "package.json" ]; then
+        log_error "package.json not found in $APP_DIR"
+        return 1
+    fi
+    
+    # Check if npm is available
+    if ! command -v npm >/dev/null 2>&1; then
+        log_error "npm not found"
+        return 1
+    fi
+    
+    # Install dependencies (include devDependencies for build tools)
+    if npm install 2>&1; then
+        log_success "✓ Application dependencies installed"
+        return 0
+    else
+        log_error "Failed to install application dependencies"
+        return 1
+    fi
+}
+
+# Build the application
+secure_build_application() {
+    log_info "Building application..."
+    
+    if [ ! -d "$APP_DIR" ]; then
+        log_error "Application directory not found: $APP_DIR"
+        return 1
+    fi
+    
+    cd "$APP_DIR" || return 1
+    
+    # Generate Prisma client
+    log_info "Generating Prisma client..."
+    if ! npx prisma generate 2>&1; then
+        log_warning "⚠ Prisma generate failed (may already be generated)"
+    fi
+    
+    # Run build
+    if npm run build 2>&1; then
+        log_success "✓ Application built successfully"
+        return 0
+    else
+        log_error "Failed to build application"
+        return 1
+    fi
+}
+
+# Configure systemd service from template
+secure_configure_systemd_service() {
+    local service_name="$1"
+    local template_path="$2"
+    
+    log_info "Configuring systemd service: $service_name"
+    
+    if [ ! -f "$template_path" ]; then
+        log_error "Service template not found: $template_path"
+        return 1
+    fi
+    
+    local target_path="/etc/systemd/system/$service_name"
+    
+    if cp "$template_path" "$target_path"; then
+        chmod 644 "$target_path"
+        log_success "✓ Configured systemd service: $service_name"
+        return 0
+    else
+        log_error "Failed to configure systemd service: $service_name"
+        return 1
+    fi
+}
+
+# Configure Nginx from generated config
+secure_configure_nginx() {
+    log_info "Configuring Nginx reverse proxy..."
+    
+    # Load environment to get DEPLOY_DOMAIN and PORT
+    if [ -f "$APP_DIR/.env" ]; then
+        set +a
+        source "$APP_DIR/.env"
+        set -a
+    fi
+    
+    local nginx_config="$APP_DIR/config/nginx/nginx.conf"
+    if [ ! -f "$nginx_config" ]; then
+        log_warning "⚠ Nginx config not found, generating..."
+        
+        cd "$APP_DIR" || return 1
+        
+        # Generate nginx config with environment
+        if ! DEPLOY_DOMAIN="${DEPLOY_DOMAIN:-vantus.systems}" \
+             DEPLOY_PORT="${PORT:-3005}" \
+             DEPLOY_ROOT="$APP_DIR" \
+             node scripts/generate-nginx-config.mjs >/dev/null 2>&1; then
+            log_error "Failed to generate Nginx config"
+            return 1
+        fi
+    fi
+    
+    # Verify config was created
+    if [ ! -f "$nginx_config" ]; then
+        log_error "Nginx config generation failed"
+        return 1
+    fi
+    
+    # Copy to Nginx directory
+    mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
+    if cp "$nginx_config" /etc/nginx/sites-available/vantus.conf; then
+        chmod 644 /etc/nginx/sites-available/vantus.conf
+        
+        # Enable site if not already enabled
+        if [ ! -L /etc/nginx/sites-enabled/vantus.conf ]; then
+            ln -sf /etc/nginx/sites-available/vantus.conf /etc/nginx/sites-enabled/vantus.conf
+        fi
+        
+        # Test Nginx configuration
+        if nginx -t >/dev/null 2>&1; then
+            log_success "✓ Nginx configured and validated"
+            return 0
+        else
+            log_warning "⚠ Nginx configuration validation failed, but continuing"
+            return 0
+        fi
+    else
+        log_error "Failed to copy Nginx config"
+        return 1
+    fi
 }
 
 # Add comprehensive verification command handler
@@ -834,12 +1041,39 @@ for dir in "$APP_DIR" "$LOG_DIR" "$DATA_DIR"; do
     fi
 done
 
-log_section "STEP 4: Secure Package Installation"
+log_section "STEP 4: Environment Configuration"
 
-# Install required packages with comprehensive error handling
-if ! secure_install_packages "nginx" "sqlite3" "certbot" "python3-certbot-nginx" "rsync" "curl" "git"; then
-    log_error "Package installation failed"
-    generate_error_summary
+# Check if environment file exists
+if [ -f "$ENV_FILE" ]; then
+    log_success "Environment file exists: $ENV_FILE"
+    log_info "Loading environment from: $ENV_FILE"
+    set -a
+    source "$ENV_FILE" 2>/dev/null || true
+    set +a
+elif [ -f "$APP_DIR/.env" ]; then
+    log_success "Environment file exists: $APP_DIR/.env"
+    log_info "Loading environment from: $APP_DIR/.env"
+    set -a
+    source "$APP_DIR/.env" 2>/dev/null || true
+    set +a
+else
+    log_warning "⚠ No environment file found, using defaults"
+    log_info "To configure environment manually, run: node scripts/setup-env.js"
+fi
+
+log_section "STEP 5: Secure Package Installation"
+
+# Clean up old Next.js middleware.ts if it exists (Next.js 16 uses proxy.ts only)
+if [ -f "$APP_DIR/middleware.ts" ]; then
+    log_info "Removing legacy middleware.ts (Next.js 16 uses proxy.ts only)"
+    rm -f "$APP_DIR/middleware.ts"
+fi
+    
+    # Clean up node_modules to ensure fresh install
+    if [ -d "$APP_DIR/node_modules" ]; then
+        log_info "Cleaning up old node_modules directory..."
+        rm -rf "$APP_DIR/node_modules" "$APP_DIR/package-lock.json"
+    fi
     exit 1
 fi
 
@@ -850,7 +1084,7 @@ if ! secure_install_nodejs; then
     exit 1
 fi
 
-log_section "STEP 5: Application Setup"
+log_section "STEP 6: Application Setup"
 
 # Copy application files with validation
 if [ -d ".git" ]; then
@@ -875,7 +1109,7 @@ else
     exit 1
 fi
 
-log_section "STEP 6: Dependency Installation"
+log_section "STEP 7: Dependency Installation"
 
 # Install application dependencies with comprehensive error handling
 if ! secure_install_app_dependencies; then
@@ -884,7 +1118,7 @@ if ! secure_install_app_dependencies; then
     exit 1
 fi
 
-log_section "STEP 7: Application Build"
+log_section "STEP 8: Application Build"
 
 # Build application with comprehensive error handling
 if ! secure_build_application; then
@@ -893,7 +1127,16 @@ if ! secure_build_application; then
     exit 1
 fi
 
-log_section "STEP 8: Systemd Service Configuration"
+log_section "STEP 9: Nginx Configuration"
+
+# Configure Nginx reverse proxy with comprehensive error handling
+if ! secure_configure_nginx; then
+    log_error "Nginx configuration failed"
+    generate_error_summary
+    exit 1
+fi
+
+log_section "STEP 10: Systemd Service Configuration"
 
 # Configure systemd services with comprehensive error handling
 if ! secure_configure_systemd_service "vantus.service" "$APP_DIR/config/systemd/vantus.service"; then
@@ -913,8 +1156,7 @@ if ! systemctl daemon-reload; then
     exit 1
 fi
 
-# Enable services with comprehensive error handling
-log_info "STEP 9: Final Verification"
+log_section "STEP 11: Final Verification"
 
 # Run comprehensive verification
 if ! verify_dependencies; then

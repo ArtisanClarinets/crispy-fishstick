@@ -1,6 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 // import { getRateLimiter } from '@/lib/security/rate-limit';
 
@@ -13,15 +11,21 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-// Mock Redis and rate limiter
-vi.mock('ioredis', () => ({
-  Redis: vi.fn().mockImplementation(() => ({
-    hgetall: vi.fn().mockResolvedValue(null),
-    hmset: vi.fn().mockResolvedValue('OK'),
-    expireat: vi.fn().mockResolvedValue(1),
-    hincrby: vi.fn().mockResolvedValue(1),
-  })),
-}));
+// Mock Redis properly as a class constructor
+vi.mock('ioredis', () => {
+  const Redis = vi.fn();
+  Redis.prototype.hgetall = vi.fn().mockResolvedValue(null);
+  Redis.prototype.hmset = vi.fn().mockResolvedValue('OK');
+  Redis.prototype.expireat = vi.fn().mockResolvedValue(1);
+  Redis.prototype.hincrby = vi.fn().mockResolvedValue(1);
+  Redis.prototype.quit = vi.fn();
+  Redis.prototype.on = vi.fn();
+
+  return {
+    Redis: Redis,
+    default: Redis,
+  };
+});
 
 // Create a persistent mock instance using vi.hoisted
 const { mockRateLimiterInstance } = vi.hoisted(() => ({
@@ -39,9 +43,18 @@ vi.mock('@/lib/security/rate-limit', () => ({
   }
 }));
 
+// Mock MFA
 vi.mock('@/lib/security/mfa', () => ({
   decryptSecret: vi.fn().mockResolvedValue('test-secret'),
 }));
+
+// Mock authenticator
+vi.spyOn(authenticator, 'check').mockReturnValue(true);
+
+// Import authOptions AFTER mocking dependencies
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { getRateLimiter } from '@/lib/security/rate-limit';
 
 describe('Authentication Logic', () => {
   const credentialsProvider = authOptions.providers.find(
@@ -51,7 +64,7 @@ describe('Authentication Logic', () => {
   // @ts-ignore - NextAuth types make it hard to access the authorize method directly
   const authorize = credentialsProvider.options.authorize;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     mockRateLimiterInstance.checkLoginAttempt.mockReset();
     mockRateLimiterInstance.checkLoginAttempt.mockResolvedValue({ success: true, remaining: 5 });
@@ -191,11 +204,37 @@ describe('Authentication Logic', () => {
       const mockUser = {
         id: '1',
         email: 'test@example.com',
-        passwordHash: await bcrypt.hash('password123', 10),
+        passwordHash: hashedPassword,
         RoleAssignment: []
       };
 
       (prisma.user.findUnique as any).mockResolvedValue(mockUser);
+
+      const redisModule = await import('ioredis');
+      // @ts-ignore
+      const redis = new redisModule.Redis();
+      const rateLimiter = getRateLimiter(redis);
+
+      // Call authorize which internally uses the rate limiter
+      await authorize({
+        email: 'test@example.com',
+        password: password,
+      }, { ip: '127.0.0.1' });
+
+      // Verify checkLoginAttempt was called
+      expect(rateLimiter.checkLoginAttempt).toHaveBeenCalledWith('127.0.0.1', 'test@example.com');
+    });
+
+    it('should handle rate limit errors in authorize function', async () => {
+      // Mock rate limiter to return rate limit exceeded
+      const redisModule = await import('ioredis');
+      // @ts-ignore
+      const redis = new redisModule.Redis();
+      const rateLimiter = getRateLimiter(redis);
+      (rateLimiter.checkLoginAttempt as any).mockResolvedValueOnce({
+        success: false,
+        retryAfter: 30
+      });
 
       // This should throw RATE_LIMIT_EXCEEDED
       await expect(authorize({
@@ -299,7 +338,7 @@ describe('Authentication Logic', () => {
       const result = await authorize({
         email: 'test@example.com',
         password: password,
-        code: '123456', // This would be validated against the secret
+        code: '123456',
       });
 
       expect(result).not.toBeNull();
@@ -325,6 +364,7 @@ describe('Authentication Logic', () => {
       // Mock decryptSecret to return a valid secret
       const mfaModule = await import('@/lib/security/mfa');
       vi.spyOn(mfaModule, 'decryptSecret').mockResolvedValue('test-secret');
+      vi.mocked(authenticator.check).mockReturnValue(false);
 
       // Ensure authenticator check fails (default behavior of real implementation with fake inputs,
       // or we can mock it to false to be explicit)

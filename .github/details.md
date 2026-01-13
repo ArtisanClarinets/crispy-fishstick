@@ -1,10 +1,10 @@
-# Copilot Instructions — Thompson Systems (Next.js 16 + Prisma)
+# Copilot Instructions — Vantus Systems (Next.js 16 + Prisma)
 
 These instructions are for GitHub Copilot (VS Code) working **inside this repository**.
 
 ## What this repo is
 - Project name (package.json): `crispy-fishstick`
-- App title (README.md): **Thompson Systems**
+- App title (README.md): **Vantus Systems**
 - Primary goal: A production-grade public website (marketing, case studies, labs) plus a hardened **Admin Portal** and APIs for operational workloads (leads, projects, proposals, contracts, invoices, media, audits, JIT access, MFA, webhooks, and observability tools).
 - Total source files: ~450 TypeScript/JS/MDX/MD files (excluding node_modules, .next, coverage)
 
@@ -79,6 +79,7 @@ These instructions are for GitHub Copilot (VS Code) working **inside this reposi
 - `AGENT.md`, `AGENT_GUIDE.md`, `ADMIN.md`, `ARCHITECTURE_REVIEW.md` — agent & architecture contracts and hard requirements
 - `docs/` — deployment, security review, and operational runbooks
 - `.agent/` — agent artifacts, decisions, and verification workflows
+- **2026-01-13:** `/.github/agents/general.agent.md` updated to add anti-hallucination controls, bounded execution rules, DAP workflow, and skills-based subagent orchestration (details.md updated)
 - `public/proof/build.json` — build proof artifact generated at build time
 
 ## API Endpoints (75 route files total; ~67 admin endpoints)
@@ -218,6 +219,74 @@ Notes: `scripts/setup-env.js` guides production env setup (generates secrets) an
 - `GET /api/csrf` — CSRF token
 - `POST /api/contact` — public contact form
 - `app/api/admin/*` — all admin API routes (users, projects, proposals, contracts, invoices, leads, media, webhooks, JIT access, audit exports)
+
+## Deployment Scripts & Infrastructure (`scripts/` directory)
+
+Updated 2026-01-13: All scripts have been reviewed, completed, and consolidated. See [SCRIPTS_INVENTORY.md](../scripts/SCRIPTS_INVENTORY.md) for full details.
+
+### Bootstrap & Deployment
+
+**`bootstrap-ubuntu22.sh`** ⭐ — **Production-grade Ubuntu 22.04 bootstrap**
+- Complete automated setup: user creation → package install → app build → Nginx config → systemd services
+- **Usage**: `sudo bash scripts/bootstrap-ubuntu22.sh` (11-step process)
+- **Verify mode**: `sudo bash scripts/bootstrap-ubuntu22.sh --verify` (check deployment state anytime)
+- Features: Fortune-500 hardened error handling, comprehensive logging, full idempotency, atomic rollback support
+
+### Configuration Generation
+
+- **`generate-nginx-config.mjs`** — Generates Nginx reverse proxy config (output: `config/nginx/nginx.conf`)
+  - Auto-detects TLS certificates, generates HTTP-only or HTTPS+redirect config
+  - Called during bootstrap with env vars: `DEPLOY_DOMAIN`, `DEPLOY_PORT`, `DEPLOY_ROOT`
+- **`generate-build-proof.mjs`** — Creates build proof artifact (`public/proof/build.json`)
+  - Git commit SHA, timestamp, dependency hash, quality gate status
+  - Auto-called via npm postinstall hook
+
+### Database & Backup
+
+- **`database-backup.sh`** — Secure backup/restore for SQLite, PostgreSQL, MySQL
+  - **Usage**: `sudo bash scripts/database-backup.sh backup [name]`, `restore [name]`, `verify [name]`, `list`
+  - Features: atomic ops, encryption, 90-day retention, integrity checks, least-privilege
+- **`validate-database.sh`** — Check DB connectivity, Prisma readiness, schema state
+  - Tests: DATABASE_URL, DB type detection, Prisma schema validation, migrations status
+
+### Environment & Permissions
+
+- **`setup-env.js`** — Interactive environment configuration
+  - Generates `.env` with all required variables, auto-generates secrets, admin credentials
+  - **Usage**: `node scripts/setup-env.js`
+- **`validate-file-permissions.sh`** — Audit sensitive file permissions
+  - Checks: `/var/www/vantus/.env`, `/etc/default/vantus` (both should be 600, vantus:vantus)
+
+### Admin Tools
+
+- **`verify-admin.ts`** — Check admin user existence, role assignments, MFA state
+  - **Usage**: `npx tsx scripts/verify-admin.ts [--email=...] [--password=...]`
+- **`reset-mfa.ts`** — Admin MFA reset (requires `--yes` flag for safety)
+  - **Usage**: `npx tsx scripts/reset-mfa.ts --email=user@example.com --yes`
+- **`check-permissions.ts`** — Read-only role & permission inspector
+  - **Usage**: `npx tsx scripts/check-permissions.ts --email=admin@example.com`
+- **`update-permissions.ts`** — Manage RBAC permissions
+  - **Usage**: `npx tsx scripts/update-permissions.ts --role=Owner --add=users:read`
+
+### Testing & Validation
+
+- **`test-bootstrap-workflow.sh`** — Validate bootstrap script structure & dependencies
+- **`test-port-configuration.sh`** — Verify port 3005 consistency across all components
+- **`smoke-test.ts`** — Production smoke tests (homepage, NextAuth, optional health endpoints)
+- **`validate-file-permissions-test.sh`** — Test permission validation logic
+
+### Utilities
+
+- **`worker.ts`** — Background worker entrypoint with graceful shutdown & error handling
+- **`postinstall.js`** — npm postinstall hook (Node.js version check + build proof generation)
+
+### Important Notes
+
+- **Config Management**: Bootstrap generates `config/nginx/nginx.conf` and copies systemd services from `config/systemd/`
+- **Edge Device Configs**: `config/nginx/edge_device/` are **never** modified by bootstrap (manual deploy only)
+- **Port**: All components consistently use PORT=3005 (verified by `test-port-configuration.sh`)
+- **Idempotency**: All scripts are safe to re-run; `--verify` flag checks state without modifying
+- **Documentation**: Full script inventory at `scripts/SCRIPTS_INVENTORY.md`
 
 ## Standard workflow (commands defined in package.json)
 ```bash

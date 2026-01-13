@@ -99,6 +99,7 @@ export function SignalLinesField() {
         ctx.stroke();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pointerX, pointerY, reducedMotion, theme, systemTheme]); // Dependencies that should trigger redraw
 
   // Handle resize

@@ -38,6 +38,9 @@
   ],
   "exclude": [
     "node_modules",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "tailwind.config.ts",
+    ".next"
   ]
 }

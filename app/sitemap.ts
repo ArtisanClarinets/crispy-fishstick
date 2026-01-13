@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { siteConfig } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thompsonsystems.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://vantus.systems.com';
 
   const routes = [
     '',
@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/process',
     '/trust',
     '/contact',
-    '/infrastructure',
+    '/infrastructure', // Hub
     '/infrastructure/academy',
     '/infrastructure/estimator',
     '/infrastructure/configurator',

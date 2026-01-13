@@ -58,6 +58,7 @@ export function SystemLayer() {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setToneKey(baseTone);
 
     if (reducedMotion) return;

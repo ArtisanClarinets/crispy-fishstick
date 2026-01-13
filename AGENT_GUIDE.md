@@ -11,6 +11,9 @@ Before modifying any code, you must identify which **Domain** your change affect
 - **Styling**: Tailwind CSS
 - **State**: React Server Components (RSC) + Server Actions
 - **React**: React 19
+- **Database**: SQLite via Prisma (v5.22.0) ORM (with multi-tenancy support)
+- **Authentication**: NextAuth.js
+- **Deployment**: Baremetal Ubuntu 22.04 LTS Server with Nginx Reverse Proxy
 
 ---
 

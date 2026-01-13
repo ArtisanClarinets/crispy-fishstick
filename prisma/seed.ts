@@ -30,9 +30,26 @@ async function ensureSqliteFileWritable() {
   }
 }
 
+async function checkRoleTable() {
+  try {
+    // Check if Role table exists in SQLite
+    const result = await prisma!.$queryRaw`SELECT name FROM sqlite_master WHERE type='table' AND name='Role'`;
+    if (Array.isArray(result) && result.length > 0) {
+      console.log("✅ Role table exists.");
+    } else {
+      throw new Error("❌ Role table does not exist in the database. Please run migrations.");
+    }
+  } catch (error) {
+    console.error("❌ Failed to check Role table existence:", error);
+    throw error;
+  }
+}
+
 async function main() {
   await ensureSqliteFileWritable();
   prisma = new PrismaClient();
+
+  await checkRoleTable();
 
   if (!process.env.ADMIN_BOOTSTRAP_EMAIL || !process.env.ADMIN_BOOTSTRAP_PASSWORD) {
     if (process.env.NODE_ENV === "production") {
@@ -47,61 +64,68 @@ async function main() {
   const passwordHash = await bcrypt.hash(password, 10);
 
   // 1. Create Roles
-  const roles = [
-    {
-      name: "Owner",
-      permissions: [
-        "admin.access",
-        "leads.read", "leads.write",
-        "media.read", "media.write",
-        "audit.read", "audit.export",
-        "users.read", "users.write",
-        "roles.read", "roles.write",
-        "jit.approve",
-        "proposals.read", "proposals.write", "proposals.approve",
-        "contracts.read", "contracts.write",
-        "projects.read", "projects.write",
-        "services.read", "services.write",
-        "incidents.read", "incidents.write",
-        "invoices.read", "invoices.write",
-        "content.read", "content.write",
-        "analytics.read",
-        "settings.read", "settings.write",
-        "webhooks.read", "webhooks.write"
-      ],
-    },
-    {
-      name: "Admin",
-      permissions: [
-        "admin.access",
-        "leads.read", "leads.write",
-        "media.read", "media.write",
-        "audit.read",
-        "proposals.read", "proposals.write",
-        "contracts.read", "contracts.write",
-        "projects.read", "projects.write",
-        "services.read", "services.write",
-        "incidents.read", "incidents.write"
-      ],
-    },
-    {
-      name: "Editor",
-      permissions: [
-        "admin.access",
-        "leads.read",
-        "media.read", "media.write",
-        "proposals.read",
-        "projects.read"
-      ],
-    },
-  ];
+  console.log("Creating roles...");
+  try {
+    const roles = [
+      {
+        name: "Owner",
+        permissions: [
+          "admin.access",
+          "leads.read", "leads.write",
+          "media.read", "media.write",
+          "audit.read", "audit.export",
+          "users.read", "users.write",
+          "roles.read", "roles.write",
+          "jit.approve",
+          "proposals.read", "proposals.write", "proposals.approve",
+          "contracts.read", "contracts.write",
+          "projects.read", "projects.write",
+          "services.read", "services.write",
+          "incidents.read", "incidents.write",
+          "invoices.read", "invoices.write",
+          "content.read", "content.write",
+          "analytics.read",
+          "settings.read", "settings.write",
+          "webhooks.read", "webhooks.write"
+        ],
+      },
+      {
+        name: "Admin",
+        permissions: [
+          "admin.access",
+          "leads.read", "leads.write",
+          "media.read", "media.write",
+          "audit.read",
+          "proposals.read", "proposals.write",
+          "contracts.read", "contracts.write",
+          "projects.read", "projects.write",
+          "services.read", "services.write",
+          "incidents.read", "incidents.write"
+        ],
+      },
+      {
+        name: "Editor",
+        permissions: [
+          "admin.access",
+          "leads.read",
+          "media.read", "media.write",
+          "proposals.read",
+          "projects.read"
+        ],
+      },
+    ];
 
-  for (const r of roles) {
-    await prisma.role.upsert({
-      where: { name: r.name },
-      update: { permissions: JSON.stringify(r.permissions) },
-      create: { name: r.name, permissions: JSON.stringify(r.permissions) },
-    });
+    for (const r of roles) {
+      await prisma.role.upsert({
+        where: { name: r.name },
+        update: { permissions: JSON.stringify(r.permissions) },
+        create: { name: r.name, permissions: JSON.stringify(r.permissions) },
+      });
+    }
+    console.log("✅ Roles created successfully.");
+  } catch (error) {
+    console.error("❌ Failed to create roles:", error);
+    throw error;
   }
 
   // 2. Create Default Tenant

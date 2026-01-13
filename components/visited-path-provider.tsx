@@ -18,15 +18,16 @@ export function VisitedPathProvider({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   useEffect(() => {
-    // We mark the page as visited AFTER the first render
-    if (!visitedPaths.has(pathname)) {
-      setVisitedPaths((prev) => {
-        const next = new Set(prev);
-        next.add(pathname);
-        return next;
-      });
-    }
-  }, [pathname, visitedPaths]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setVisitedPaths((prev) => {
+      if (prev.has(pathname)) {
+        return prev;
+      }
+      const next = new Set(prev);
+      next.add(pathname);
+      return next;
+    });
+  }, [pathname]);
 
   const hasVisited = (path: string) => {
     return visitedPaths.has(path);

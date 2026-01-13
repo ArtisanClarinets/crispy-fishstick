@@ -95,7 +95,7 @@ export default function InfrastructureHubPage() {
             <div className="space-y-2">
               <h3 className="font-semibold">Full Explanation</h3>
               <p className="text-muted-foreground text-sm">
-                We show our work. You'll see exactly why we recommend a specific CPU or drive type.
+                We show our work. You&apos;ll see exactly why we recommend a specific CPU or drive type.
               </p>
             </div>
             <div className="space-y-2">
