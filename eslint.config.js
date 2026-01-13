@@ -1,28 +1,14 @@
-const next = require("eslint-config-next");
+const nextEslintConfig = require("eslint-config-next");
 const typescriptEslint = require("@typescript-eslint/eslint-plugin");
-const typescriptParser = require("@typescript-eslint/parser");
 
 module.exports = [
+  ...nextEslintConfig,
   {
-    ignores: ["**/node_modules/*", ".next/*", "out/*"]
-  },
-  {
-    files: ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"],
+    files: ["**/*.ts", "**/*.tsx"],
     plugins: {
-      "@typescript-eslint": typescriptEslint,
-    },
-    languageOptions: {
-      parser: typescriptParser,
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-        ecmaVersion: "latest",
-        sourceType: "module",
-      },
+        "@typescript-eslint": typescriptEslint,
     },
     rules: {
-      ...next.rules,
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
@@ -30,7 +16,17 @@ module.exports = [
           "varsIgnorePattern": "^_",
           "caughtErrorsIgnorePattern": "^_"
         }
-      ],
-    },
+      ]
+    }
+  },
+  {
+    // Disable this rule for test files as it causes false positives
+    files: ["e2e/**/*.ts", "e2e/**/*.spec.ts", "tests/**/*.ts"],
+    rules: {
+      "@next/next/no-assign-module-variable": "off"
+    }
+  },
+  {
+    ignores: ["**/node_modules/*", ".next/*", "out/*"],
   },
 ];

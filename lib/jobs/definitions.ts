@@ -35,7 +35,7 @@ export type GeneratePdfJobData = z.infer<typeof generatePdfJobSchema>;
  */
 export const exportJobSchema = z.object({
   resourceType: z.string(),
-  filters: z.record(z.any()).optional(),
+  filters: z.record(z.unknown()).optional(),
   format: z.enum(["csv", "xlsx", "json"]),
   userId: z.string(),
   retryAttempt: z.number().default(0),
@@ -49,7 +49,7 @@ export type ExportJobData = z.infer<typeof exportJobSchema>;
 export const webhookDeliveryJobSchema = z.object({
   endpointId: z.string(),
   event: z.string(),
-  payload: z.record(z.any()),
+  payload: z.record(z.unknown()),
   attempt: z.number().default(1),
   retryAttempt: z.number().default(0),
 });

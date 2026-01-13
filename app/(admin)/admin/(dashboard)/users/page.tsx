@@ -30,13 +30,6 @@ export default async function AdminUsersPage(
     select: SAFE_USER_WITH_ROLES_SELECT,
   });
 
-  // Note: buildPaginationResult expects full objects, but we are selecting partial.
-  // However, the pagination logic only cares about ID and timestamps for cursor if we were doing cursor-based.
-  // But wait, `buildPaginationResult` logic might depend on `id` field.
-  // SAFE_USER_WITH_ROLES_SELECT should include `id` and `createdAt`.
-  // Let's verify SAFE_USER_WITH_ROLES_SELECT if I can read it, but usually it does.
-  // Assuming it does.
-
   const { data, nextCursor, prevCursor } = buildPaginationResult(users, params);
 
   return (

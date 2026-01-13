@@ -1,5 +1,8 @@
 ---
 description: Completely implements a new feature in the existing source code, from planning to production deployment, ensuring security and quality standards are met.
+model: GPT5-mini
+name: workflow-add-new-feature
+skills: ['prisma-data-model', 'ui-design-system', 'ops-deployment', 'security-best-practices', 'nextjs-app-router', 'react-components', 'tailwind-css', 'zod-validation', 'api-design-security', 'rate-limiting', api-endpoints']
 ---
 
 # Workflow: Add New Feature

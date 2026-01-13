@@ -216,9 +216,7 @@ export function recommendServer(intent: WorkloadIntent): RecommendationResult {
     score: scoreSku(sku, requirements)
   })).filter(x => x.score > 0).sort((a, b) => b.score - a.score); // Descending score
 
-  // If no exact match, return the largest available as fallback (or empty if none)
-  // For this exercise, if no match, we return the biggest one but mark it as "overkill" or "underpowered" in notes?
-  // Actually, if score is 0, it's filtered. If list empty, we might need a "Custom Quote" fallback.
+  // If list is empty, we might need a "Custom Quote" fallback.
   
   const primarySku = scoredSkus[0]?.sku || SKU_INVENTORY[SKU_INVENTORY.length - 1]; // Fallback to biggest if nothing fits (simplification)
   const alternativeSkus = scoredSkus.slice(1, 3).map(x => x.sku);

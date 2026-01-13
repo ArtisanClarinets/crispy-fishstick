@@ -1,8 +1,8 @@
-# Thompson Systems
+# Vantus Systems
 
 **Engineering for High-Trust Products.**
 
-Thompson Systems is a specialized engineering studio for founders who demand production-grade quality, rigorous systems, and Apple-caliber interfaces. This repository contains the source code for the portfolio and diagnostic tools of Dylan Thompson.
+Vantus Systems is a specialized engineering studio for founders who demand production-grade quality, rigorous systems, and Apple-caliber interfaces. This repository contains the source code for the portfolio and diagnostic tools of Dylan Thompson.
 
 ## ⚡ Key Features
 
@@ -23,14 +23,14 @@ Thompson Systems is a specialized engineering studio for founders who demand pro
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript 5.x
 - **Styling**: Tailwind CSS
-- **Database**: Prisma ORM (PostgreSQL)
-- **Auth**: NextAuth.js v5 (Beta)
+- **Database**: Prisma ORM (SQLite)
+- **Auth**: NextAuth.js v4 (Stable)
 - **UI Components**: Radix UI / Shadcn
 - **React**: React 19
 - **Security:**
   - AES-256-GCM Encryption for secrets (MFA)
-  - Strict Content Security Policy (CSP)
-  - Rate Limiting (Database backed)
+  - Strict Content Security Policy (CSP) via Middleware
+  - Rate Limiting (Redis backed)
   - Safe Data Serialization (DTOs)
   - Private File Uploads with Type Validation
   - Role-Based Access Control (RBAC) with JIT Access
@@ -147,4 +147,4 @@ The interface follows an "Engineered Hardware" aesthetic, prioritizing:
 
 ## 📄 License
 
-Proprietary. All rights reserved by Thompson Systems.
+Proprietary. All rights reserved by Vantus Systems.

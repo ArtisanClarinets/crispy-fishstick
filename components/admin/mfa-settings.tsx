@@ -214,7 +214,7 @@ export function MFASettings({
                 </p>
                 <div className="flex justify-center p-4 bg-white rounded-lg w-fit">
                   {qrCodeUrl && (
-                    <img
+                    <Image
                       src={qrCodeUrl}
                       alt="MFA QR Code"
                       width={192}

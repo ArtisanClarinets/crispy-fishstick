@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Calculator, Server } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata = {
@@ -95,7 +94,7 @@ export default function InfrastructureHubPage() {
             <div className="space-y-2">
               <h3 className="font-semibold">Full Explanation</h3>
               <p className="text-muted-foreground text-sm">
-                We show our work. You'll see exactly why we recommend a specific CPU or drive type.
+                We show our work. You&apos;ll see exactly why we recommend a specific CPU or drive type.
               </p>
             </div>
             <div className="space-y-2">

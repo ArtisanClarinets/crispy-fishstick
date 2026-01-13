@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+
 interface AcademyArticlePageProps {
   params: Promise<{
     slug: string;

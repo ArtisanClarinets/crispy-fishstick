@@ -16,6 +16,69 @@ interface WavesProps {
   yGap?: number;
 }
 
+class Line {
+  y: number;
+  points: any[];
+  constructor(y: number, width: number, xGap: number) {
+    this.y = y;
+    this.points = [];
+    for (let x = 0; x <= width + xGap; x += xGap) {
+      this.points.push({
+        x: x,
+        y: y,
+        waveX: x,
+        waveY: y,
+        cursorX: x,
+        cursorY: y,
+        vx: 0,
+        vy: 0,
+      });
+    }
+  }
+
+  update(t: number, waveSpeedX: number, waveSpeedY: number, waveAmpX: number, waveAmpY: number, cursorActive: boolean, mouseX: number, mouseY: number, maxCursorMove: number, tension: number, friction: number) {
+    for (let i = 0; i < this.points.length; i++) {
+      const p = this.points[i];
+
+      const noise = Math.sin(i * 0.05 + t * waveSpeedX) * Math.cos(i * 0.05 + t * waveSpeedY);
+      p.waveX = p.x + noise * waveAmpX;
+      p.waveY = p.y + noise * waveAmpY;
+
+      let dist = 0;
+      let angle = 0;
+      if (cursorActive) {
+        const dx = mouseX - p.x;
+        const dy = mouseY - p.y;
+        dist = Math.sqrt(dx * dx + dy * dy);
+        angle = Math.atan2(dy, dx);
+      }
+
+      const targetCursorX = cursorActive && dist < 200 ? p.x - Math.cos(angle) * ((200 - dist) / 200) * maxCursorMove : p.x;
+      const targetCursorY = cursorActive && dist < 200 ? p.y - Math.sin(angle) * ((200 - dist) / 200) * maxCursorMove : p.y;
+
+      p.vx += (targetCursorX - p.cursorX) * tension;
+      p.vy += (targetCursorY - p.cursorY) * tension;
+      p.vx *= friction;
+      p.vy *= friction;
+      p.cursorX += p.vx;
+      p.cursorY += p.vy;
+    }
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.beginPath();
+    ctx.moveTo(this.points[0].cursorX + (this.points[0].waveX - this.points[0].x), this.points[0].cursorY + (this.points[0].waveY - this.points[0].y));
+
+    for (let i = 1; i < this.points.length; i++) {
+      const p = this.points[i];
+      const px = p.cursorX + (p.waveX - p.x);
+      const py = p.cursorY + (p.waveY - p.y);
+      ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+}
+
 export default function Waves({
   lineColor = "rgba(0, 0, 0, 0.1)", // Default placeholder, will be overridden by theme
   backgroundColor = "transparent",
@@ -42,24 +105,15 @@ export default function Waves({
 
     let width = container.clientWidth;
     let height = container.clientHeight;
-    let lines: any[] = [];
+    let lines: Line[] = [];
     let frameId: number;
     let mouseX = 0;
     let mouseY = 0;
     let cursorActive = false;
 
-    // Use computed styles for colors if possible, but canvas needs explicit strings
-    // We'll rely on props or defaults.
-    // If the prop is a CSS variable reference (e.g. "hsl(var(--primary))"),
-    // we need to resolve it if we want to use it in canvas, OR the user passes a valid color string.
-    // For now, we assume the user passes a valid string or we stick to the default.
-    // However, to be "cohesive", we want it to react to the theme.
-    // We can get the computed style of the container.
-
     function getThemeColor() {
       const style = getComputedStyle(document.body);
       const primary = style.getPropertyValue('--primary').trim();
-      // primary is likely "220 15% 10%", we need to convert to rgba or hsl
       if (primary.includes(' ')) {
          return `hsl(${primary} / 0.15)`;
       }
@@ -76,78 +130,11 @@ export default function Waves({
       initLines();
     }
 
-    class Line {
-      y: number;
-      points: any[];
-      constructor(y: number) {
-        this.y = y;
-        this.points = [];
-        for (let x = 0; x <= width + xGap; x += xGap) {
-          this.points.push({
-            x: x,
-            y: y,
-            waveX: x,
-            waveY: y,
-            cursorX: x,
-            cursorY: y,
-            vx: 0,
-            vy: 0
-          });
-        }
-      }
-
-      update(t: number) {
-        for (let i = 0; i < this.points.length; i++) {
-          const p = this.points[i];
-
-          // Wave movement
-          const noise = Math.sin(i * 0.05 + t * waveSpeedX) * Math.cos(i * 0.05 + t * waveSpeedY);
-          p.waveX = p.x + noise * waveAmpX;
-          p.waveY = p.y + noise * waveAmpY;
-
-          // Mouse interaction
-          let dist = 0;
-          let angle = 0;
-          if (cursorActive) {
-             const dx = mouseX - p.x;
-             const dy = mouseY - p.y;
-             dist = Math.sqrt(dx * dx + dy * dy);
-             angle = Math.atan2(dy, dx);
-          }
-
-          const targetCursorX = cursorActive && dist < 200 ? p.x - Math.cos(angle) * ((200 - dist) / 200) * maxCursorMove : p.x;
-          const targetCursorY = cursorActive && dist < 200 ? p.y - Math.sin(angle) * ((200 - dist) / 200) * maxCursorMove : p.y;
-
-          p.vx += (targetCursorX - p.cursorX) * tension;
-          p.vy += (targetCursorY - p.cursorY) * tension;
-          p.vx *= friction;
-          p.vy *= friction;
-          p.cursorX += p.vx;
-          p.cursorY += p.vy;
-        }
-      }
-
-      draw(ctx: CanvasRenderingContext2D) {
-        ctx.beginPath();
-        ctx.moveTo(this.points[0].cursorX + (this.points[0].waveX - this.points[0].x), this.points[0].cursorY + (this.points[0].waveY - this.points[0].y));
-
-        for (let i = 1; i < this.points.length; i++) {
-           const p = this.points[i];
-           const px = p.cursorX + (p.waveX - p.x);
-           const py = p.cursorY + (p.waveY - p.y);
-           ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-      }
-    }
-
     function initLines() {
       lines = [];
-      // Calculate how many lines based on yGap
       const totalLines = Math.ceil(height / yGap);
-      // Start slightly above 0 to cover
       for (let i = 0; i <= totalLines; i++) {
-        lines.push(new Line(i * yGap));
+        lines.push(new Line(i * yGap, width, xGap));
       }
     }
 
@@ -163,7 +150,7 @@ export default function Waves({
       ctx!.lineWidth = 1;
 
       lines.forEach((line) => {
-        line.update(t);
+        line.update(t, waveSpeedX, waveSpeedY, waveAmpX, waveAmpY, cursorActive, mouseX, mouseY, maxCursorMove, tension, friction);
         line.draw(ctx!);
       });
 
