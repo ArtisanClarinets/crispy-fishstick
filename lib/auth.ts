@@ -132,6 +132,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/admin/login",
+    error: "/admin/error",
   },
   // Add secure cookie settings
   cookies: {
@@ -367,12 +368,22 @@ export const authOptions: NextAuthOptions = {
     },
     // Add redirect callback for security
     async redirect({ url, baseUrl }) {
-      // Prevent open redirect vulnerabilities
-      if (url.startsWith("/") || url.startsWith(baseUrl)) {
-        return url;
+      /**
+       * Hardened redirect handling.
+       *
+       * - Allows relative redirects ("/admin", "/admin?x=y").
+       * - Allows absolute redirects only when the origin matches `baseUrl`.
+       * - Denies any cross-origin redirect to prevent open redirect attacks.
+       */
+      try {
+        const base = new URL(baseUrl);
+        const target = new URL(url, base);
+
+        if (target.origin !== base.origin) return base.toString();
+        return target.toString();
+      } catch {
+        return baseUrl;
       }
-      // Default to home page for external redirects
-      return baseUrl;
     },
   },
   // Security events

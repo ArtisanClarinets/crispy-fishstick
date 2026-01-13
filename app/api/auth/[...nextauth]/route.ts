@@ -1,69 +1,21 @@
 import NextAuth from "next-auth";
+
 import { authOptions } from "@/lib/auth";
-import { NextResponse } from "next/server";
-import winston from "winston";
-import type { NextRequest } from "next/server";
 
-// Configure logger for server-side error logging
-const logger = winston.createLogger({
-  level: "error",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: "logs/auth-errors.log" })
-  ]
-});
+/**
+ * NextAuth route handler (App Router)
+ *
+ * IMPORTANT:
+ * - `NextAuth(authOptions)` returns a single handler function in NextAuth v4.
+ * - Next.js Route Handlers require named exports for each HTTP method.
+ *
+ * Prior implementation attempted to call `handler.GET`/`handler.POST`, which do
+ * not exist in NextAuth v4 and caused all GET requests (e.g. /api/auth/error,
+ * /api/auth/session, /api/auth/csrf) to return 405 "Method Not Allowed".
+ */
+const handler = NextAuth(authOptions);
 
-// Create the NextAuth handler instance
-const authHandler = NextAuth(authOptions);
+// Ensure this route runs in the Node.js runtime (required for Prisma).
+export const runtime = "nodejs";
 
-// Wrap the NextAuth handler to handle dynamic route segments and errors properly
-async function handleAuthRequest(
-  req: NextRequest,
-  context: { params: Promise<{ nextauth: string[] }> }
-): Promise<Response | void> {
-  try {
-    // Extract the nextauth segments from the dynamic route
-    const params = await context.params;
-    const resolvedContext = { params };
-    
-    // Call the appropriate HTTP method handler based on the request method
-    if (req.method === "GET") {
-      return authHandler.GET?.(req, resolvedContext) ?? NextResponse.json(
-        { error: "Method Not Allowed" },
-        { status: 405 }
-      );
-    } else if (req.method === "POST") {
-      return authHandler.POST?.(req, resolvedContext) ?? NextResponse.json(
-        { error: "Method Not Allowed" },
-        { status: 405 }
-      );
-    } else {
-      return NextResponse.json(
-        { error: "Method Not Allowed" },
-        { status: 405 }
-      );
-    }
-  } catch (error) {
-    // Log the full error details server-side without exposing sensitive info to client
-    logger.error({
-      message: "Authentication handler error",
-      error: error instanceof Error ? error.message : "Unknown error",
-      stack: error instanceof Error ? error.stack : undefined,
-      timestamp: new Date().toISOString(),
-      requestMethod: req.method,
-      requestUrl: req.url
-    });
-    
-    // Return a safe, generic error response to the client
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
-}
-
-export { handleAuthRequest as GET, handleAuthRequest as POST };
+export { handler as GET, handler as POST };

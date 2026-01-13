@@ -60,6 +60,11 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
+        if (result.error === "Configuration") {
+          // NextAuth configuration error (missing NEXTAUTH_SECRET, bad NEXTAUTH_URL, etc.)
+          router.replace("/admin/error");
+          return;
+        }
         if (result.error === "MFA_REQUIRED") {
           setShowMFA(true);
           toast({
