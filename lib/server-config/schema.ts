@@ -98,15 +98,6 @@ export interface RecommendationResult {
 // --- Runtime Validation Schemas ---
 
 /**
- * WorkloadIntentSchema - Validates workload intent data at runtime
- * 
- * Using z.any() as a minimal schema to avoid complex type inference that can cause
- * stack overflow during TypeScript type checking. The actual runtime validation
- * is handled by the validateWorkloadIntent() function.
- */
-export const WorkloadIntentSchema = z.any();
-
-/**
  * Validates workload intent data against the TypeScript interface
  */
 export function validateWorkloadIntent(data: unknown): data is WorkloadIntent {
