@@ -77,6 +77,12 @@ function getAuthSecret(): string {
 // Get the secret once and enforce requirements
 const nextAuthSecret = getAuthSecret();
 
+// Determine security settings dynamically based on NEXTAUTH_URL
+const nextAuthUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+const url = new URL(nextAuthUrl);
+const isHttps = url.protocol === "https:";
+const isLocalhost = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+
 // Create Redis client for rate limiting
 let rateLimiterInstance: any = null;
 
@@ -122,7 +128,7 @@ declare module "next-auth/jwt" {
 
 export const authOptions: NextAuthOptions = {
   secret: nextAuthSecret,
-  useSecureCookies: process.env.NODE_ENV === "production",
+  useSecureCookies: isHttps,
   // trustHost: true, // Not supported in NextAuthOptions type for this version, but can be set via env var TRUST_HOST=true
   session: {
     strategy: "jwt",
@@ -137,18 +143,18 @@ export const authOptions: NextAuthOptions = {
   // Add secure cookie settings
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === "production" 
+      name: isHttps 
         ? "__Secure-next-auth.session-token"
         : "next-auth.session-token",
       options: {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: process.env.NODE_ENV === "production",
-        // Add __Host prefix for additional security in production
-        ...(process.env.NODE_ENV === "production" && {
-          domain: new URL(process.env.NEXTAUTH_URL || "http://localhost").hostname,
-        }),
+        secure: isHttps,
+        // Add __Host prefix for additional security in production (HTTPS only, non-localhost)
+        ...(isHttps && !isLocalhost ? {
+          domain: url.hostname,
+        } : {}),
       },
     },
   },

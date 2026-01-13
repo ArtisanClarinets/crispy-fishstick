@@ -99,23 +99,8 @@ export default function LoginPage() {
           });
         }
       } else {
-        const callbackUrl = searchParams.get("callbackUrl");
-        if (callbackUrl) {
-          try {
-            const decodedUrl = decodeURIComponent(callbackUrl);
-            // Ensure relative path only for security
-            if (decodedUrl.startsWith('/') && !decodedUrl.startsWith('//')) {
-              router.replace(decodedUrl);
-            } else {
-              router.replace('/admin');
-            }
-          } catch (_e) {
-            router.replace('/admin');
-          }
-        } else {
-          router.replace('/admin');
-        }
-        router.refresh();
+        // Force a hard navigation to ensure cookies are properly set and recognized
+        window.location.assign("/admin");
       }
     } catch (_error) {
       toast({
