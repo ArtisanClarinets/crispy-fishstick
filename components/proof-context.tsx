@@ -110,7 +110,7 @@ export function ProofProvider({ children }: { children: React.ReactNode }) {
     // Only run if we don't have a fresh snapshot? Or always?
     // Let's run it always to be "live", but debounce/check if running
     void runAudit();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, []);
 
   return (

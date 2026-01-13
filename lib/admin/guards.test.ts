@@ -12,7 +12,7 @@ vi.mock('next-auth', () => ({
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     user: {
-      findUnique: vi.fn(),
+      findFirst: vi.fn(),
     },
     role: {
       findMany: vi.fn(),
@@ -39,7 +39,7 @@ describe('Admin Guards', () => {
 
     it('should return null if user not found in db', async () => {
       (getServerSession as any).mockResolvedValue({ user: { email: 'test@example.com' } });
-      (prisma.user.findUnique as any).mockResolvedValue(null);
+      (prisma.user.findFirst as any).mockResolvedValue(null);
       
       const user = await getSessionUser();
       expect(user).toBeNull();
@@ -64,7 +64,7 @@ describe('Admin Guards', () => {
         JitAccessRequest: [],
       };
 
-      (prisma.user.findUnique as any).mockResolvedValue(mockUser);
+      (prisma.user.findFirst as any).mockResolvedValue(mockUser);
 
       const user = await getSessionUser();
       expect(user).not.toBeNull();
@@ -92,7 +92,7 @@ describe('Admin Guards', () => {
         ],
       };
   
-        (prisma.user.findUnique as any).mockResolvedValue(mockUser);
+        (prisma.user.findFirst as any).mockResolvedValue(mockUser);
         
         const mockJitRoles = [
             {
@@ -126,7 +126,7 @@ describe('Admin Guards', () => {
         JitAccessRequest: [],
       };
       
-      (prisma.user.findUnique as any).mockResolvedValue(mockUser);
+      (prisma.user.findFirst as any).mockResolvedValue(mockUser);
       
       await expect(requireAdmin({ permissions: ['admin.super'] })).rejects.toThrow('Forbidden');
     });
@@ -150,7 +150,7 @@ describe('Admin Guards', () => {
         JitAccessRequest: [],
       };
       
-      (prisma.user.findUnique as any).mockResolvedValue(mockUser);
+      (prisma.user.findFirst as any).mockResolvedValue(mockUser);
       
       const user = await requireAdmin({ permissions: ['admin.super'] });
       expect(user.email).toBe('admin@example.com');

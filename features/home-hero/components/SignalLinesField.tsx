@@ -13,6 +13,7 @@ export function SignalLinesField() {
   // We subscribe to specific changes to trigger redraws
   const pointerX = usePointerSignalStore((state) => state.x);
   const pointerY = usePointerSignalStore((state) => state.y);
+  // const lastInput = usePointerSignalStore((state) => state.lastInput);
 
   // Helper to get CSS variable values
   const getCssVar = (name: string) => {

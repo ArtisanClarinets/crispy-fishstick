@@ -34,6 +34,14 @@ export default withAuth(
         ) {
           return true;
         }
+      } catch (_error) {
+        console.error("[Proxy] Session validation error: [REDACTED]");
+        const url = new URL("/admin/login", request.url);
+        url.searchParams.set("error", "SESSION_VALIDATION_ERROR");
+        return NextResponse.redirect(url);
+      }
+    }
+  }
 
         // Require authentication for all other admin routes
         return !!token;

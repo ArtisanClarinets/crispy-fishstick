@@ -14,7 +14,7 @@ const mockConfig = {
   ipAllowlist: {
     enabled: true,
     allowedIPs: ["192.168.1.100"],
-    allowedCIDRs: ["192.168.1.0/24", "10.0.0.0/8"],
+    allowedCIDRs: ["192.168.2.0/24", "10.0.0.0/8"],
   },
   geographicRestrictions: {
     enabled: false,
@@ -82,7 +82,7 @@ describe("Admin Protection Utilities", () => {
       expect(isIpAllowed("192.168.1.101", mockConfig)).toBe(false);
 
       // Test with CIDR match
-      expect(isIpAllowed("192.168.1.50", mockConfig)).toBe(true);
+      expect(isIpAllowed("192.168.2.50", mockConfig)).toBe(true);
       expect(isIpAllowed("10.5.5.5", mockConfig)).toBe(true);
       expect(isIpAllowed("172.16.0.1", mockConfig)).toBe(false);
     });

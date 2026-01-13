@@ -23,7 +23,8 @@ function ipToNumber(ip: string): number {
   
   // Use unsigned 32-bit integer arithmetic
   // JavaScript uses 32-bit signed integers, so we need to handle this carefully
-  const result = (parts[0] * 256 * 256 * 256) + (parts[1] * 256 * 256) + (parts[2] * 256) + parts[3];
+  // We use Math.pow to avoid overflow in intermediate calculations before unsigned conversion
+  const result = ((parts[0] * 16777216) + (parts[1] * 65536) + (parts[2] * 256) + parts[3]);
   return result >>> 0; // Convert to unsigned 32-bit integer
 }
 
@@ -40,9 +41,18 @@ function cidrToRange(cidr: string): { start: number; end: number } {
     throw new Error(`Invalid CIDR prefix: ${prefix}`);
   }
   
-  const mask = prefixNum === 0 ? 0 : (~0 << (32 - prefixNum)) >>> 0;
-  const start = ipNum & mask;
-  const end = start | ((~mask) >>> 0);
+  // Create mask using Math.pow to avoid bitwise shift overflow issues with signed ints
+  const mask = prefixNum === 0 ? 0 : (0xffffffff - (Math.pow(2, 32 - prefixNum) - 1));
+
+  // Apply mask using standard math to avoid signed bitwise issues
+  // But bitwise AND is safer if we ensure operands are treated as unsigned?
+  // Actually, bitwise AND in JS returns signed 32-bit int.
+  // We need to convert back to unsigned with >>> 0.
+
+  const start = (ipNum & mask) >>> 0;
+  // Calculate end by adding the inverted mask size
+  const size = Math.pow(2, 32 - prefixNum);
+  const end = (start + size - 1) >>> 0;
   
   return { start, end };
 }
@@ -154,7 +164,13 @@ function isWithinBusinessHours(config: any): boolean {
     
     const currentHour = parseInt(parts.find(p => p.type === "hour")?.value || "0", 10);
     const currentMinute = parseInt(parts.find(p => p.type === "minute")?.value || "0", 10);
-    const currentDay = parseInt(parts.find(p => p.type === "weekday")?.value || "0", 10) - 1; // Convert to 0-6 (Sunday-Saturday)
+
+    // Map weekday short name to 0-6 (Sunday-Saturday)
+    const weekdayMap: Record<string, number> = {
+      "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6
+    };
+    const weekdayStr = parts.find(p => p.type === "weekday")?.value || "Sun";
+    const currentDay = weekdayMap[weekdayStr] ?? 0;
     
     const currentTimeMinutes = currentHour * 60 + currentMinute;
     const startTimeMinutes = parseTimeToMinutes(config.timeBasedAccess.businessHours.startTime);
@@ -206,7 +222,13 @@ function isWithinMaintenanceWindow(config: any): boolean {
       
       const currentHour = parseInt(parts.find(p => p.type === "hour")?.value || "0", 10);
       const currentMinute = parseInt(parts.find(p => p.type === "minute")?.value || "0", 10);
-      const currentDay = parseInt(parts.find(p => p.type === "weekday")?.value || "0", 10) - 1; // Convert to 0-6 (Sunday-Saturday)
+
+      // Map weekday short name to 0-6 (Sunday-Saturday)
+      const weekdayMap: Record<string, number> = {
+        "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6
+      };
+      const weekdayStr = parts.find(p => p.type === "weekday")?.value || "Sun";
+      const currentDay = weekdayMap[weekdayStr] ?? 0;
       
       const currentTimeMinutes = currentHour * 60 + currentMinute;
       const startTimeMinutes = parseTimeToMinutes(window.startTime);
@@ -291,4 +313,7 @@ export {
   cidrToRange,
   isIpInCidr,
   getCountryFromIp,
+  parseTimeToMinutes,
+  isWithinBusinessHours,
+  isWithinMaintenanceWindow
 };

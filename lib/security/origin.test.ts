@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 import { assertSameOrigin } from './origin';
 import { NextRequest } from 'next/server';
 
