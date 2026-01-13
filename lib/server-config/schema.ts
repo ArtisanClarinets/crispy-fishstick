@@ -1,3 +1,13 @@
+/**
+ * Server Configuration Schema
+ * 
+ * This file defines TypeScript interfaces and minimal Zod schemas for runtime validation.
+ * TypeScript interfaces are defined explicitly to avoid recursive z.infer<> calls that
+ * can cause "Maximum call stack size exceeded" errors during type checking.
+ */
+
+import { z } from "zod";
+
 // --- TypeScript Interface Definitions ---
 // Defined explicitly to avoid recursive z.infer<> calls that cause stack overflow
 import { z } from "zod";
@@ -99,6 +109,9 @@ export const ResourceRequirementsSchema = z.object({
   networkSpeedGbps: z.number(),
 });
 
+/**
+ * ServerSkuSchema - Validates server SKU data at runtime
+ */
 export const ServerSkuSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -108,6 +121,9 @@ export const ServerSkuSchema = z.object({
   stockStatus: z.enum(["in_stock", "low_stock", "backorder"]),
 });
 
+/**
+ * RecommendationResultSchema - Validates recommendation results at runtime
+ */
 export const RecommendationResultSchema = z.object({
   requirements: ResourceRequirementsSchema,
   primarySku: ServerSkuSchema,
