@@ -283,7 +283,7 @@ return (
        <div className="container py-12 md:py-16">
          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
            <div className="md:col-span-2 space-y-6">
--            <h3 className="text-xl font-bold tracking-tight">Thompson Systems</h3>
+-            <h3 className="text-xl font-bold tracking-tight">Vantus Systems</h3>
 +            <h3 className="text-lg font-bold tracking-tight flex items-center gap-2">
 +              <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)]" />
 +              Vantus Systems
@@ -911,7 +911,7 @@ import { cn } from "@/lib/utils";
 +                     </div>
 +                     <div className="space-y-1">
 +                        <strong className="text-foreground">Privacy Protocol</strong>
-+                        <p>All computations are executed locally within the client-side runtime environment. No financial inputs or telemetry data are transmitted to Thompson Systems servers.</p>
++                        <p>All computations are executed locally within the client-side runtime environment. No financial inputs or telemetry data are transmitted to Vantus Systems servers.</p>
 +                     </div>
 ```
 

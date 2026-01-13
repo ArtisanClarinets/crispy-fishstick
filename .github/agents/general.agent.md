@@ -1,7 +1,8 @@
+---
 description: 'Beast Mode 2.0: A powerful autonomous agent tuned specifically for GPT-5 that can solve complex problems by using tools, conducting research, and iterating until the problem is fully resolved.'
 model: GPT-5 (copilot)
-tools: ['vscode', 'execute/getTerminalOutput', 'execute/runTask', 'execute/getTaskOutput', 'execute/createAndRunTask', 'execute/runNotebookCell', 'execute/testFailure', 'execute/runInTerminal', 'read', 'edit/editFiles', 'search', 'web', 'critical-thinking/*', 'desktop-commander/*', 'memory/*', 'sequentialthinking/*', 'agent', 'github/add_comment_to_pending_review', 'github/assign_copilot_to_issue', 'github/create_branch', 'github/create_or_update_file', 'github/create_pull_request', 'github/create_repository', 'github/delete_file', 'github/fork_repository', 'github/get_commit', 'github/get_file_contents', 'github/get_label', 'github/get_latest_release', 'github/get_me', 'github/get_release_by_tag', 'github/get_tag', 'github/get_team_members', 'github/get_teams', 'github/list_branches', 'github/list_commits', 'github/list_pull_requests', 'github/list_releases', 'github/list_tags', 'github/merge_pull_request', 'github/pull_request_read', 'github/pull_request_review_write', 'github/push_files', 'github/request_copilot_review', 'github/search_code', 'github/search_pull_requests', 'github/search_repositories', 'github/update_pull_request', 'github/update_pull_request_branch', 'memory', 'prisma.prisma/prisma-migrate-status', 'prisma.prisma/prisma-migrate-dev', 'prisma.prisma/prisma-migrate-reset', 'prisma.prisma/prisma-studio', 'prisma.prisma/prisma-platform-login', 'prisma.prisma/prisma-postgres-create-database', 'todo']
-name: 'GPT 5 Beast Mode'
+tools: ['vscode', 'execute/runNotebookCell', 'execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'read', 'edit/editFiles', 'search', 'web', 'critical-thinking/*', 'desktop-commander/*', 'memory/*', 'next-devtools/*', 'sequentialthinking/*', 'agent', 'prisma/*', 'deepwiki-sse/*', 'memory', 'github.vscode-pull-request-github/copilotCodingAgent', 'github.vscode-pull-request-github/issue_fetch', 'github.vscode-pull-request-github/suggest-fix', 'github.vscode-pull-request-github/searchSyntax', 'github.vscode-pull-request-github/doSearch', 'github.vscode-pull-request-github/renderIssues', 'github.vscode-pull-request-github/activePullRequest', 'github.vscode-pull-request-github/openPullRequest', 'todo']
+name: 'General Beast Mode'
 ---
 
 # Operating principles
@@ -174,7 +175,7 @@ Keep all preambles short (1–2 sentences), factual, and include the next step.
 
 VANTUS is a sophisticated web application built on a modern, type-safe technology stack. It serves a dual purpose:
 
-1.  **Public-Facing Website (`app/(site)`):** A digital portfolio and marketing front for "Thompson Systems."
+1.  **Public-Facing Website (`app/(site)`):** A digital portfolio and marketing front for "Vantus Systems."
 2.  **Internal Admin Panel (`app/(admin)`):** A comprehensive tool for managing business operations, including leads, projects, invoices, users, and security audits.
 
 ### Technology Stack

@@ -1,5 +1,6 @@
-"use client";
+'use client';
 
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -134,7 +135,7 @@ export default function ContactPage() {
             Thanks for reaching out. I usually respond within 24 hours to schedule a deep-dive session.
           </p>
           <Button asChild variant="outline">
-            <a href="/">Back to Home</a>
+            <Link href="/">Back to Home</Link>
           </Button>
         </motion.div>
       </div>

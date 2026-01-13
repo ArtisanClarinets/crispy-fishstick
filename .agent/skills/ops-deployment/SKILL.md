@@ -1,62 +1,72 @@
 ---
 name: ops-deployment
-description: Procedures for building, verifying, and deploying the application using Vantus Systems specific scripts.
+description: Procedures for building, verifying, and deploying the application using Vantus Systems specific scripts. Use when performing ops tasks, troubleshooting builds, or explaining the deployment process.
 ---
 
 # Ops Deployment
 
-This skill details the custom build and deployment pipeline for Project SENTINEL.
-Use this skill when performing ops tasks, troubleshooting builds, or explaining the deployment process.
+This skill details the custom build and deployment pipeline for Project SENTINEL. It ensures system integrity through cryptographic proofs, automated server bootstrapping, and hardened security configurations.
 
-## 1. Build Process
+## Quick Start
 
-We do not use a standard `next build`. We use a "Build Proof" system.
+Deploy a new version in 4 steps:
 
-*   **Command**: `npm run build`
-*   **What it does**:
-    1.  Runs `scripts/generate-build-proof.mjs`.
-    2.  Generates a cryptographic proof of the build (git commit, timestamp, dependency hash).
-    3.  Runs `next build`.
-*   **Artifact**: This process creates artifacts used by the `/proof` runtime endpoints to verify system integrity.
+1.  **Verify Environment**: Ensure all required secrets are set in `.env` or `/etc/default/vantus`.
+2.  **Run Build Proof**: Execute `npm run build` to generate the cryptographic build proof and compile the app.
+3.  **Apply Migrations**: Run `npx prisma migrate deploy` to update the production database.
+4.  **Restart Services**: Restart the Systemd service and reload Nginx to apply changes.
 
-## 2. Server Bootstrap (Ubuntu 22.04)
+```bash
+# Example: Manual deployment sequence
+npm run build
+npx prisma migrate deploy
+sudo systemctl restart vantus
+sudo systemctl reload nginx
+```
 
-For a fresh production server, we use a single automated script.
+## Core Concepts
 
-*   **Script**: `scripts/bootstrap-ubuntu22.sh`
-*   **Actions**:
-    *   Creates `vantus` system user.
-    *   Installs Node.js, Nginx, SQLite, Certbot.
-    *   Sets up directory structure (`/var/www/vantus`).
-    *   Configures firewall (UFW).
-    *   Runs the build and migration.
-    *   Sets up Systemd and Nginx.
+### 1. Build Proof System
+We use a "Build Proof" system instead of a standard `next build` to ensure the integrity of the running code.
+*   **Artifact**: `scripts/generate-build-proof.mjs` creates a cryptographic signature of the build.
+*   **Verification**: The app exposes `/proof/build.json` for runtime integrity checks.
 
-## 3. Environment Setup
+### 2. Automated Bootstrapping (Ubuntu 22.04)
+Fresh production servers are configured using `scripts/bootstrap-ubuntu22.sh`.
+*   **Security**: Creates an unprivileged `vantus` user and configures UFW.
+*   **Stack**: Installs Node.js, Nginx, SQLite, and Certbot.
 
-Configuration is handled interactively to ensure security.
+### 3. Environment Configuration
+Interactive setup via `scripts/setup-env.js` ensures secure secret generation and correct database wiring.
 
-*   **Script**: `scripts/setup-env.js`
-*   **Usage**: `node scripts/setup-env.js` (or via bootstrap).
-*   **Features**:
-    *   Auto-generates secure secrets (`NEXTAUTH_SECRET`, `MFA_ENCRYPTION_KEY`).
-    *   Configures database URL and admin credentials.
-    *   Writes to `.env` (local) or `/etc/default/vantus` (production).
+## Ops Workflows
 
-## 4. Nginx Configuration
+### Troubleshooting a Failed Build
 
-We generate Nginx config programmatically to ensure security headers and best practices.
+**Step 1: Check Build Logs**
+Review the output of `npm run build`. Look for errors in the `generate-build-proof` step or Next.js compilation.
 
-*   **Script**: `scripts/generate-nginx-config.mjs`
-*   **Usage**: `npm run generate:nginx` (requires env vars `DEPLOY_DOMAIN`, `DEPLOY_PORT`, etc.).
-*   **Key Features**:
-    *   Enforces HSTS.
-    *   Configures strict CSP headers.
-    *   Sets up reverse proxy to Next.js (default port 3000).
-    *   Handles static file caching.
+**Step 2: Verify Dependencies**
+Ensure `package-lock.json` is consistent and all dependencies are installed via `npm ci`.
 
-## 5. Security & Verification
+**Step 3: Validate Environment**
+Run `node scripts/setup-env.js --verify` to check for missing or invalid environment variables.
 
-*   **Build Proof**: The app exposes `/proof/build.json` to prove what code is running.
-*   **Headers**: The app and Nginx cooperate to enforce strict security headers (CSP, X-Frame-Options).
-*   **User**: The app runs as the unprivileged `vantus` user, not root.
+### Updating Nginx Configuration
+
+**Step 1: Generate Config**
+Run `npm run generate:nginx` to create a new configuration based on current environment variables.
+
+**Step 2: Test Configuration**
+Always run `sudo nginx -t` before reloading to prevent downtime due to syntax errors.
+
+**Step 3: Apply Changes**
+Execute `sudo systemctl reload nginx`.
+
+## Advanced Patterns
+
+### Zero-Downtime Migrations
+For complex schema changes, use a dual-write strategy or ensure migrations are backward-compatible with the currently running code version.
+
+### Integrity Monitoring
+Integrate the `/proof/build.json` endpoint with external monitoring tools to detect unauthorized code changes or deployment drift.

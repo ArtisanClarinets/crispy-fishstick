@@ -5,8 +5,14 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
 import { assertSameOrigin } from "@/lib/security/origin";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
 
 export const dynamic = "force-dynamic";
+
+const disableMfaSchema = z.object({
+  password: z.string().min(1, "Password is required"),
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +25,15 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store" } });
     }
 
+    const body = await req.json();
+    const result = disableMfaSchema.safeParse(body);
+
+    if (!result.success) {
+      return new NextResponse("Invalid request data", { status: 400, headers: { "Cache-Control": "no-store" } });
+    }
+
+    const { password } = result.data;
+
     const limitResult = await rateLimit({
       key: `mfa-disable:${session.user.id}`,
       limit: 5,
@@ -27,6 +42,22 @@ export async function POST(req: NextRequest) {
 
     if (!limitResult.success) {
       return new NextResponse("Too many requests", { status: 429, headers: { "Cache-Control": "no-store" } });
+    }
+
+    // Verify password
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true, passwordHash: true },
+    });
+
+    if (!user || !user.passwordHash) {
+      return new NextResponse("User not found", { status: 404, headers: { "Cache-Control": "no-store" } });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+
+    if (!isValidPassword) {
+      return new NextResponse("Invalid password", { status: 401, headers: { "Cache-Control": "no-store" } });
     }
 
     await prisma.user.update({

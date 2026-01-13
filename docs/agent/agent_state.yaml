@@ -1,0 +1,125 @@
+---
+version: 1
+last_updated_utc: "2026-01-13T02:58:57.196Z"
+project:
+  name: "Vantus Systems Bootstrap Script Fix"
+  repo_root: "/home/vantus/vantus"
+goal:
+  primary_objective: "Fix bootstrap-ubuntu22.sh script to ensure zero-error execution with proper security, reliability, and functionality"
+  success_criteria:
+    - Script executes without syntax errors
+    - All required packages install successfully
+    - Environment file generated with correct permissions (600, vantus:vantus)
+    - Redis configured and running if requested
+    - Nginx config generated in correct location (config/nginx/vantus-web-app.conf)
+    - Documentation updated and accurate
+    - Verification commands pass
+constraints:
+  must_not_break:
+    - Existing functionality
+    - Security controls
+    - Idempotency of the script
+  security_requirements:
+    - No secrets in client bundles or logs
+    - Secure file permissions (600 for sensitive files)
+    - Proper ownership (vantus:vantus)
+    - Server-side validation and authorization
+assumptions:
+  - Ubuntu 22.04 LTS system
+  - Baremetal server behind reverse proxy
+  - Edge device routes traffic to this server
+  - Script runs as sudo
+open_questions:
+  - Are there any missing function definitions in the script?
+  - What is the exact structure of the config/nginx directory?
+  - Are there any systemd service files that need to be created?
+decisions:
+  - id: "D-0001"
+    date_utc: "2026-01-13T02:58:57.196Z"
+    decision: "Fix syntax errors first before adding new functionality"
+    rationale: "Syntax errors prevent script execution, must be resolved first"
+  - id: "D-0002"
+    date_utc: "2026-01-13T02:58:57.196Z"
+    decision: "Generate nginx config in repo instead of modifying system files"
+    rationale: "Maintains separation between repo and system configuration"
+  - id: "D-0003"
+    date_utc: "2026-01-13T02:58:57.196Z"
+    decision: "Add interactive AWS prompt to conditionally configure AWS services"
+    rationale: "User should opt-in to AWS configuration, not assume it's always needed"
+work_plan:
+  milestones:
+    - id: "M-001"
+      name: "Analysis and Grounding"
+      status: "done"
+      deliverables:
+        - Grounding files created
+        - Script analysis completed
+        - Issues identified
+    - id: "M-002"
+      name: "Fix Syntax Errors"
+      status: "in_progress"
+      deliverables:
+        - secure_install_packages function defined
+        - Conditional statement syntax fixed
+        - All function calls validated
+    - id: "M-003"
+      name: "Update Environment Configuration"
+      status: "pending"
+      deliverables:
+        - Interactive AWS prompt added
+        - Redis setup completed
+        - .env generation updated
+        - File permissions fixed
+    - id: "M-004"
+      name: "Fix Nginx Configuration Logic"
+      status: "pending"
+      deliverables:
+        - Nginx config generation in repo
+        - System nginx modifications removed
+        - Bootstrap integration updated
+    - id: "M-005"
+      name: "Complete Redis Integration"
+      status: "pending"
+      deliverables:
+        - Redis server installation
+        - Security configuration
+        - Service enablement
+        - Connectivity verification
+    - id: "M-006"
+      name: "Update Documentation"
+      status: "pending"
+      deliverables:
+        - README updated
+        - Inline comments updated
+        - Associated docs updated
+    - id: "M-007"
+      name: "Verification and Testing"
+      status: "pending"
+      deliverables:
+        - Verification commands run
+        - Script execution tested
+        - Security requirements validated
+verification:
+  commands_to_run:
+    - "bash -n scripts/bootstrap-ubuntu22.sh"
+    - "sudo bash scripts/bootstrap-ubuntu22.sh --verify"
+  last_run_results:
+    - command: "bash -n scripts/bootstrap-ubuntu22.sh"
+      status: "not_run"
+      notes: "Will run after syntax fixes"
+    - command: "sudo bash scripts/bootstrap-ubuntu22.sh --verify"
+      status: "not_run"
+      notes: "Will run after all fixes"
+risks:
+  - id: "R-0001"
+    risk: "Script syntax errors prevent execution"
+    mitigation: "Fix syntax errors first, validate with bash -n"
+  - id: "R-0002"
+    risk: "Security controls weakened during fixes"
+    mitigation: "Review all changes for security impact, maintain least privilege"
+  - id: "R-0003"
+    risk: "Idempotency broken by changes"
+    mitigation: "Preserve should_skip logic and idempotent operations"
+  - id: "R-0004"
+    risk: "System configuration conflicts"
+    mitigation: "Generate configs in repo, don't modify system files directly"---

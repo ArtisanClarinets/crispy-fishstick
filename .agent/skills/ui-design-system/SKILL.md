@@ -1,47 +1,110 @@
 ---
 name: ui-design-system
-description: Guidelines for generating UI code that matches the "Engineered Hardware" aesthetic of Project SENTINEL.
+description: Guidelines for generating UI code that matches the "Engineered Hardware" aesthetic of Project SENTINEL. Use when creating new components, implementing layouts, or ensuring visual consistency across the platform.
 ---
 
 # UI Design System
 
-This skill defines the visual language and coding standards for the UI.
-The aesthetic is "Engineered Hardware" / "Premium Interface".
+This skill defines the visual language and coding standards for the UI. The aesthetic is "Engineered Hardware" / "Premium Interface", emphasizing precision, technical clarity, and high-end manufacturing aesthetics.
 
-## 1. Core Directives
+## Quick Start
 
-*   **Component Library**: Use `components/ui/*.tsx` (shadcn/ui based) for all standard elements. Do not reinvent buttons, inputs, or cards.
-*   **Font**: **JetBrains Mono** is used for technical data, code, and "system" feel. Inter (`var(--font-inter)`) is the primary sans-serif.
-*   **Theme**: Support both Light and Dark modes. Use semantic colors (`bg-background`, `text-muted-foreground`).
+Implement a new UI element in 4 steps:
 
-## 2. Design Philosophy ("Engineered Hardware")
+1.  **Check shadcn/ui**: Verify if the component exists in `components/ui/*.tsx`.
+2.  **Apply "Engineered" Styling**: Use 1px borders, `JetBrains Mono` for technical data, and subtle glass effects.
+3.  **Ensure Accessibility**: Verify contrast ratios and focus states (WCAG 2.2 AA).
+4.  **Add Purposeful Motion**: Use `framer-motion` with defined timing functions for subtle transitions.
 
-*   **Precision**: 1px borders, clear visual hierarchy.
-*   **Glass**: Subtle transparency (`bg-background/80`, `backdrop-blur`) used for depth, not decoration.
-*   **Grids**: Persistent background grids or distinct separators to evoke blueprints/schematics.
-*   **Typography**: High contrast headers. Muted technical labels (uppercase, small tracking).
+```tsx
+// Example: Engineered Hardware Card
+import { Card } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
-## 3. Motion (Framer Motion)
+export function SystemCard({ title, value }: { title: string; value: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+    >
+      <Card className="border-surface-200 bg-background/80 backdrop-blur-sm p-4">
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono mb-1">
+          {title}
+        </div>
+        <div className="text-2xl font-semibold tracking-tight">
+          {value}
+        </div>
+      </Card>
+    </motion.div>
+  );
+}
+```
 
-Animations must be "subtle and purposeful", avoiding layout thrash.
+## Core Concepts
+
+### 1. Design Philosophy ("Engineered Hardware")
+
+*   **Precision**: 1px borders, clear visual hierarchy, and strict alignment.
+*   **Glass**: Subtle transparency (`bg-background/80`, `backdrop-blur`) used for depth and layering, not decoration.
+*   **Grids**: Persistent background grids or distinct separators to evoke blueprints and technical schematics.
+*   **Typography**: High contrast headers (Inter). Muted technical labels (JetBrains Mono, uppercase, small tracking).
+
+### 2. Component Architecture
+
+*   **Library**: Use `components/ui/*.tsx` (shadcn/ui based) for all standard elements.
+*   **Composition**: Build complex interfaces by composing small, atomic components.
+*   **Theme**: Native support for Light and Dark modes using semantic Tailwind classes (`bg-background`, `text-foreground`).
+
+### 3. Motion & Interaction
+
+Animations must be "subtle and purposeful", avoiding layout thrash or excessive movement.
 
 *   **Library**: `framer-motion`
-*   **Timing Functions** (defined in `tailwind.config.ts`):
-    *   `transition-precision`: `cubic-bezier(0.25, 1, 0.5, 1)`
-    *   `transition-premium`: `cubic-bezier(0.22, 1, 0.36, 1)`
-*   **Reduced Motion**: Always respect `prefers-reduced-motion`.
+*   **Timing Functions**:
+    *   `transition-precision`: `cubic-bezier(0.25, 1, 0.5, 1)` (Standard)
+    *   `transition-premium`: `cubic-bezier(0.22, 1, 0.36, 1)` (Slow/Elegant)
 
-## 4. Accessibility (WCAG 2.2 AA)
+## UI Implementation Workflows
 
-*   **Contrast**: Ensure text meets contrast ratios (especially muted text).
-*   **Focus**: Visible focus rings are mandatory for keyboard navigation.
-*   **Targets**: Minimum touch target size (44x44px where possible).
-*   **Semantic HTML**: Use proper heading levels and landmarks.
+### Creating a New Feature View
 
-## 5. Tailwind Configuration
+**Step 1: Layout Definition**
+Use the standard grid system and spacing. Ensure the view respects the admin/site boundary.
 
-*   **Colors**: Use the extended palette in `tailwind.config.ts`:
-    *   `surface-50`, `surface-100`, `surface-200` for depth.
-    *   `hsl(var(--variable))` syntax is used.
-*   **Spacing**: Standard Tailwind spacing.
-*   **Animate**: `tailwindcss-animate` plugin is active.
+**Step 2: Component Selection**
+Prioritize existing components. If a new component is needed, document it in the design system.
+
+**Step 3: State Management**
+Use React state for local UI changes. For global state (like task management), integrate with the appropriate providers.
+
+```tsx
+// Integration with Task Management (Example)
+const handleAction = async () => {
+  // Update UI state to show progress
+  setIsLoading(true);
+  try {
+    await updateTodoList({ todos: "[x] Completed UI Action" });
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+
+### Accessibility Compliance
+
+**Contrast & Color**
+*   Ensure text meets WCAG 2.2 AA contrast ratios.
+*   Do not rely on color alone to convey information.
+
+**Keyboard Navigation**
+*   Visible focus rings are mandatory (`focus-visible:ring-2`).
+*   Maintain a logical tab order.
+
+## Advanced Patterns
+
+### Responsive Technical Data
+Use `JetBrains Mono` for tabular data and ensure it scales gracefully on mobile using overflow containers or responsive font sizes.
+
+### Dynamic Theming
+Leverage `hsl(var(--variable))` for all colors to allow for runtime theme adjustments without CSS overrides.

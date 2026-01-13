@@ -30,6 +30,7 @@ export function ScrambleText({
   // Initialize with scrambled text
   useEffect(() => {
     if (prefersReducedMotion) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDisplayText(
       text
         .split("")

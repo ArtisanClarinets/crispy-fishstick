@@ -1,81 +1,40 @@
-# Crispy Fishstick — Production Security Review (Jan 5, 2026)
+# Crispy Fishstick — Production Security Review (Updated: Jan 13, 2026)
 
-This report is based on a file-by-file review of the supplied repository archive.
+This report documents the security status and remediation efforts for the Vantus application.
 
-## Reality check (non-negotiable)
+## 🚨 Release Blockers (Status: ✅ ALL RESOLVED)
 
-It is **not possible** to guarantee “zero chance of attack infiltration.” What you *can* do is remove the obvious footguns, eliminate data leaks, add real access controls, harden upload paths, and ensure your production runtime and secrets are correctly configured.
+### 1) Sensitive credential material exposure
+- **Issue**: Password hashes and MFA secrets were potentially exposed in API responses.
+- **Remediation**: ✅ **RESOLVED**. Implementation uses `SAFE_USER_SELECT` in `lib/security/safe-user.ts` to exclude all sensitive fields from Prisma queries. Audit logs are redacted.
 
-Below are **release blockers** and then a **file-by-file remediation plan**.
+### 2) Unrestricted file upload & Path Traversal
+- **Issue**: Potential for path traversal in media download and unrestricted uploads.
+- **Remediation**: ✅ **RESOLVED**. 
+    - `validateFile` in `lib/security/upload.ts` enforces strict MIME types and size limits.
+    - Path traversal vulnerability in `app/api/admin/media/[id]/download/route.ts` fixed with `path.resolve` and strict filename validation.
 
----
+### 3) Public cron endpoint
+- **Issue**: Unprotected cron endpoints.
+- **Remediation**: ✅ **RESOLVED**. `app/api/cron/contract-reminders/route.ts` requires `CRON_SECRET` Bearer token.
 
-## 🚨 Release Blockers (fix before any public launch)
+### 4) Database file in repository
+- **Issue**: `prisma/dev.db` was present in the repo.
+- **Remediation**: ✅ **RESOLVED**. The binary file has been removed from the repository.
 
-### 1) Sensitive credential material is being returned to the browser
-**Impact:** Password hashes and MFA secrets can be exposed to admin users (and in some flows, to the browser via client components / API responses). This is catastrophic.
+### 5) Insecure Seed Credentials
+- **Issue**: Default "admin" password in seed script.
+- **Remediation**: ✅ **RESOLVED**. `prisma/seed.ts` now enforces environment variables in production and warns in development.
 
-**Primary locations:**
-- `app/api/admin/users/route.ts`
-- `app/api/admin/users/[id]/route.ts`
-- `app/api/admin/users/[id]/roles/route.ts`
-- `app/api/admin/audit/route.ts` (because audit logs store raw before/after)
-- `app/(admin)/admin/users/[id]/page.tsx` (passes full `user` to a client component)
+### 6) Prisma query logging
+- **Issue**: Query logging enabled in production.
+- **Remediation**: ✅ **RESOLVED**. `lib/prisma.ts` configures logging based on `NODE_ENV`.
 
-**Fix:** Use Prisma `select` to return only safe fields. Redact secrets from audit logs. Never serialize full `User` records to client components.
+## 🛡️ Additional Enhancements
 
----
-
-### 2) Unrestricted file upload to `public/uploads` (stored malware / XSS hosting)
-**Impact:** Even with admin-only access, a compromised admin account becomes a malware hosting platform on your domain. Additionally, serving user-controlled files from your origin increases blast radius and can enable same-origin attacks.
-
-**Primary locations:**
-- `app/api/admin/media/route.ts`
-- `lib/storage.ts`
-- `app/api/admin/media/[id]/route.ts` (contains a path-join bug)
-
-**Fix:** Restrict types + size, store outside `public/`, serve via a controlled download route with forced `Content-Type` and `Content-Disposition`, or move to S3 with signed URLs. Fix the absolute-path join bug.
-
----
-
-### 3) Public cron endpoint can be triggered by anyone
-**Impact:** Anyone can spam-trigger reminders, DB reads, and outgoing emails.
-
-**Primary location:**
-- `app/api/cron/contract-reminders/route.ts`
-
-**Fix:** Require a secret header/token and use POST-only. Rate limit. Consider removing entirely unless actively used.
-
----
-
-### 4) You are shipping a real SQLite database file in the repo
-**Impact:** `prisma/dev.db` can contain users, hashes, MFA secrets, and PII. Deploying it is a hard “no.”
-
-**Primary location:**
-- `prisma/dev.db` (binary in repo)
-- `.gitignore` (does not ignore it)
-
-**Fix:** Delete the file, rotate secrets, and add proper ignore rules. Use a real production DB (Postgres/MySQL) via `DATABASE_URL`.
-
----
-
-### 5) Seed creates an admin user with default password `"admin"`
-**Impact:** If seeding is run in prod, you will deploy with a trivial credential.
-
-**Primary location:**
-- `prisma/seed.ts`
-
-**Fix:** Remove defaults. Fail hard if env vars are missing. Never seed prod automatically.
-
----
-
-### 6) Prisma is logging every query in production
-**Impact:** Query logs can include sensitive values (emails, messages, tokens, etc.). This becomes an exfiltration vector via logs.
-
-**Primary location:**
-- `lib/prisma.ts` (`log: ["query"]`)
-
-**Fix:** Enable query logging only in dev.
+- **Global Middleware**: Implemented `middleware.ts` for consistent authentication enforcement and secure headers (CSP, HSTS, etc.).
+- **MFA Security**: Enhanced `POST /api/admin/auth/mfa/disable` to require password verification.
+- **Input Validation**: Centralized Zod schemas for all sensitive API operations.
 
 ---
 

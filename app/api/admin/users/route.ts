@@ -36,7 +36,10 @@ export async function GET() {
     });
 
     return jsonNoStore(users);
-  } catch (_error) {
+  } catch (error: any) {
+    if (error?.message === "Forbidden") {
+      return jsonNoStore({ error: "Forbidden" }, { status: 403 });
+    }
     return jsonNoStore({ error: "Unauthorized" }, { status: 401 });
   }
 }
@@ -44,7 +47,6 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     // Phase 6: CSRF/Origin Enforcement
-    // @ts-ignore - req type mismatch between next/server and built-in Request, but it works at runtime
     assertSameOrigin(req);
 
     const actor = await requireAdmin({ permissions: ["users.write"] });

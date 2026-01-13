@@ -20,7 +20,7 @@ export default function AcademyIndexPage() {
         </div>
         <div className="p-6 border rounded-lg bg-card">
           <h3 className="text-xl font-semibold mb-2">vCPU vs Core</h3>
-          <p className="text-muted-foreground text-sm mb-4">The performance difference they don't want you to measure.</p>
+          <p className="text-muted-foreground text-sm mb-4">The performance difference they don&apos;t want you to measure.</p>
           <span className="text-xs font-mono bg-muted px-2 py-1 rounded">Coming Soon</span>
         </div>
       </div>
