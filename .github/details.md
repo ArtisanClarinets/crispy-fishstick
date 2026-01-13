@@ -79,6 +79,7 @@ These instructions are for GitHub Copilot (VS Code) working **inside this reposi
 - `AGENT.md`, `AGENT_GUIDE.md`, `ADMIN.md`, `ARCHITECTURE_REVIEW.md` — agent & architecture contracts and hard requirements
 - `docs/` — deployment, security review, and operational runbooks
 - `.agent/` — agent artifacts, decisions, and verification workflows
+- **2026-01-13:** `/.github/agents/general.agent.md` updated to add anti-hallucination controls, bounded execution rules, DAP workflow, and skills-based subagent orchestration (details.md updated)
 - `public/proof/build.json` — build proof artifact generated at build time
 
 ## API Endpoints (75 route files total; ~67 admin endpoints)
