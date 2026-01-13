@@ -2,7 +2,7 @@ import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
 export default withAuth(
-  function middleware(_req) {
+  function middleware(req) {
     const response = NextResponse.next();
     
     // Security Headers
@@ -24,27 +24,25 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ req, token }) => {
-        const { pathname } = req.nextUrl;
-        
-        // Allow public admin routes
-        if (
-          pathname.startsWith("/admin/login") || 
-          pathname.startsWith("/admin/error") ||
-          pathname.startsWith("/admin/public")
-        ) {
-          return true;
-        }
-      } catch (_error) {
-        console.error("[Proxy] Session validation error: [REDACTED]");
-        const url = new URL("/admin/login", request.url);
-        url.searchParams.set("error", "SESSION_VALIDATION_ERROR");
-        return NextResponse.redirect(url);
-      }
-    }
-  }
+        try {
+          const { pathname } = req.nextUrl;
 
-        // Require authentication for all other admin routes
-        return !!token;
+          // Allow public admin routes
+          if (
+            pathname.startsWith("/admin/login") ||
+            pathname.startsWith("/admin/error") ||
+            pathname.startsWith("/admin/public")
+          ) {
+            return true;
+          }
+
+          // Require authentication for all other admin routes
+          return !!token;
+        } catch (_error) {
+          console.error("[Proxy] Session validation error");
+          // On error, deny access which will trigger redirect to sign-in
+          return false;
+        }
       },
     },
     pages: {
