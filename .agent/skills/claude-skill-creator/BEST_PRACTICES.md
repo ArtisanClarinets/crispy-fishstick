@@ -460,7 +460,7 @@ A production-ready Skill has:
 
 ✓ **Clear naming** - Descriptive, lowercase, hyphenated
 ✓ **Focused purpose** - One clear capability
-✓ **Discoverable** - When-to-use in description  
+✓ **Discoverable** - When-to-use in description
 ✓ **Documented workflows** - Step-by-step procedures
 ✓ **Working examples** - Copy-paste ready code
 ✓ **Error handling** - Defensive, validates input

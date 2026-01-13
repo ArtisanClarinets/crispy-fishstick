@@ -351,6 +351,6 @@ python scripts/validate_skill.py path/to/your/skill/SKILL.md
 
 ---
 
-**Last Updated**: October 2024  
-**Version**: 1.0.0  
+**Last Updated**: October 2024
+**Version**: 1.0.0
 **Status**: ✅ Active and maintained

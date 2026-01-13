@@ -147,7 +147,7 @@ export const ResourceRequirementsSchema = z.object({
   cpuCores: z.number(),
   ramGB: z.number(),
   storageGB: z.number(),
-  storageType: z.string(),
+  storageType: z.enum(["NVMe", "SSD", "HDD"]),
   gpuCount: z.number().optional(),
   gpuVramGB: z.number().optional(),
   networkSpeedGbps: z.number(),
@@ -162,7 +162,7 @@ export const ServerSkuSchema = z.object({
   description: z.string(),
   specs: ResourceRequirementsSchema,
   priceMonthly: z.number(),
-  stockStatus: z.string(),
+  stockStatus: z.enum(["in_stock", "low_stock", "backorder"]),
 });
 
 /**
@@ -178,3 +178,49 @@ export const RecommendationResultSchema = z.object({
     notes: z.array(z.string()),
   }),
 });
+
+// Precise Schemas for Intents
+
+const BaseIntentSchema = z.object({
+  trafficPattern: z.enum(["constant", "bursty", "predictable_spikes"]),
+  userCount: z.number().min(1),
+  environment: z.enum(["production", "staging", "dev"]),
+});
+
+const WebServerIntentSchema = BaseIntentSchema.extend({
+  workloadType: z.literal("web_server"),
+  requestsPerSecond: z.number(),
+  concurrentConnections: z.number(),
+});
+
+const DatabaseIntentSchema = BaseIntentSchema.extend({
+  workloadType: z.literal("database"),
+  datasetSizeGB: z.number(),
+  readWriteRatio: z.enum(["read_heavy", "write_heavy", "balanced"]),
+});
+
+const AiMlIntentSchema = BaseIntentSchema.extend({
+  workloadType: z.literal("ai_ml"),
+  modelSizeParams: z.enum(["small", "medium", "large", "xlarge"]),
+  batchSize: z.number(),
+  trainingOrInference: z.enum(["training", "inference"]),
+});
+
+const StorageNodeIntentSchema = BaseIntentSchema.extend({
+  workloadType: z.literal("storage_node"),
+  storageCapacityTB: z.number(),
+  accessFrequency: z.enum(["hot", "warm", "cold"]),
+});
+
+const GeneralComputeIntentSchema = BaseIntentSchema.extend({
+  workloadType: z.literal("general_compute"),
+  concurrentJobs: z.number(),
+});
+
+export const WorkloadIntentSchema = z.discriminatedUnion("workloadType", [
+  WebServerIntentSchema,
+  DatabaseIntentSchema,
+  AiMlIntentSchema,
+  StorageNodeIntentSchema,
+  GeneralComputeIntentSchema,
+]);
