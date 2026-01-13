@@ -1,78 +1,186 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Fonts */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* Radius */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Colors */
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-surface-50: var(--surface-50);
+  --color-surface-100: var(--surface-100);
+  --color-surface-200: var(--surface-200);
+
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-fade-in-up: fade-in-up 0.5s ease-out forwards;
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+  @keyframes fade-in-up {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Transition Timing Functions */
+  --ease-precision: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Custom Utilities */
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+  @media (width >= theme(--breakpoint-sm)) { padding-inline: 2rem; }
+  @media (width >= theme(--breakpoint-lg)) { padding-inline: 4rem; }
+  @media (width >= theme(--breakpoint-xl)) { padding-inline: 5rem; }
+  @media (width >= theme(--breakpoint-2xl)) { padding-inline: 6rem; }
+  max-width: 1400px;
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility glass {
+  background-color: color-mix(in oklch, var(--background), transparent 20%);
+  backdrop-filter: blur(12px);
+  border-bottom-width: 1px;
+  border-color: color-mix(in oklch, var(--border), transparent 50%);
+}
+
+@utility text-gradient {
+  background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to bottom right, var(--foreground), color-mix(in oklch, var(--foreground), transparent 40%));
+}
+
+@utility border-hairline {
+  border-width: 0.5px;
+}
 
 @layer base {
   :root {
-    /* Premium Light Mode: slightly warm, very clean */
-    --background: 0 0% 100%;
-    --foreground: 220 15% 10%; /* Darker, less pure black */
+    /* Premium Light Mode (OKLCH) */
+    --background: oklch(1 0 0); /* White */
+    --foreground: oklch(0.18 0.01 254); /* Dark Slate */
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 15% 10%;
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.18 0.01 254);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 10%;
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.18 0.01 254);
 
-    --primary: 220 15% 10%;
-    --primary-foreground: 0 0% 98%;
+    --primary: oklch(0.18 0.01 254);
+    --primary-foreground: oklch(0.98 0 0);
 
-    --secondary: 220 15% 96%;
-    --secondary-foreground: 220 15% 10%;
+    --secondary: oklch(0.96 0.002 254);
+    --secondary-foreground: oklch(0.18 0.01 254);
 
-    --muted: 220 15% 96%;
-    --muted-foreground: 220 10% 40%; /* Increased contrast for readability */
+    --muted: oklch(0.96 0.002 254);
+    --muted-foreground: oklch(0.48 0.02 254);
 
-    --accent: 220 15% 96%;
-    --accent-foreground: 220 15% 10%;
+    --accent: oklch(0.96 0.002 254);
+    --accent-foreground: oklch(0.18 0.01 254);
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: oklch(0.63 0.22 29);
+    --destructive-foreground: oklch(0.98 0 0);
 
-    --border: 220 15% 92%;
-    --input: 220 15% 92%;
-    --ring: 220 15% 10%;
+    --border: oklch(0.92 0.004 254);
+    --input: oklch(0.92 0.004 254);
+    --ring: oklch(0.18 0.01 254);
 
     --radius: 0.75rem;
 
-    --surface-50: 0 0% 98%;
-    --surface-100: 0 0% 96%;
-    --surface-200: 0 0% 94%;
+    --surface-50: oklch(0.98 0 0);
+    --surface-100: oklch(0.96 0 0);
+    --surface-200: oklch(0.94 0 0);
+
+    /* System Layer Vars for Light Mode */
+    --system-h: 220;
+    --system-s: 15%;
+    --system-l: 10%;
+    --system-glow-a: 0.05;
   }
 
   .dark {
-    /* Premium Dark Mode: Deep, rich, slightly blue-tinted black */
-    --background: 224 20% 6%; /* #0c0d12 - Very deep slate */
-    --foreground: 210 20% 98%;
+    /* Premium Dark Mode (OKLCH) */
+    --background: oklch(0.13 0.01 261); /* #0c0d12 */
+    --foreground: oklch(0.98 0.002 247);
 
-    --card: 224 20% 8%; /* Slightly lighter than bg */
-    --card-foreground: 210 20% 98%;
+    --card: oklch(0.14 0.01 261);
+    --card-foreground: oklch(0.98 0.002 247);
 
-    --popover: 224 20% 8%;
-    --popover-foreground: 210 20% 98%;
+    --popover: oklch(0.14 0.01 261);
+    --popover-foreground: oklch(0.98 0.002 247);
 
-    --primary: 210 20% 98%;
-    --primary-foreground: 224 20% 8%;
+    --primary: oklch(0.98 0.002 247);
+    --primary-foreground: oklch(0.14 0.01 261);
 
-    --secondary: 224 15% 12%; /* Elegant dark gray */
-    --secondary-foreground: 210 20% 98%;
+    --secondary: oklch(0.20 0.01 261);
+    --secondary-foreground: oklch(0.98 0.002 247);
 
-    --muted: 224 15% 12%;
-    --muted-foreground: 215 15% 65%; /* Readable gray */
+    --muted: oklch(0.20 0.01 261);
+    --muted-foreground: oklch(0.71 0.02 247);
 
-    --accent: 224 15% 15%; /* Distinct from secondary */
-    --accent-foreground: 210 20% 98%;
+    --accent: oklch(0.22 0.01 261);
+    --accent-foreground: oklch(0.98 0.002 247);
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: oklch(0.39 0.15 29);
+    --destructive-foreground: oklch(0.98 0 0);
 
-    --border: 224 15% 14%; /* Subtle borders */
-    --input: 224 15% 14%;
-    --ring: 210 20% 98%;
+    --border: oklch(0.21 0.01 261);
+    --input: oklch(0.21 0.01 261);
+    --ring: oklch(0.98 0.002 247);
 
-    --surface-50: 224 20% 8%;
-    --surface-100: 224 20% 10%;
-    --surface-200: 224 20% 12%;
+    --surface-50: oklch(0.14 0.01 261);
+    --surface-100: oklch(0.16 0.01 261);
+    --surface-200: oklch(0.18 0.01 261);
+
+    /* System Layer Vars for Dark Mode */
+    --system-h: 224;
+    --system-s: 20%;
+    --system-l: 6%;
+    --system-glow-a: 0.15;
   }
 }
 
@@ -84,8 +192,6 @@
     @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-
-  /* Smooth scrolling for anchor links */
   html {
     scroll-behavior: smooth;
   }
@@ -96,7 +202,6 @@
      Micro-Interactions (Updated)
   ---------------------------- */
 
-  /* Button: Pressure + Highlight Shift */
   .btn-precision {
     @apply relative overflow-hidden transition-transform duration-150 ease-precision;
   }
@@ -106,7 +211,6 @@
   .btn-precision:active {
     transform: translateY(0) scale(0.98);
   }
-  /* Sweep highlight via ::before or ::after - keeping ::after from previous but refined */
   .btn-precision::after {
     content: "";
     @apply absolute top-0 left-0 right-0 h-px opacity-0 transition-all duration-500 ease-out;
@@ -118,7 +222,6 @@
     opacity: 1;
   }
 
-  /* Input: Focus Beam */
   .input-precision {
     @apply transition-all duration-200 bg-origin-border;
     background-clip: padding-box, border-box;
@@ -126,12 +229,11 @@
   .input-precision:focus {
     @apply border-transparent;
     background-image: linear-gradient(var(--background), var(--background)),
-                      linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+                      linear-gradient(90deg, transparent, var(--primary), transparent);
     background-size: 200% 100%;
     animation: beam-sweep 0.8s ease-out forwards;
   }
 
-  /* Card: Lift + Specular Sweep */
   .card-precision {
     @apply relative transition-all duration-300 ease-premium overflow-hidden;
   }
@@ -158,7 +260,6 @@
     transform: translateX(100%);
   }
 
-  /* Link: Progress Underline */
   .link-precision {
     @apply relative no-underline;
   }
@@ -170,7 +271,6 @@
     @apply scale-x-100;
   }
 
-  /* Reduce Motion overrides */
   @media (prefers-reduced-motion: reduce) {
     .btn-precision:hover,
     .card-precision:hover {
@@ -182,34 +282,20 @@
     .btn-precision::after,
     .card-precision::before,
     .link-precision::after {
-      display: none; /* Disable sweeps */
+      display: none;
     }
-    /* Keep state changes (colors, borders) but remove motion */
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* Premium utilities */
-  .glass {
-    @apply bg-background/80 backdrop-blur-md border-b border-border/50;
-  }
-
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/60;
-  }
-
-  .border-hairline {
-    border-width: 0.5px;
   }
 }
 
 /* ---------------------------
    System Layer (site-wide)
 ---------------------------- */
+
+/* Note: Using HSL vars for gradients where interpolation isn't critical or legacy logic is used.
+   But strictly, we should use OKLCH. I kept system-h/s/l for now to avoid breaking the complex gradient logic below
+   which might rely on specific HSL behavior, but I'll try to adapt if possible.
+   Actually, I can just leave these HSL vars defined in :root alongside OKLCH for this specific effect.
+*/
 
 .system-layer {
   position: absolute;
