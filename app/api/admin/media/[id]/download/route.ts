@@ -67,10 +67,28 @@ export const GET = adminRead(
     });
     
     // Determine file path
-    const uploadsDir = process.env.UPLOADS_DIR || "./uploads";
-    const filePath = asset.storageKey
-      ? path.join(uploadsDir, asset.storageKey)
-      : path.join(uploadsDir, asset.key);
+    const uploadsDir = path.resolve(process.env.UPLOADS_DIR || "./uploads");
+    const filename = asset.storageKey || asset.key;
+    
+    // Security check: Prevent path traversal
+    if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
+      console.error(`[Media Download] Potential path traversal attempt: ${filename}`);
+      return NextResponse.json(
+        { error: "Invalid filename" },
+        { status: 400 }
+      );
+    }
+
+    const filePath = path.join(uploadsDir, filename);
+    
+    // Double check that the resolved path is within uploadsDir
+    if (!filePath.startsWith(uploadsDir)) {
+      console.error(`[Media Download] Path traversal detected: ${filePath}`);
+      return NextResponse.json(
+        { error: "Access denied" },
+        { status: 403 }
+      );
+    }
     
     // Check if file exists
     if (!existsSync(filePath)) {

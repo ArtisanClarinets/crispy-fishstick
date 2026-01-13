@@ -1,6 +1,6 @@
-# Thompson Systems — Public Website PRD
+# Vantus Systems — Public Website PRD
 
-**Project:** Thompson Systems Engineering Studio
+**Project:** Vantus Systems Engineering Studio
 **Codename:** Project CRISPY FISHSTICK
 **Document Type:** Product Requirements Document (Public-Facing Front End)
 **Status:** Live v2.0
@@ -9,7 +9,7 @@
 ---
 
 ## 0. Executive Summary
-Thompson Systems is a specialized engineering studio for founders who demand production-grade quality. The public website serves as a high-trust entry point for enterprise clients, demonstrating technical rigor through its own implementation. The site emphasizes clarity, performance, and engineering precision.
+Vantus Systems is a specialized engineering studio for founders who demand production-grade quality. The public website serves as a high-trust entry point for enterprise clients, demonstrating technical rigor through its own implementation. The site emphasizes clarity, performance, and engineering precision.
 
 ---
 
@@ -84,4 +84,4 @@ Thompson Systems is a specialized engineering studio for founders who demand pro
 ---
 
 ## 5. Migration Guide
-Refer to `MIGRATION.md` for details on updating from the legacy Vantus System to the new Thompson Systems identity.
+Refer to `MIGRATION.md` for details on updating from the legacy Vantus System to the new Vantus Systems identity.

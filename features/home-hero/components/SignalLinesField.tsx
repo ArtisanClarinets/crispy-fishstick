@@ -13,7 +13,6 @@ export function SignalLinesField() {
   // We subscribe to specific changes to trigger redraws
   const pointerX = usePointerSignalStore((state) => state.x);
   const pointerY = usePointerSignalStore((state) => state.y);
-  const lastInput = usePointerSignalStore((state) => state.lastInput);
 
   // Helper to get CSS variable values
   const getCssVar = (name: string) => {
@@ -99,6 +98,7 @@ export function SignalLinesField() {
         ctx.stroke();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pointerX, pointerY, reducedMotion, theme, systemTheme]); // Dependencies that should trigger redraw
 
   // Handle resize

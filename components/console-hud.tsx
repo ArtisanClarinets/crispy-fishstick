@@ -23,7 +23,7 @@ export function ConsoleHud() {
   const [buildProof, setBuildProof] = useState<BuildProof | null>(null);
   const [auditLabel, setAuditLabel] = useState("CHECKING");
   const pathname = usePathname();
-  const startTime = useRef<number>(Date.now());
+  const startTime = useRef<number | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
   // Scroll visibility logic
@@ -74,7 +74,9 @@ export function ConsoleHud() {
 
   // Timestamps
   useEffect(() => {
+    startTime.current = Date.now();
     const interval = setInterval(() => {
+      if (startTime.current === null) return;
       const now = Date.now();
       const elapsed = now - startTime.current;
       // Format as T+mm:ss
@@ -89,6 +91,7 @@ export function ConsoleHud() {
   useEffect(() => {
     const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
     if (navEntry) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTtfb(Math.round(navEntry.responseStart));
     }
 
@@ -142,6 +145,7 @@ export function ConsoleHud() {
   // Sync Blip on navigation
   useEffect(() => {
     if (prefersReducedMotion) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSyncing(true);
     const t = setTimeout(() => setSyncing(false), 350);
     return () => clearTimeout(t);

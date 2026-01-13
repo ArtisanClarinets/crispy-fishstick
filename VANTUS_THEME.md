@@ -1,7 +1,7 @@
-# Vantus Theme System (Thompson Systems Edition)
+# Vantus Theme System (Vantus Systems Edition)
 
 ## Overview
-The Vantus Theme System has been updated to align with the Thompson Systems brand identity. This document outlines the core design tokens, typography, and component styling principles used in the application.
+The Vantus Theme System has been updated to align with the Vantus Systems brand identity. This document outlines the core design tokens, typography, and component styling principles used in the application.
 
 ## Design Tokens
 

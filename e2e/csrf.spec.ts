@@ -14,12 +14,6 @@ test.describe('CSRF Protection', () => {
     await page.goto('/admin/leads');
     
     // Monitor network requests
-    const requestPromise = page.waitForRequest(request => 
-      request.method() === 'POST' || 
-      request.method() === 'PUT' || 
-      request.method() === 'DELETE' ||
-      request.method() === 'PATCH'
-    );
     
     // Trigger a mutation (e.g., try to create a lead or delete one)
     // Since we don't want to actually modify data in a destructive way that breaks other tests,
@@ -35,7 +29,7 @@ test.describe('CSRF Protection', () => {
     // But the requirement is to test the request header.
     // We'll create a dummy fetch call in the console to verify fetchWithCsrf
     
-    const csrfHeader = await page.evaluate(async () => {
+    await page.evaluate(async () => {
         // We need to access fetchWithCsrf or just check if a manual fetch gets the header
         // Since fetchWithCsrf is internal, we can't access it easily from console unless exposed.
         

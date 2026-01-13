@@ -1,6 +1,6 @@
 # Breaking Changes
 
-## Refactor: Thompson Systems UI Overhaul
+## Refactor: Vantus Systems UI Overhaul
 
 ### 1. Theme Variables
 - **Removed**: Any legacy color tokens not present in the new `globals.css` (e.g., specific brand colors from the old system).

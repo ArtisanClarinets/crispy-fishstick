@@ -35,7 +35,7 @@ export default function LoginPage() {
             } else {
               router.replace('/admin');
             }
-          } catch (e) {
+          } catch (_e) {
             router.replace('/admin');
           }
         } else {
@@ -104,7 +104,7 @@ export default function LoginPage() {
             } else {
               router.replace('/admin');
             }
-          } catch (e) {
+          } catch (_e) {
             router.replace('/admin');
           }
         } else {

@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
 import { decryptSecret } from "@/lib/security/mfa";
 import { updateSessionActivity } from "@/lib/security/session";
-import { Redis } from "ioredis";
 import { getRateLimiter } from "@/lib/security/rate-limit";
 import { z } from "zod";
 
@@ -84,7 +83,7 @@ try {
   const Redis = require('ioredis');
   const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
   rateLimiterInstance = getRateLimiter(redis);
-} catch (error) {
+} catch (_error) {
   console.warn('Redis not available, rate limiting will be disabled');
   // Create a mock rate limiter for testing/fallback
   rateLimiterInstance = {

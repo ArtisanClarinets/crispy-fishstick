@@ -1,8 +1,11 @@
+<<<<<<< HEAD
 import { notFound } from "next/navigation";
 import { getMdxContent } from "@/lib/mdx";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+=======
+>>>>>>> ccb6ba7 (Updated a lot of stuff)
 
 interface AcademyArticlePageProps {
   params: Promise<{

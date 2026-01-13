@@ -1,10 +1,10 @@
-# Copilot Instructions — Thompson Systems (Next.js 16 + Prisma)
+# Copilot Instructions — Vantus Systems (Next.js 16 + Prisma)
 
 These instructions are for GitHub Copilot (VS Code) working **inside this repository**.
 
 ## What this repo is
 - Project name (package.json): `crispy-fishstick`
-- App title (README.md): **Thompson Systems**
+- App title (README.md): **Vantus Systems**
 - Primary goal: A production-grade public website (marketing, case studies, labs) plus a hardened **Admin Portal** and APIs for operational workloads (leads, projects, proposals, contracts, invoices, media, audits, JIT access, MFA, webhooks, and observability tools).
 - Total source files: ~450 TypeScript/JS/MDX/MD files (excluding node_modules, .next, coverage)
 
