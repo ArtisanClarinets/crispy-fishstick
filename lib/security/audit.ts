@@ -4,11 +4,11 @@
  * @module lib/security/audit
  */
 
-import winston from 'winston';
 import { Redis } from 'ioredis';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
+import { logger } from '@/lib/logging';
 
 // Types and Interfaces
 interface AuditEvent {
@@ -48,19 +48,6 @@ const DEFAULT_THRESHOLDS: AlertThresholds = {
 const REPUTATION_DECAY_RATE = 0.95; // Decay reputation score by 5% per day
 const FAILED_ATTEMPT_PENALTY = 15;
 const SUCCESS_ATTEMPT_BONUS = 2;
-
-// Logger Setup
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'logs/security-audit.log' })
-  ],
-});
 
 /**
  * Security Audit Logger
@@ -265,7 +252,9 @@ export class SecurityAuditLogger {
     context: Record<string, any>
   ): Promise<void> {
     // Log the alert
-    logger[severity === 'critical' ? 'error' : 'warn'](message, { 
+    logger.log({
+      level: severity === 'critical' ? 'error' : 'warn',
+      message,
       alertType,
       severity,
       context

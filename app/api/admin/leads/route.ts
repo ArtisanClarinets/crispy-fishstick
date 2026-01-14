@@ -36,10 +36,6 @@ export async function GET(req: NextRequest) {
         tenantId: user.tenantId || undefined
     });
 
-    // Note: getLeads returns array. We need total count?
-    // prisma.lead.findMany in original code didn't return count, it used buildPaginationResult which assumes leads has (take + 1) items to determine next cursor.
-    // My DAL getLeads returns (take + 1). So it fits.
-
     return buildPaginationResult(leads, pagination);
   });
 }
@@ -51,18 +47,8 @@ export async function POST(req: NextRequest) {
     const lead = await createLead({
       ...validatedData,
       message: validatedData.message || "",
-      // Tenant? DAL createLead accepts tenantId?
-      // My DAL createLead doesn't explicit accepts tenantId in the args I wrote, but it accepts "data".
-      // Wait, let's check lib/dal.ts createLead signature.
+      tenantId: user.tenantId || undefined
     });
-
-    // Actually, createLead in DAL didn't support tenantId injection from outside easily in my implementation.
-    // "data: { ...data, ... }"
-    // I should update DAL to allow tenantId if needed.
-    // Or update DAL now.
-
-    // But wait, the original code injected tenantId from user.tenantId.
-    // I need to support that.
 
     return { data: lead, status: 201 };
   });

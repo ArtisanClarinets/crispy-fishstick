@@ -42,10 +42,10 @@ export function Header() {
 
   const navLinks = [
     { href: "/work", label: "Work" },
-    { href: "/infrastructure", label: "Infrastructure" }, // Hub
+    { href: "/infrastructure", label: "System" }, // Renamed from Infrastructure
     { href: "/lab/revenue-leak", label: "Lab" },
     { href: "/process", label: "Process" },
-    { href: "/trust", label: "Trust Center" },
+    { href: "/trust", label: "Trust" },
   ];
 
   return (
@@ -53,14 +53,14 @@ export function Header() {
       className={cn(
         "fixed top-0 w-full z-50 transition-all duration-300",
         isScrolled || isOpen
-          ? "bg-background/80 backdrop-blur-md border-b border-border/50"
+          ? "bg-background/80 backdrop-blur-md border-b border-border/50 shadow-sm"
           : "bg-transparent"
       )}
     >
-      <div className="container flex h-20 items-center justify-between relative z-50">
+      <div className="container flex h-16 md:h-20 items-center justify-between relative z-50">
         <Link
             href="/"
-            className="text-lg font-bold tracking-tight transition-opacity hover:opacity-80"
+            className="text-lg font-bold tracking-tight transition-opacity hover:opacity-80 flex items-center gap-2"
             onClick={() => setIsOpen(false)}
         >
           {siteConfig.company}
@@ -78,14 +78,15 @@ export function Header() {
             </Link>
           ))}
           <ThemeToggle data-testid="theme-toggle-desktop" />
-          <Button asChild variant="default" className="rounded-full px-6">
+          <Button asChild variant="default" className="rounded-full px-6 btn-precision">
             <Link href={siteConfig.cta.primary.href}>
               {siteConfig.cta.primary.text}
             </Link>
           </Button>
         </nav>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Menu Toggle - Visible but maybe less prominent if we have bottom nav?
+            Keeping it for full menu access since bottom nav is limited. */}
         <div className="flex md:hidden items-center gap-4">
           <ThemeToggle />
           <button
@@ -104,9 +105,9 @@ export function Header() {
         style={{ scaleX }}
       />
 
-      {/* Mobile Nav */}
+      {/* Mobile Nav Overlay */}
       {isOpen && (
-        <div className="md:hidden fixed inset-0 top-0 z-40 bg-background/95 backdrop-blur-xl p-6 pt-24 flex flex-col gap-6 animate-in fade-in duration-200">
+        <div className="md:hidden fixed inset-0 top-16 z-40 bg-background/95 backdrop-blur-xl p-6 flex flex-col gap-6 animate-in fade-in duration-200">
           <nav className="flex flex-col gap-6">
             {navLinks.map((link) => (
               <Link
@@ -118,7 +119,7 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
-            <Button asChild size="lg" className="mt-4 w-full">
+            <Button asChild size="lg" className="mt-4 w-full btn-precision">
               <Link href={siteConfig.cta.primary.href} onClick={() => setIsOpen(false)}>
                 {siteConfig.cta.primary.text}
               </Link>

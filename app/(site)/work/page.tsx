@@ -6,6 +6,7 @@ import { Reveal } from "@/components/reveal";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { CoverArt } from "@/components/cover-art";
+import { BeforeAfterToggle } from "@/components/before-after-toggle";
 
 export default function WorkPage() {
   return (
@@ -18,6 +19,19 @@ export default function WorkPage() {
           <p className="text-xl text-muted-foreground leading-relaxed">
             A collection of technical deep dives. I specialize in complex, data-heavy applications where performance and reliability are non-negotiable.
           </p>
+        </Reveal>
+      </div>
+
+      {/* Before/After Performance Demo */}
+      <div className="mb-24">
+        <Reveal delay={0.2}>
+            <div className="bg-secondary/20 rounded-2xl p-8 border border-border/50">
+                <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold mb-2">The Vantus Difference</h2>
+                    <p className="text-muted-foreground">Compare a standard implementation vs. our engineered approach.</p>
+                </div>
+                <BeforeAfterToggle />
+            </div>
         </Reveal>
       </div>
 
