@@ -1,0 +1,23 @@
+Migration Log - 2026-01-14
+==========================
+
+The following files were identified as outdated, invalid, or unnecessary and moved to the .trash/ directory:
+
+From Root:
+- API_API_API.md (Snapshot)
+- NEXT16_AUDIT.md (Invalid/Outdated audit)
+- COMPLETE_FILE_AUDIT.md (Invalid/Snapshot)
+- CODE_QUALITY_VIOLATIONS.md (Snapshot)
+- INFRASTRUCTURE_DEFICIENCIES.md (Snapshot)
+- REMEDIATION_ROADMAP.md (Snapshot)
+- SECURITY_CRITICAL_ISSUES.md (Snapshot)
+- EXECUTIVE_AUDIT_SUMMARY.md (Snapshot)
+- DEPLOYMENT_UPDATE_SUMMARY.md (Snapshot)
+- TEST_REPORT.md (Snapshot)
+- GUI_design_guide.md (Superseded by new_design_system.md)
+
+From docs/:
+- docs/AGENTS.md (Redundant with root AGENTS.md)
+- docs/ARCHITECTURE_REVIEW.md (Outdated draft)
+- docs/SECURITY_AUDIT_REPORT.md (Snapshot)
+- docs/SECURITY_REVIEW.md (Snapshot)

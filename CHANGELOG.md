@@ -8,21 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] - 2026-01-06
 
 ### Security Hardening (Comprehensive Review)
-This release focuses on addressing all critical security vulnerabilities identified in the [Security Review](./docs/SECURITY_REVIEW.md).
+This release focuses on addressing all critical security vulnerabilities identified in the [Security Review](./.trash/docs/SECURITY_REVIEW.md).
 
 #### 🚨 Release Blockers Resolved
 - **Data Leakage**: Implemented `SafeUserWithRolesDto` and `SAFE_USER_WITH_ROLES_SELECT` to ensure sensitive fields (`passwordHash`, `mfaSecret`) are never selected from the database or sent to the client.
-  - *Ref: SECURITY_REVIEW.md Item #1*
+  - *Ref: Security Review Item #1*
 - **Unrestricted Uploads**: Moved file uploads to a private directory (`/uploads`) outside the public web root. Implemented strict validation for file type (MIME), size (max 5MB), and filename sanitization. Added a controlled download route with directory traversal protection.
-  - *Ref: SECURITY_REVIEW.md Item #2*
+  - *Ref: Security Review Item #2*
 - **Public Cron Endpoint**: Secured `/api/cron/contract-reminders` by requiring a `CRON_SECRET` header.
-  - *Ref: SECURITY_REVIEW.md Item #3*
+  - *Ref: Security Review Item #3*
 - **Sensitive Artifacts**: Removed `prisma/dev.db` and `contact_submissions.json` from the repository and added them to `.gitignore`.
-  - *Ref: SECURITY_REVIEW.md Item #4*
+  - *Ref: Security Review Item #4*
 - **Insecure Seeding**: Updated `prisma/seed.ts` to fail in production if secure environment variables are not provided, preventing default credentials.
-  - *Ref: SECURITY_REVIEW.md Item #5*
+  - *Ref: Security Review Item #5*
 - **Production Logging**: Configured `lib/prisma.ts` to disable query logging in production environments to prevent sensitive data leakage in logs.
-  - *Ref: SECURITY_REVIEW.md Item #6*
+  - *Ref: Security Review Item #6*
 
 #### Added
 - **MFA Encryption**: Implemented AES-256-GCM encryption for MFA secrets at rest (`lib/security/mfa.ts`).
