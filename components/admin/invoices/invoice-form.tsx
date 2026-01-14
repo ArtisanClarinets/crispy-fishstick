@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Plus, Trash } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { fetchWithCsrf } from "@/lib/fetchWithCsrf";
 import { useAdmin } from "@/hooks/useAdmin";
 
@@ -276,8 +276,7 @@ export function InvoiceForm({ tenants }: InvoiceFormProps) {
         </CardContent>
         <CardFooter>
           {canCreate && (
-            <Button type="submit" disabled={isLoading} className="ml-auto">
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" loading={isLoading} className="ml-auto">
               Create Invoice
             </Button>
           )}
