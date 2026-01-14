@@ -150,5 +150,9 @@ export async function getUser(id: string) {
 
 // ETag helper
 export function generateETag(data: any): string {
-  return crypto.createHash("md5").update(JSON.stringify(data)).digest("hex");
+// ETag helper
+export function generateETag(data: any): string {
+  // Use the stronger 'sha256' hash instead of the insecure 'md5'
+  return crypto.createHash("sha256").update(JSON.stringify(data)).digest("hex");
+}
 }
