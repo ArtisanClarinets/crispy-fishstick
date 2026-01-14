@@ -10,17 +10,14 @@ const RECOVERY_CODE_EXPIRATION_DAYS = 7;
 function getMFAEncryptionKey(): string {
   const key = process.env.MFA_ENCRYPTION_KEY;
   
-  if (process.env.NODE_ENV === "production" && !key) {
-    throw new Error(
-      "MFA_ENCRYPTION_KEY is required in production. Please set a dedicated MFA_ENCRYPTION_KEY in your environment variables."
-    );
-  }
-
   if (!key) {
-    console.warn("WARNING: No MFA encryption key configured. MFA will not work reliably.");
-  }
-
-  if (!key) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "MFA_ENCRYPTION_KEY is required in production. Please set a dedicated MFA_ENCRYPTION_KEY in your environment variables."
+      );
+    }
+    // In development, warn but allow proceeding (will fail if used) or use a fixed dev key?
+    // The previous code threw an error anyway, so we will stick to throwing to ensure safety.
     throw new Error(
       "MFA_ENCRYPTION_KEY is required. Please set a dedicated MFA_ENCRYPTION_KEY in your environment variables."
     );

@@ -1,38 +1,15 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "../prisma";
+import { prisma } from "@/lib/prisma";
+import { RateLimiterMemory } from "rate-limiter-flexible";
+import { COMMON_PASSWORD_LIST } from "./common-passwords";
+import { logger } from "@/lib/logging";
 
-// Common password list (subset of 10,000+ common passwords)
-const COMMON_PASSWORD_LIST = [
-  "password", "123456", "12345678", "1234", "qwerty", "12345", "dragon",
-  "baseball", "football", "letmein", "monkey", "abc123", "mustang",
-  "michael", "shadow", "master", "jennifer", "111111", "2000",
-  "jordan", "superman", "harley", "1234567", "freedom", "whatever",
-  "trustno1", "sunshine", "iloveyou", "starwars", "bailey", "jesus",
-  "nicholas", "matthew", "hello", "azerty", "654321", "password1",
-  "admin", "welcome", "login", "passw0rd", "master", "hello123",
-  "freedom", "whatever", "trustno1", "696969", "batman", "spiderman",
-  "superman", "ironman", "hulk", "thor", "captain", "america", "avenger",
-  "wolverine", "deadpool", "gandalf", "frodo", "bilbo", "legolas", "aragorn",
-  "gimli", "sauron", "darth", "vader", "luke", "leia", "han", "solo", "yoda",
-  "obiwan", "anakin", "padme", "chewbacca", "r2d2", "c3po", "boba", "fett",
-  "jabba", "palpatine", "skywalker", "kenobi", "sith", "jedi", "tatooine",
-  "hoth", "endor", "dagobah", "naboo", "coruscant", "kashyyyk", "mustafar",
-  "alderaan", "bespin", "geonosis", "kamino", "utapau", "felucia", "mygeeto",
-  "saleucami", "cato", "neimoidia", "kessel", "ord", "mantell", "byss",
-  "dantooine", "yavin", "hoth", "dagobah", "endor", "jakku", "takodana",
-  "starkiller", "ahchto", "crait", "exegol", "pasaana", "kijimi", "ajan",
-  "kloss", "chandrila", "corellia", "dathomir", "felucia", "geonosis",
-  "hoth", "kamino", "kashyyyk", "mustafar", "mygeeto", "naboo", "ord",
-  "mantell", "saleucami", "scarif", "sullust", "tatooine", "utapau",
-  "yavin", "zakarr", "zakuul", "ziost", "abregado", "alderaan", "anch",
-  "toine", "bastion", "bespin", "byss", "cato", "neimoidia", "chandrila",
-  "corellia", "dantooine", "dathomir", "dagobah", "endor", "felucia",
-  "geonosis", "hoth", "jakku", "kamino", "kashyyyk", "korriban",
-  "malachor", "mandalore", "mantell", "mon", "calamari", "mustafar",
-  "mygeeto", "naboo", "ord", "mantell", "pasaana", "quermia", "raleigh",
-  "rishi", "ruusan", "saleucami", "scarif", "serenno", "sullust",
-  "tatooine", "takodana", "utapau", "yavin", "zakarr", "zakuul", "ziost"
-];
+// Rate limiter for HIBP API calls
+// Limit to 1 request per second to avoid hitting API limits
+const hibpLimiter = new RateLimiterMemory({
+  points: 1,
+  duration: 1,
+});
 
 // Character diversity categories for entropy calculation
 const CHARACTER_CATEGORIES = [
@@ -108,7 +85,7 @@ export async function isPasswordInHistory(userId: string, newPassword: string): 
 
     return false;
   } catch (error) {
-    console.error('Error checking password history:', error);
+    logger.error('Error checking password history:', error);
     // Fail safe - allow password change if we can't check history
     return false;
   }
@@ -121,6 +98,14 @@ export async function isPasswordInHistory(userId: string, newPassword: string): 
  */
 export async function isPasswordBreached(password: string): Promise<boolean> {
   try {
+    // Check rate limit
+    try {
+      await hibpLimiter.consume("hibp_global");
+    } catch {
+      logger.warn("HIBP rate limit exceeded, skipping breach check");
+      return false; // Fail safe
+    }
+
     // Hash the password using SHA-1 (as required by HIBP API)
     const sha1 = require('crypto').createHash('sha1');
     const hash = sha1.update(password).digest('hex').toUpperCase();
@@ -140,7 +125,7 @@ export async function isPasswordBreached(password: string): Promise<boolean> {
 
     if (!response.ok) {
       // If API is unavailable, we'll allow the password but log it
-      console.warn('HaveIBeenPwned API unavailable, proceeding without breach check');
+      logger.warn('HaveIBeenPwned API unavailable, proceeding without breach check');
       return false;
     }
 
@@ -157,7 +142,7 @@ export async function isPasswordBreached(password: string): Promise<boolean> {
 
     return false;
   } catch (error) {
-    console.error('Error checking password breach status:', error);
+    logger.error('Error checking password breach status:', error);
     // Fail safe - allow password if we can't check breach status
     return false;
   }
@@ -251,7 +236,7 @@ export async function addToPasswordHistory(userId: string, passwordHash: string)
       }
     });
   } catch (error) {
-    console.error('Error adding password to history:', error);
+    logger.error('Error adding password to history:', error);
     // Don't fail the password change if we can't update history
   }
 }
