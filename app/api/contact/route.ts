@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/security/request";
+import { createLead } from "@/lib/dal";
 
 const contactFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
 
     const ip = getClientIp(req);
     const userAgent = req.headers.get("user-agent") ?? "unknown";
-    const rateLimitKey = `contact:${ip}:${userAgent}`; // Prefix to namespace
+    const rateLimitKey = `contact:${ip}:${userAgent}`;
     
     const limitResult = await rateLimit({
       key: rateLimitKey,
@@ -82,7 +82,6 @@ export async function POST(req: Request) {
     const validatedData = contactFormSchema.parse(body);
 
     if (validatedData.honeypot && validatedData.honeypot.length > 0) {
-      // Silently ignore honeypot submissions
       return NextResponse.json(
         { message: "Message received successfully" },
         { status: 200 }
@@ -99,23 +98,23 @@ export async function POST(req: Request) {
       return response;
     }
 
-    // Save to Database (SQLite)
-    await prisma.lead.create({
-      data: {
-        name: validatedData.name,
-        email: validatedData.email,
-        message: validatedData.message,
-        budget: validatedData.budget,
-        role: validatedData.role,
-        website: validatedData.website || null,
-        source: "contact_form",
-        status: "new",
-      },
+    // Use DAL
+    await createLead({
+      name: validatedData.name,
+      email: validatedData.email,
+      message: validatedData.message,
+      budget: validatedData.budget,
+      role: validatedData.role,
+      website: validatedData.website || null,
+      source: "contact_form",
     });
 
-    // Log metadata only (No PII)
+    // Send transactional email (Stub)
+    // console.log("Sending email...");
+
+    // Log metadata only
     console.log("Contact submission received", {
-      ip: "REDACTED", // or hash it
+      ip: "REDACTED",
       timestamp: new Date().toISOString(),
       status: "saved"
     });
@@ -137,7 +136,7 @@ export async function POST(req: Request) {
       return response;
     }
 
-    console.error("Error processing contact form (metadata only):", error instanceof Error ? error.message : "Unknown error");
+    console.error("Error processing contact form:", error instanceof Error ? error.message : "Unknown error");
     const response = NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

@@ -6,7 +6,7 @@ test.describe('MFA Flow', () => {
     // 1. Login
     await page.goto('/admin/login');
     await page.getByLabel('Email').fill('admin@vantus.systems');
-    await page.getByLabel('Password').fill('admin123');
+    await page.getByLabel('Password').fill('admin123!');
     await page.getByRole('button', { name: 'Sign In' }).click();
     await expect(page).toHaveURL('/admin');
 
@@ -52,7 +52,7 @@ test.describe('MFA Flow', () => {
 
     // 6. Login with MFA
     await page.getByLabel('Email').fill('admin@vantus.systems');
-    await page.getByLabel('Password').fill('admin123');
+    await page.getByLabel('Password').fill('admin123!');
     await page.getByRole('button', { name: 'Sign In' }).click();
 
     // Should see MFA prompt

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Check, ArrowRight, RefreshCcw } from "lucide-react";
+import { ArrowRight, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 
 interface EstimatorOutputProps {

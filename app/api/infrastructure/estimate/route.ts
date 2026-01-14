@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Rate Limiting
     const ip = req.headers.get("x-forwarded-for") || "anonymous";
-    const { success, remaining, reset } = await rateLimit({
+    const { success, remaining } = await rateLimit({
       key: RATE_LIMIT.key(ip),
       limit: RATE_LIMIT.limit,
       windowMs: RATE_LIMIT.windowMs,

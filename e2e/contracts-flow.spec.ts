@@ -5,7 +5,7 @@ test.describe('Contracts Flow', () => {
     // Login
     await page.goto('/admin/login');
     await page.fill('input[name="email"]', 'admin@vantus.systems');
-    await page.fill('input[name="password"]', 'admin123');
+    await page.fill('input[name="password"]', 'admin123!');
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL(/\/admin$/);
   });

@@ -36,8 +36,6 @@ describe("Estimator Math", () => {
       userCount: 1,
       environment: "production",
       modelSizeParams: "xlarge",
-      trainingOrInference: "inference",
-      batchSize: 1,
     };
 
     const result = calculateEstimate(input);

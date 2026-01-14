@@ -110,6 +110,30 @@ async function main() {
 
     console.log(`\nRole: ${role.name}`);
     console.log("Permissions:", Array.isArray(permissions) ? permissions.join(", ") : "(unreadable)");
+
+    // File permission checks
+    console.log("\nChecking file permissions...");
+    const secureFiles = [".env", "logs/security-audit.log"];
+    let failed = false;
+
+    for (const file of secureFiles) {
+      if (fs.existsSync(file)) {
+        const stats = fs.statSync(file);
+        const mode = stats.mode & 0o777;
+        // Check for 640 (rw-r-----) or stricter (600 rw-------)
+        // Allow user read/write (6), group read (4) or nothing (0), others nothing (0)
+        // So mode & 0o007 should be 0.
+        if ((mode & 0o007) !== 0) {
+          console.error(`❌ Insecure permissions on ${file}: 0o${mode.toString(8)} (others have access)`);
+          failed = true;
+        } else {
+          console.log(`✅ Permissions on ${file}: 0o${mode.toString(8)}`);
+        }
+      }
+    }
+
+    if (failed) process.exitCode = 1;
+
   } finally {
     await prisma.$disconnect();
   }

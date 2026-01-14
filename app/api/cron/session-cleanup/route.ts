@@ -29,6 +29,6 @@ export async function GET(req: Request) {
 }
 
 // Allow POST as well for flexibility
-export async function POST() {
-  return GET();
+export async function POST(req: Request) {
+  return GET(req);
 }

@@ -5,7 +5,7 @@ test.describe('Projects Flow', () => {
     // Login as admin
     await page.goto('/admin/login');
     await page.getByLabel('Email').fill('admin@vantus.systems');
-    await page.getByLabel('Password').fill('admin123');
+    await page.getByLabel('Password').fill('admin123!');
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL('/admin');
   });
