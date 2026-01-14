@@ -10,6 +10,7 @@ import { VisitedPathProvider } from "@/components/visited-path-provider";
 import { AppMotionConfig } from "@/components/motion-config";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -70,7 +71,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className={cn(
         inter.variable,
-        "font-sans antialiased min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary"
+        "font-sans antialiased min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary pb-20 md:pb-0"
       )}>
         <AuthProvider session={session}>
             <ThemeProvider
@@ -84,6 +85,7 @@ export default async function RootLayout({
                     <PointerSignalProvider>
                         <VisitedPathProvider>
                             {children}
+                            <MobileBottomNav />
                         </VisitedPathProvider>
                     </PointerSignalProvider>
                 </AppMotionConfig>
