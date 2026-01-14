@@ -26,9 +26,7 @@ export function validateConfiguration(state: ConfiguratorState): ValidationResul
   }
 
   // Storage Logic
-  let totalStorage = 0;
   state.storageDrives.forEach(drive => {
-    totalStorage += drive.sizeGB * drive.qty;
     power += drive.qty * (drive.type === "NVMe" ? 10 : 7);
     cost += drive.qty * (drive.sizeGB * (drive.type === "NVMe" ? 0.15 : 0.08));
   });

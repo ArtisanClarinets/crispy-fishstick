@@ -15,8 +15,16 @@ model Assignment {
   startDate            DateTime
   endDate              DateTime?
   allocationPercentage Int       @default(100)
+
+  // Soft delete
+  deletedAt    DateTime?
+  deletedBy    String?
+  deleteReason String?
+
   User                 User      @relation(fields: [userId], references: [id])
   Project              Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([deletedAt])
 }
 
 model AuditLog {

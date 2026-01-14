@@ -7,18 +7,21 @@ const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   turbopack: {
     root: __dirname,
   },
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+       {
+        protocol: 'https',
+        hostname: '**.splinetool.com',
+      },
+    ],
   },
   poweredByHeader: false,
   reactStrictMode: true,
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 };
 
 const withMDX = createMDX({

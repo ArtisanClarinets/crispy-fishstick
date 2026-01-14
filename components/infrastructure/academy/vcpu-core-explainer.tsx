@@ -1,12 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function VcpuCoreExplainer() {
-  const [mode, setMode] = useState("vcpu");
-
   return (
     <Card className="my-8 overflow-hidden">
       <CardHeader className="bg-muted/30 pb-2">
@@ -42,7 +39,7 @@ export function VcpuCoreExplainer() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              A vCPU is usually a single hyperthread. If the "noisy neighbor" on the other thread spikes, your performance tanks. You share the L1/L2 cache and execution units.
+              A vCPU is usually a single hyperthread. If the &quot;noisy neighbor&quot; on the other thread spikes, your performance tanks. You share the L1/L2 cache and execution units.
             </p>
           </TabsContent>
 

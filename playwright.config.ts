@@ -1,4 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 export default defineConfig({
   testDir: "./e2e",
@@ -25,6 +29,8 @@ export default defineConfig({
     env: {
       NEXTAUTH_URL: "http://localhost:3002",
       NEXTAUTH_SECRET: "e67jcdS2iFcrpNRvcvtgv2/7qMsaFBg2wSVho0wZKAU=",
+      DISABLE_RATE_LIMITING: "true",
+      NODE_ENV: "production",
     },
     // Always start a fresh server locally for deterministic test runs
     reuseExistingServer: !process.env.CI,

@@ -25,7 +25,7 @@ export function EvidencePanel({ claim, verdict, dataPoint, source }: EvidencePan
           </div>
           <div className="space-y-2">
             <div className="text-xs font-mono uppercase text-muted-foreground">Truth Engine Verification</div>
-            <h4 className="font-bold text-lg">"{claim}"</h4>
+            <h4 className="font-bold text-lg">&quot;{claim}&quot;</h4>
 
             <div className="py-2">
               <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${

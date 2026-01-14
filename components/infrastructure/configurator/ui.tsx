@@ -6,7 +6,6 @@ import { ConfiguratorState, ValidationResult } from "@/lib/infrastructure/config
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { AlertCircle, CheckCircle, Zap, DollarSign, Server, Loader2, Save } from "lucide-react";
 
 // Inline debounce for safety if not exists
@@ -88,7 +87,7 @@ function ConfiguratorContent() {
        if (!res.ok) throw new Error("Save failed");
        const { code } = await res.json();
        window.location.href = `/c/${code}`;
-     } catch (e) {
+     } catch (_e) {
        alert("Failed to save build");
      } finally {
        setIsSaving(false);

@@ -7,7 +7,7 @@ test.describe('Admin Flow', () => {
     
     // 2. Fill credentials
     await page.fill('input[name="email"]', 'admin@vantus.systems');
-    await page.fill('input[name="password"]', 'admin123');
+    await page.fill('input[name="password"]', 'admin123!');
     await page.click('button[type="submit"]');
 
     // 3. Should redirect to Dashboard

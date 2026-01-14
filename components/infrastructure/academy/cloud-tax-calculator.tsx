@@ -17,14 +17,13 @@ export function CloudTaxCalculator() {
   const cloudCost = (vcpuCount[0] * CLOUD_VCPU_PRICE) + (ramGb[0] * CLOUD_RAM_PRICE);
   const ownCost = HARDWARE_PRICE_AMORTIZED + (vcpuCount[0] * 2) + (ramGb[0] * 0.5); // Power + Maintenance
 
-  const savings = cloudCost - ownCost;
   const taxPercent = Math.round(((cloudCost - ownCost) / ownCost) * 100);
 
   return (
     <Card className="border-primary/20 my-8">
       <CardHeader className="bg-muted/30">
         <CardTitle className="flex items-center gap-2">
-          Interactive Proof: The "Rent" Premium
+          Interactive Proof: The &quot;Rent&quot; Premium
           <Badge variant="outline" className="text-xs font-normal">Live Calc</Badge>
         </CardTitle>
         <CardDescription>

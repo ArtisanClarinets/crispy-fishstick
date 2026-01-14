@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
 import { Loader2, CheckCircle2, XCircle, Copy } from 'lucide-react';
 import QRCode from 'qrcode';
-// import Image from 'next/image';
+import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/fetchWithCsrf';
 
 interface MFASettingsProps {

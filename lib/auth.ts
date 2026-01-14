@@ -5,98 +5,32 @@ import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
 import { decryptSecret } from "@/lib/security/mfa";
 import { updateSessionActivity } from "@/lib/security/session";
-// import { Redis } from "ioredis";
 import { getRateLimiter } from "@/lib/security/rate-limit";
-import { z } from "zod";
-
-// Environment variable validation schema
-const envSchema = z.object({
-  NEXTAUTH_SECRET: z.string().min(32, {
-    message: "NEXTAUTH_SECRET must be at least 32 characters long"
-  }),
-  NEXTAUTH_URL: z.string().url({
-    message: "NEXTAUTH_URL must be a valid URL"
-  }),
-  MFA_ENCRYPTION_KEY: z.string().min(64, {
-    message: "MFA_ENCRYPTION_KEY must be at least 64 characters long (32 bytes in hex)"
-  }).optional(),
-  NODE_ENV: z.enum(["development", "production", "test"]),
-});
-
-// Centralized secret resolution function with enhanced validation
-function getAuthSecret(): string {
-  // Validate environment variables using Zod
-  const envValidation = envSchema.safeParse({
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    MFA_ENCRYPTION_KEY: process.env.MFA_ENCRYPTION_KEY,
-    NODE_ENV: process.env.NODE_ENV,
-  });
-
-  if (!envValidation.success) {
-    const errors = envValidation.error.format();
-    console.error("Environment validation errors:", errors);
-    
-    // In production, fail fast on validation errors
-    if (process.env.NODE_ENV === "production") {
-      throw new Error(
-        `Environment validation failed: ${JSON.stringify(errors)}`
-      );
-    }
-    
-    // In development, provide helpful warnings but continue with fallback
-    console.warn("Using development fallback due to environment validation errors");
-  }
-
-  // Try NEXTAUTH_SECRET first, then fall back to AUTH_SECRET for compatibility
-  const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
-
-  if (process.env.NODE_ENV === "production" && !secret) {
-    throw new Error(
-      "Auth secret is required in production. Please set NEXTAUTH_SECRET or AUTH_SECRET in your environment variables."
-    );
-  }
-
-  if (!secret) {
-    // In development, provide a fallback secret for convenience
-    console.warn("No auth secret found. Using a development fallback secret.");
-    return "dev-secret-fallback-for-development-only";
-  }
-
-  // Validate secret length for security
-  if (secret.length < 32) {
-    console.warn("Auth secret should be at least 32 characters for production security");
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("NEXTAUTH_SECRET must be at least 32 characters in production");
-    }
-  }
-
-  return secret;
-}
-
-// Get the secret once and enforce requirements
-const nextAuthSecret = getAuthSecret();
-
-// Determine security settings dynamically based on NEXTAUTH_URL
-const nextAuthUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-const url = new URL(nextAuthUrl);
-const isHttps = url.protocol === "https:";
-const isLocalhost = url.hostname === "localhost" || url.hostname === "127.0.0.1" || url.hostname === "::1";
+import { authConfig } from "./auth.config";
 
 // Create Redis client for rate limiting
 let rateLimiterInstance: any = null;
 
-try {
-  const Redis = require('ioredis');
-  const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
-  rateLimiterInstance = getRateLimiter(redis);
-} catch (_error) {
-  console.warn('Redis not available, rate limiting will be disabled');
-  // Create a mock rate limiter for testing/fallback
+if (process.env.DISABLE_RATE_LIMITING === "true") {
+  console.warn('Rate limiting disabled via env var');
   rateLimiterInstance = {
     checkLoginAttempt: async () => ({ success: true, remaining: 5 }),
     getClientIp: () => '127.0.0.1',
   };
+} else {
+  try {
+    // Use require to avoid bundling issues if ioredis isn't used elsewhere or to keep it conditional
+    const Redis = require('ioredis');
+    const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
+    rateLimiterInstance = getRateLimiter(redis);
+  } catch (_error) {
+    console.warn('Redis not available, rate limiting will be disabled');
+    // Create a mock rate limiter for testing/fallback
+    rateLimiterInstance = {
+      checkLoginAttempt: async () => ({ success: true, remaining: 5 }),
+      getClientIp: () => '127.0.0.1',
+    };
+  }
 }
 
 declare module "next-auth" {
@@ -127,34 +61,7 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: NextAuthOptions = {
-  secret: nextAuthSecret,
-  useSecureCookies: isHttps,
-  // @ts-expect-error - trustHost is supported in v4 but might be missing from the type definition
-  trustHost: true,
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    // Add session fixation protection by regenerating session token on sign-in
-    updateAge: 24 * 60 * 60, // 24 hours - forces periodic session updates
-  },
-  pages: {
-    signIn: "/admin/login",
-    error: "/admin/error",
-  },
-  // Add secure cookie settings
-  cookies: {
-    sessionToken: {
-      name: isHttps 
-        ? "__Secure-next-auth.session-token"
-        : "next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: isHttps,
-      },
-    },
-  },
+  ...authConfig,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -170,7 +77,6 @@ export const authOptions: NextAuthOptions = {
 
         try {
             // Extract IP address from request context
-            // The req object may have an extended context with IP injected from the route handler
             const ip = (req as any)?.ip || "unknown";
             const email = credentials.email;
             
@@ -199,16 +105,19 @@ export const authOptions: NextAuthOptions = {
 
            // Check if user is soft-deleted
            if (user?.deletedAt) {
+             console.log("User soft deleted");
              return null;
            }
 
           if (!user || !user.passwordHash) {
+            console.log("User not found or no password hash");
             return null;
           }
 
           const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
 
           if (!isValid) {
+            console.log("Password invalid for user", user.email);
             return null;
           }
 
@@ -277,6 +186,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user, trigger, session }) {
       // Initialize security metadata on first call
       if (!token.sessionCreatedAt) {
@@ -368,25 +278,6 @@ export const authOptions: NextAuthOptions = {
       };
       
       return sanitizedSession;
-    },
-    // Add redirect callback for security
-    async redirect({ url, baseUrl }) {
-      /**
-       * Hardened redirect handling.
-       *
-       * - Allows relative redirects ("/admin", "/admin?x=y").
-       * - Allows absolute redirects only when the origin matches `baseUrl`.
-       * - Denies any cross-origin redirect to prevent open redirect attacks.
-       */
-      try {
-        const base = new URL(baseUrl);
-        const target = new URL(url, base);
-
-        if (target.origin !== base.origin) return base.toString();
-        return target.toString();
-      } catch {
-        return baseUrl;
-      }
     },
   },
   // Security events

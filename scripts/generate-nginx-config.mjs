@@ -88,8 +88,9 @@ function securityHeaders(httpsMode) {
     : "";
   return `
     # Security headers (baseline; adjust CSP in application)
-${hsts}    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-Frame-Options "SAMEORIGIN" always;
+${hsts}    # Headers matched with application proxy.ts
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
 `;
