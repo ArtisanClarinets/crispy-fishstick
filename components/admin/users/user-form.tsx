@@ -27,6 +27,7 @@ const userSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email"),
   roleIds: z.array(z.string()),
+  password: z.string().optional(),
 });
 
 type UserFormValues = z.infer<typeof userSchema>;
@@ -48,7 +49,7 @@ interface UserFormProps {
  * 
  * Security Updates (Phase 7):
  * - Uses SafeUserWithRolesDto for type safety and data protection.
- * - Password field removed to prevent insecure password management.
+ * - Password field added back for creation/updates (securely handled by API).
  * - Roles selection preserved.
  */
 export function UserForm({ initialData, roles }: UserFormProps) {
@@ -64,11 +65,23 @@ export function UserForm({ initialData, roles }: UserFormProps) {
       name: initialData?.name || "",
       email: initialData?.email || "",
       roleIds: initialData?.RoleAssignment?.map((r) => r.roleId) || [],
+      password: "",
     },
   });
 
   const onSubmit = async (data: UserFormValues) => {
     try {
+      // Validate password for creation
+      if (!initialData && (!data.password || data.password.length < 12)) {
+        form.setError("password", { message: "Password must be at least 12 characters for new users" });
+        return;
+      }
+
+      // If editing and password is empty, don't send it
+      if (initialData && !data.password) {
+        delete data.password;
+      }
+
       setLoading(true);
       
       const payload = { ...data };
@@ -126,6 +139,27 @@ export function UserForm({ initialData, roles }: UserFormProps) {
                     <FormControl>
                       <Input placeholder="john@example.com" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{initialData ? "New Password (Optional)" : "Password"}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder={initialData ? "Leave blank to keep current" : "Secure password"}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Must be at least 12 characters.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
