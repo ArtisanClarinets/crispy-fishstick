@@ -81,7 +81,7 @@ const nextAuthSecret = getAuthSecret();
 const nextAuthUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 const url = new URL(nextAuthUrl);
 const isHttps = url.protocol === "https:";
-const isLocalhost = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+const isLocalhost = url.hostname === "localhost" || url.hostname === "127.0.0.1" || url.hostname === "::1";
 
 // Create Redis client for rate limiting
 let rateLimiterInstance: any = null;
@@ -129,7 +129,8 @@ declare module "next-auth/jwt" {
 export const authOptions: NextAuthOptions = {
   secret: nextAuthSecret,
   useSecureCookies: isHttps,
-  // trustHost: true, // Not supported in NextAuthOptions type for this version, but can be set via env var TRUST_HOST=true
+  // @ts-expect-error - trustHost is supported in v4 but might be missing from the type definition
+  trustHost: true,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -151,10 +152,6 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: isHttps,
-        // Add __Host prefix for additional security in production (HTTPS only, non-localhost)
-        ...(isHttps && !isLocalhost ? {
-          domain: url.hostname,
-        } : {}),
       },
     },
   },
