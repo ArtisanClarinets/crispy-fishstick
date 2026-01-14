@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { VTLink } from "@/components/vt-link";
 import { ExecutionProtocol, ProtocolStep } from "@/components/execution-protocol";
 import { CalibrationHeadline } from "@/components/calibration-headline";
+import { Search, Hammer, Users, Key } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Protocol",
+  title: "Process | Protocol",
   description: "A systematic engineering lifecycle. Every phase is gated by audit-grade artifacts.",
 };
 
@@ -142,14 +143,63 @@ export default function ProcessPage() {
                <span className="font-mono text-emerald-500 mr-2">{">>"}</span>
                <CalibrationHeadline text="EXECUTION_PROTOCOL" />
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8">
               Systematic engineering lifecycle. Every phase is gated by audit-grade artifacts.
             </p>
           </div>
         </div>
 
+        {/* OWNER'S VIEW */}
+        <div className="mb-32">
+           <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
+              <Users className="w-6 h-6 text-primary" />
+              The Owner&apos;s View
+           </h2>
+           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[
+                 {
+                    phase: "1. Discovery",
+                    desc: "We learn your business model and define success.",
+                    icon: Search
+                 },
+                 {
+                    phase: "2. Build",
+                    desc: "We code the custom features you need (no templates).",
+                    icon: Hammer
+                 },
+                 {
+                    phase: "3. Training",
+                    desc: "We teach you how to use your new dashboard.",
+                    icon: Users
+                 },
+                 {
+                    phase: "4. Handoff",
+                    desc: "You get the keys, the code, and the hosting accounts.",
+                    icon: Key
+                 }
+              ].map((item) => {
+                 const Icon = item.icon;
+                 return (
+                    <div key={item.phase} className="p-6 bg-secondary/10 border border-border/50 rounded-xl hover:bg-secondary/20 transition-colors">
+                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                          <Icon className="w-5 h-5" />
+                       </div>
+                       <h3 className="font-bold mb-2">{item.phase}</h3>
+                       <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    </div>
+                 )
+              })}
+           </div>
+        </div>
+
         {/* Protocol Pipeline */}
-        <ExecutionProtocol steps={protocolSteps} />
+        <div className="space-y-8">
+           <div className="flex items-center gap-4">
+               <h2 className="text-2xl font-bold">Technical Deep Dive</h2>
+               <div className="h-px bg-border flex-1" />
+           </div>
+           <ExecutionProtocol steps={protocolSteps} />
+        </div>
 
         {/* CTA */}
         <div className="mt-32 md:mt-48 text-center border-t border-border/5 pt-20">
