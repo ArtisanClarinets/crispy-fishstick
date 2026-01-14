@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
+import Redis from "ioredis";
 import { decryptSecret } from "@/lib/security/mfa";
 import { updateSessionActivity } from "@/lib/security/session";
 import { getRateLimiter } from "@/lib/security/rate-limit";
@@ -19,8 +20,6 @@ if (process.env.DISABLE_RATE_LIMITING === "true") {
   };
 } else {
   try {
-    // Use require to avoid bundling issues if ioredis isn't used elsewhere or to keep it conditional
-    const Redis = require('ioredis');
     const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
     rateLimiterInstance = getRateLimiter(redis);
   } catch (_error) {
