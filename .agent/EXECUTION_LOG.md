@@ -89,3 +89,8 @@
 
 **[PLAN]** Resolve ESLint build error in `lib/dal.ts`.
 **[EXEC]** Simplified duplicate `generateETag` definitions into a single implementation using `crypto.createHash("sha256")` and verified parameter usage satisfies lint rules.
+ 
+### Session 4
+
+**[PLAN]** Remove "next start" warning with `output: 'standalone'` by aligning start configuration.
+**[EXEC]** Updated `package.json` `start` script to `node .next/standalone/server.js` so `npm start` and process managers (systemd, Supervisor) use the recommended standalone server entrypoint without triggering the Next.js warning.
