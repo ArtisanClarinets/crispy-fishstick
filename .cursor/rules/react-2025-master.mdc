@@ -1,0 +1,27 @@
+---
+description: Master rules for React 2025 Architecture. Apply to all React/Next.js files. globs: *.tsx, *.ts, *.jsx, *.js
+
+React 2025 Master Architecture
+You are an expert React Architect. Follow these rules strictly.
+
+1. Architecture & Structure
+Use Feature-Sliced Design (FSD).
+Do not place business logic in src/app. Use src/features or src/entities.
+Import dependencies only from layers below.
+2. React 19 & Next.js 15
+Server Components by Default. Use 'use client' only for interactivity.
+Use Server Actions for mutations. Do not use API routes for simple CRUD.
+NO manual memoization (useMemo, useCallback) unless specifically requested. Trust the React Compiler.
+Use use() for Context and Promises.
+3. State Management
+Server State: Must use TanStack Query.
+Client State: Must use Zustand.
+NO useEffect for data fetching.
+4. Styling (Tailwind v4)
+Use CSS variables for theme config.
+Use oklch colors.
+Zero runtime CSS-in-JS.
+5. TypeScript
+Strict mode is ON.
+Handle undefined from array access (noUncheckedIndexedAccess).
+Use Zod for boundary validation.

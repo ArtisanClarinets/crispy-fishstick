@@ -1,0 +1,30 @@
+import { MetadataRoute } from 'next';
+import { siteConfig } from '@/shared/lib/site';
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://vantus.systems.com';
+
+  const routes = [
+    '',
+    '/work',
+    '/process',
+    '/trust',
+    '/contact',
+    '/infrastructure', // Hub
+    '/infrastructure/academy',
+    '/infrastructure/estimator',
+    '/infrastructure/configurator',
+    '/lab/revenue-leak',
+  ];
+
+  const workRoutes = siteConfig.featuredWork.map((project) => `/work/${project.slug}`);
+
+  const allRoutes = [...routes, ...workRoutes];
+
+  return allRoutes.map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: route === '' ? 1 : 0.8,
+  }));
+}
