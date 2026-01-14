@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "node scripts/generate-build-proof.mjs && next build",
     "prebuild": "npm run lint && npm run typecheck",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:ci": "eslint . --max-warnings=0",
