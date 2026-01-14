@@ -14,14 +14,22 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 // Mock Redis and rate limiter
-vi.mock('ioredis', () => ({
-  Redis: vi.fn().mockImplementation(() => ({
-    hgetall: vi.fn().mockResolvedValue(null),
-    hmset: vi.fn().mockResolvedValue('OK'),
-    expireat: vi.fn().mockResolvedValue(1),
-    hincrby: vi.fn().mockResolvedValue(1),
-  })),
-}));
+vi.mock('ioredis', () => {
+  class Redis {
+    constructor() {}
+    hgetall = vi.fn().mockResolvedValue(null);
+    hmset = vi.fn().mockResolvedValue('OK');
+    expireat = vi.fn().mockResolvedValue(1);
+    hincrby = vi.fn().mockResolvedValue(1);
+    quit = vi.fn();
+    on = vi.fn();
+    disconnect = vi.fn();
+  }
+  return {
+    Redis: Redis,
+    default: Redis,
+  };
+});
 
 // Create a persistent mock instance to handle caching in lib/auth.ts
 const { mockRateLimiterInstance } = vi.hoisted(() => ({

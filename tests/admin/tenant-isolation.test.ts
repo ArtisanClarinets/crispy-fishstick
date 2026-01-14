@@ -1,6 +1,23 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { PrismaClient } from "@prisma/client";
 import { tenantWhere } from "@/lib/admin/guards";
+
+// Mock ioredis to prevent connection errors
+vi.mock('ioredis', () => {
+  const Redis = vi.fn();
+  Redis.prototype.hgetall = vi.fn().mockResolvedValue({});
+  Redis.prototype.hmset = vi.fn().mockResolvedValue('OK');
+  Redis.prototype.expireat = vi.fn().mockResolvedValue(1);
+  Redis.prototype.hincrby = vi.fn().mockResolvedValue(1);
+  Redis.prototype.quit = vi.fn();
+  Redis.prototype.on = vi.fn();
+  Redis.prototype.disconnect = vi.fn();
+
+  return {
+    Redis: Redis,
+    default: Redis,
+  };
+});
 
 const prisma = new PrismaClient();
 

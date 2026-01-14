@@ -13,13 +13,16 @@ vi.mock('@/lib/prisma', () => ({
 
 // Mock Redis properly as a class constructor
 vi.mock('ioredis', () => {
-  const Redis = vi.fn();
-  Redis.prototype.hgetall = vi.fn().mockResolvedValue(null);
-  Redis.prototype.hmset = vi.fn().mockResolvedValue('OK');
-  Redis.prototype.expireat = vi.fn().mockResolvedValue(1);
-  Redis.prototype.hincrby = vi.fn().mockResolvedValue(1);
-  Redis.prototype.quit = vi.fn();
-  Redis.prototype.on = vi.fn();
+  class Redis {
+    constructor() {}
+    hgetall = vi.fn().mockResolvedValue(null);
+    hmset = vi.fn().mockResolvedValue('OK');
+    expireat = vi.fn().mockResolvedValue(1);
+    hincrby = vi.fn().mockResolvedValue(1);
+    quit = vi.fn();
+    on = vi.fn();
+    disconnect = vi.fn();
+  }
 
   return {
     Redis: Redis,
