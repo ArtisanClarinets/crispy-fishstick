@@ -84,3 +84,8 @@
 **[EXEC]** Created `lib/fetchWithCsrf.ts` and `hooks/useAdmin.ts`.
 **[EXEC]** Refactored `leads-table.tsx`, `media-uploader.tsx`, `lead-form.tsx`, `media-manager.tsx`, `project-form.tsx`, `audit-list.tsx`, `config-wizard.tsx` to use `fetchWithCsrf` and RBAC checks.
 **[EXEC]** Refactored `invoice-form.tsx`, `contract-form.tsx`, `incident-form.tsx`, `user-form.tsx`, `content-form.tsx` to use `fetchWithCsrf` and RBAC UI gating. Verified `proposal-actions.tsx`, `invoice-actions.tsx`, `content-actions.tsx`. Confirmed no raw `fetch` calls remain in admin components.
+ 
+### Session 3
+
+**[PLAN]** Resolve ESLint build error in `lib/dal.ts`.
+**[EXEC]** Simplified duplicate `generateETag` definitions into a single implementation using `crypto.createHash("sha256")` and verified parameter usage satisfies lint rules.
