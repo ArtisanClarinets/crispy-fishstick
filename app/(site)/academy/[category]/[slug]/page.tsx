@@ -46,6 +46,7 @@ interface PageProps {
 
 export default async function ArticlePage({ params }: PageProps) {
   const { slug } = await params;
+  if (!Object.prototype.hasOwnProperty.call(articles, slug)) return notFound();
   const article = articles[slug];
 
   if (!article) {
