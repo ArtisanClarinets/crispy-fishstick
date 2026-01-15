@@ -30,6 +30,10 @@ export function MobileBottomNav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/auth")) {
+    return null;
+  }
+
   // Hide on desktop
   // Also check if we are on admin pages? The prompt suggested moving admin nav to bottom too.
   // But for now let's stick to public/general structure or make it adaptive.
