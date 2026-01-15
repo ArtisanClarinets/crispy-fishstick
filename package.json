@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/generate-build-proof.mjs && NEXTAUTH_URL=http://localhost NEXTAUTH_SECRET=12345678901234567890123456789012 next build",
+    "build": "node scripts/generate-build-proof.mjs && node -e \"if (!process.env.NEXTAUTH_SECRET) { console.error('ERROR: NEXTAUTH_SECRET is not set for build. Set it in your environment or .env file.'); process.exit(1); }\" && NEXTAUTH_URL=http://localhost next build",
     "prebuild": "npm run lint && npm run typecheck",
     "start": "PORT=3005 node .next/standalone/server.js",
     "lint": "eslint .",
