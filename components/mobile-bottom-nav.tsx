@@ -4,9 +4,31 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Home, Briefcase, Activity, FlaskConical } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show on scroll up or at the very top
+      if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY.current && currentScrollY > 10) {
+        // Hide on scroll down
+        setIsVisible(false);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Hide on desktop
   // Also check if we are on admin pages? The prompt suggested moving admin nav to bottom too.
@@ -16,7 +38,7 @@ export function MobileBottomNav() {
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/work", label: "Work", icon: Briefcase },
-    { href: "/infrastructure", label: "System", icon: Activity },
+    { href: "/performance", label: "System", icon: Activity },
     { href: "/lab/revenue-leak", label: "Lab", icon: FlaskConical },
     // "Menu" could be a link to a full menu page or just trigger the header menu?
     // Since Header has the menu button, maybe we don't need it here, or we duplicate.
@@ -24,7 +46,12 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50 pb-safe">
+    <div 
+      className={cn(
+        "md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50 pb-safe transition-transform duration-300 ease-in-out",
+        isVisible ? "translate-y-0" : "translate-y-full"
+      )}
+    >
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));

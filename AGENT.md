@@ -14,6 +14,18 @@ You must behave like you are shipping directly to production at a Fortune-500 st
 
 ---
 
+## Core Context Files
+Before any changes, review these key documents to understand the full context of the application:
+
+- **[AGENT_GUIDE.md](./AGENT_GUIDE.md):** Your primary guide to the architecture, vital functions, and "do-not-break" zones.
+- **[PRD.md](./PRD.md):** The Product Requirements Document for the public-facing website.
+- **[ADMIN.md](./ADMIN.md):** The detailed plan and requirements for the Admin Portal.
+- **[ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md):** A high-level review of the architecture, technologies, and current state of the project, including known issues.
+- **[REMEDIATION_ROADMAP.md](./REMEDIATION_ROADMAP.md):** The plan to address existing issues and improve the codebase.
+- **[new_design_system.md](./new_design_system.md):** The principles, tokens, and standards for the "AXIOM" design system.
+
+---
+
 ## Prime Directives (non-negotiable)
 1) **Logic must NEVER break.**
 2) **Security first:** RBAC, CSRF, CSP/nonce, tenant isolation, secrets hygiene.
@@ -46,10 +58,10 @@ For any non-trivial change, you MUST verify:
 
 ### 1) Framework wiring (Next.js 16)
 - Confirm required entrypoints exist and are active.
-- Next.js 16 uses **`proxy.ts`** as the request interception boundary (not middleware). :contentReference[oaicite:5]{index=5}
-  - Ensure a functioning `proxy.ts` exists at repo root (or `src/proxy.ts` if using `src/` layout). :contentReference[oaicite:6]{index=6}
-  - Keep interception centralized; do NOT split into multiple proxy entrypoints. :contentReference[oaicite:7]{index=7}
-  - Pass information from Proxy to the app via **headers/cookies/redirects/rewrites/URL** (no globals). :contentReference[oaicite:8]{index=8}
+- Next.js 16 uses **`proxy.ts`** as the request interception boundary (not middleware).
+  - Ensure a functioning `proxy.ts` exists at repo root (or `src/proxy.ts` if using `src/` layout).
+  - Keep interception centralized; do NOT split into multiple proxy entrypoints.
+  - Pass information from Proxy to the app via **headers/cookies/redirects/rewrites/URL** (no globals).
 
 ### 2) Surface boundaries
 - Do not mix surfaces:

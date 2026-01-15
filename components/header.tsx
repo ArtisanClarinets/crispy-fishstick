@@ -42,7 +42,7 @@ export function Header() {
 
   const navLinks = [
     { href: "/work", label: "Work" },
-    { href: "/infrastructure", label: "System" }, // Renamed from Infrastructure
+    { href: "/performance", label: "System" }, // Renamed from Infrastructure
     { href: "/lab/revenue-leak", label: "Lab" },
     { href: "/process", label: "Process" },
     { href: "/trust", label: "Trust" },
@@ -119,7 +119,7 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
-            <Button asChild size="lg" className="mt-4 w-full btn-precision">
+            <Button asChild size="lg" className="mt-4 w-full rounded-full btn-precision">
               <Link href={siteConfig.cta.primary.href} onClick={() => setIsOpen(false)}>
                 {siteConfig.cta.primary.text}
               </Link>

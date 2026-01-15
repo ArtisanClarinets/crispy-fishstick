@@ -296,7 +296,7 @@ export function ProofPanel() {
                     const status = gate.ran ? (gate.passed ? "Passed" : "Failed") : "Not run";
                     const statusClass = gate.ran
                       ? gate.passed
-                        ? "text-emerald-500"
+                        ? "text-signal-success"
                         : "text-destructive"
                       : "text-muted-foreground";
                     return (
