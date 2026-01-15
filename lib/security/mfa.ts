@@ -26,12 +26,14 @@ function getMFAEncryptionKey(): string {
   return key;
 }
 
-// Ensure key is 32 bytes
-const key = createHash("sha256").update(String(getMFAEncryptionKey())).digest();
+// Lazy-load key to avoid build-time errors
+function getKey(): Buffer {
+  return createHash("sha256").update(String(getMFAEncryptionKey())).digest();
+}
 
 export async function encryptSecret(text: string): Promise<string> {
   const iv = randomBytes(12); // 96-bit IV for GCM
-  const cipher = createCipheriv(ALGORITHM, key, iv);
+  const cipher = createCipheriv(ALGORITHM, getKey(), iv);
   
   let encrypted = cipher.update(text, "utf8", "hex");
   encrypted += cipher.final("hex");
@@ -52,7 +54,7 @@ export async function decryptSecret(cipherText: string): Promise<string | null> 
     const iv = Buffer.from(ivHex, "hex");
     const authTag = Buffer.from(authTagHex, "hex");
     
-    const decipher = createDecipheriv(ALGORITHM, key, iv);
+    const decipher = createDecipheriv(ALGORITHM, getKey(), iv);
     decipher.setAuthTag(authTag);
     
     let decrypted = decipher.update(encryptedHex, "hex", "utf8");

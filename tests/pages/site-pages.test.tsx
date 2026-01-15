@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AboutPage from '@/app/(site)/about/page';
-import InfrastructureHubPage from '@/app/(site)/infrastructure/page';
+import PerformancePage from '@/app/(site)/performance/page';
 import ProcessPage from '@/app/(site)/process/page';
 import ServicesPage from '@/app/(site)/services/page';
 import TrustCenterPage from '@/app/(site)/trust/page';
@@ -62,13 +62,13 @@ describe('Site Pages', () => {
     });
   });
 
-  describe('InfrastructureHubPage', () => {
-    it('should render infrastructure hub content', () => {
-      render(<InfrastructureHubPage />);
-      expect(screen.getByText(/Radical Transparency/i)).toBeInTheDocument();
-      expect(screen.getByText(/Academy/i)).toBeInTheDocument();
-      expect(screen.getByText(/Estimator/i)).toBeInTheDocument();
-      expect(screen.getByText(/Configurator/i)).toBeInTheDocument();
+  describe('PerformancePage', () => {
+    it('should render performance page content', () => {
+      render(<PerformancePage />);
+      expect(screen.getByText(/Speed is a Feature/i)).toBeInTheDocument();
+      expect(screen.getByText(/Edge Delivery/i)).toBeInTheDocument();
+      expect(screen.getByText(/Database Integrity/i)).toBeInTheDocument();
+      expect(screen.getByText(/Auto-Scaling/i)).toBeInTheDocument();
     });
   });
 

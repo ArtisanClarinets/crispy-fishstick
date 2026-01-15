@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 
 export async function register() {
+  // Initialize Sentry first
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     await import('./sentry.server.config');
   }
@@ -8,13 +9,11 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === 'edge') {
     await import('./sentry.edge.config');
   }
-}
 
-export const onRequestError = Sentry.captureRequestError;
-export async function register() {
-  const startTime = performance.now();
-  
+  // Telemetry and Environment Checks (Node.js runtime only)
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const startTime = performance.now();
+    
     // Telemetry: Initialize basic tracing
     console.log(`[Telemetry] Service starting...`);
     
@@ -32,16 +31,6 @@ export async function register() {
     // Telemetry: Record startup duration
     const duration = performance.now() - startTime;
     console.log(`[Telemetry] Service ready in ${duration.toFixed(2)}ms`);
-  }
-}
-
-export async function register() {
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
-    await import('./sentry.server.config');
-  }
-
-  if (process.env.NEXT_RUNTIME === 'edge') {
-    await import('./sentry.edge.config');
   }
 }
 
