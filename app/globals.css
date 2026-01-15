@@ -133,6 +133,10 @@
     --accent: oklch(0.96 0.002 254);
     --accent-foreground: oklch(0.18 0.01 254);
 
+    /* Helper RGBs for legacy/opacity support */
+    --primary-rgb: 37 99 235;
+    --grid-rgb: 9 9 11;
+
     /* Signal Green (Emerald-500 equivalent in OKLCH) */
     --signal-success: oklch(0.69 0.17 142.5);
     --signal-success-foreground: oklch(0.98 0 0);
@@ -180,6 +184,10 @@
     --accent: oklch(0.22 0.01 261);
     --accent-foreground: oklch(0.98 0.002 247);
 
+    /* Helper RGBs for legacy/opacity support */
+    --primary-rgb: 59 130 246;
+    --grid-rgb: 255 255 255;
+
     /* Signal Green for Dark Mode */
     --signal-success: oklch(0.69 0.17 142.5);
     --signal-success-foreground: oklch(0.14 0.01 261);
@@ -211,6 +219,12 @@
     @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary text-base leading-relaxed;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Corporate Typography Defaults */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans tracking-tight font-bold text-foreground;
+  }
+
   /* Grain Texture using CSS noise */
   body::before {
     content: "";
@@ -221,7 +235,7 @@
     height: 100%;
     pointer-events: none;
     z-index: 50;
-    opacity: 0.04;
+    opacity: 0.03; /* Subtler grain for corporate feel */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     mix-blend-mode: overlay;
@@ -237,13 +251,17 @@
   ---------------------------- */
 
   .btn-precision {
-    @apply relative overflow-hidden transition-all duration-150 ease-precision;
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 ease-precision relative overflow-hidden focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-precision:focus-visible {
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
   }
   .btn-precision:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px); /* More subtle lift */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Slight shadow on lift */
   }
   .btn-precision:active {
-    transform: translateY(0) scale(0.95); /* Updated to 0.95 for more tactile feel */
+    transform: translateY(0) scale(0.98);
   }
   .btn-precision::after {
     content: "";
@@ -261,7 +279,7 @@
     background-clip: padding-box, border-box;
   }
   .input-precision:focus {
-    @apply border-transparent;
+    @apply border-transparent ring-2 ring-primary/20; /* Consistent focus ring */
     background-image: linear-gradient(var(--background), var(--background)),
                       linear-gradient(90deg, transparent, var(--primary), transparent);
     background-size: 200% 100%;
@@ -273,8 +291,8 @@
     @apply relative transition-all duration-300 ease-premium overflow-hidden border border-border;
   }
   .card-precision:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px); /* Subtler lift */
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.1);
     @apply border-transparent; /* Hide default border to show gradient */
   }
 
@@ -290,10 +308,6 @@
       var(--primary) 50%,
       transparent 80%
     );
-    /* In a real scenario, animating a border gradient cleanly often requires a wrapper or masking.
-       For this CSS-only approach, we can use a pseudo-element behind the card content if the card background is opaque.
-       Since .card-precision usually has a background color, this works.
-    */
     background-size: 200% 200%;
     animation: border-shimmer 2s linear infinite;
   }
@@ -334,6 +348,27 @@
     @apply scale-x-100;
   }
 
+  /* Refined sheen for hero & covers (Carbon Glass) */
+  .signal-sheen {
+    @apply relative overflow-hidden isolate transition-all duration-500;
+  }
+  .signal-sheen::before {
+    content: "";
+    @apply absolute inset-0 -z-10 opacity-0 transition-opacity duration-500;
+    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--primary-rgb), 0.15), transparent 40%);
+  }
+  .signal-sheen::after {
+    content: "";
+    @apply absolute inset-0 -z-10 opacity-0 transition-opacity duration-500;
+    background: linear-gradient(120deg, transparent 30%, rgba(var(--primary-rgb), 0.1) 45%, rgba(var(--primary-rgb), 0.15) 50%, rgba(var(--primary-rgb), 0.1) 55%, transparent 70%);
+    background-size: 200% 200%;
+    background-position: 100% 0;
+  }
+  .signal-sheen:hover::before,
+  .signal-sheen:hover::after {
+    @apply opacity-100;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .btn-precision:hover,
     .card-precision:hover {
@@ -349,7 +384,7 @@
       display: none;
     }
     body::before {
-        display: none; /* Disable noise if it causes issues, though usually fine */
+        display: none;
     }
   }
 }
