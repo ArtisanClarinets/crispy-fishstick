@@ -1,59 +1,59 @@
-# Performance Optimization Guide
+# PERFORMANCE OPTIMIZATION GUIDE
 
-## Bundle Analysis
-**Estimated Total Size:** ~450KB (Gzipped) - **Requires Action**
+## ⚡ Bundle Analysis & Bloat
 
-### Heavy Dependencies
-1.  **Three.js / Spline (`@splinetool/runtime`, `@splinetool/react-spline`)**
-    *   **Impact:** ~600KB+ parsed. massive main thread blocking time.
-    *   **Recommendation:** Lazy load these components (`next/dynamic`). Only load on interaction or visibility.
-2.  **Framer Motion (`framer-motion`)**
-    *   **Impact:** ~30KB gzipped.
-    *   **Recommendation:** Use `LazyMotion` features to strip unused animations.
-3.  **GSAP (`gsap`)**
-    *   **Impact:** Duplicate functionality with Framer Motion.
-    *   **Recommendation:** Consolidate to ONE animation library. Remove GSAP if Framer Motion is the primary choice.
+### 1. Duplicate Animation Libraries (Waste: ~150KB+)
+**Issue:** The project includes both `framer-motion` (approx 50KB gzipped) and `gsap` (approx 60KB+ gzipped depending on plugins). Both serve similar purposes (complex animations).
+**Recommendation:** Standardize on one. `framer-motion` is more "React-native", while `GSAP` is more powerful for timeline sequencing.
+**Action:** Remove `gsap` if possible, or `framer-motion` if GSAP is the primary driver.
+**Files:** `package.json`
 
-## Database Optimization
+### 2. Heavy 3D Runtime
+**Issue:** `@splinetool/react-spline` and `@splinetool/runtime` are included. These runtimes are extremely heavy (>500KB - 1MB parsed).
+**Impact:** Significant Time-To-Interactive (TTI) delay on pages using 3D elements.
+**Action:** Lazy load the Spline component using `next/dynamic` with `ssr: false`.
+```tsx
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
+  ssr: false,
+  loading: () => <div>Loading 3D...</div>
+})
+```
 
-### N+1 Query Risks
-**Location:** `app/api/admin/users/route.ts` -> `lib/admin/guards.ts`
-**Issue:**
-The `getSessionUser` function fetches the user, then:
+---
+
+## 🐢 Database & Backend Bottlenecks
+
+### 1. Synchronous Email Loop in Cron
+**Location:** `app/api/cron/contract-reminders/route.ts`
+**Issue:** The route fetches all expiring contracts and iterates through them, `await`ing `sendEmail` for each one.
 ```typescript
-if (jitRoleIds.length > 0) {
-    const jitRoles = await prisma.role.findMany({ ... }); // Extra round trip
+for (const contract of expiringContracts) {
+  await sendEmail({...}); // API call per iteration
 }
 ```
-While not a loop, it's sequential fetching.
-**Fix:** Use `include` or explicit join in the initial Prisma query to fetch JIT roles if possible.
-
-### JSON Field Performance
-**Location:** `Role.permissions` (Stringified JSON)
-**Issue:** No database-level indexing on JSON contents. Cannot efficiently query "Users with Permission X".
-**Impact:** Filtering users by permission requires full table scans or in-memory filtering (O(n)).
-**Fix:** Normalize permissions into a `Permission` table and `RolePermission` join table.
-
-## Rendering Performance
-
-### Server-Side Rendering (SSR) overhead
-**Issue:** `app/(admin)/admin/(dashboard)/page.tsx` uses `force-dynamic`.
-**Impact:** This page rebuilds on EVERY request. It fetches 5 distinct database queries.
-```typescript
-Promise.all([
-    prisma.lead.count(...),
-    prisma.project.count(...),
-    ...
-])
-```
+**Impact:** If 500 contracts expire, and email sending takes 200ms, the request takes 100 seconds. This will likely time out Vercel/AWS Lambda functions (default 10-60s limit).
 **Fix:**
-- Ensure `Promise.all` is actually used (it is, which is good).
-- Add caching headers or `unstable_cache` for expensive aggregations.
+1.  **Queueing:** Push jobs to Redis/BullMQ.
+2.  **Batching:** Send emails in parallel chunks (e.g., `Promise.all` with concurrency limit).
+```typescript
+// Better approach (simple concurrency)
+await Promise.all(expiringContracts.map(c => sendEmail(...)));
+```
 
-## Metrics Targets
+### 2. Missing Caching on Admin Reads
+**Location:** `app/api/admin/users/route.ts`
+**Issue:** `export const dynamic = "force-dynamic"` is used. While correct for real-time data, frequent polling by the admin dashboard will hammer the database.
+**Fix:** Implement `stale-while-revalidate` caching headers or Redis caching for list views where realtime consistency isn't strictly required (e.g., 60s cache).
 
-| Route | Current Est. | Target | Action |
-|-------|--------------|--------|--------|
-| `/admin` (Dashboard) | ~850ms | <300ms | Add DB indexes on `status` columns, cache stats. |
-| `/api/admin/users` | ~400ms | <100ms | Optimize role permission parsing. |
-| Landing Page (Spline) | ~2.5s LCP | <1.2s LCP | Lazy load 3D assets. |
+---
+
+## 🏗️ Infrastructure & Rendering
+
+### 1. Image Optimization
+**Status:** `next/image` is used, but `sharp` is missing from `package.json`.
+**Impact:** Next.js's built-in image optimization is slower in production without `sharp`.
+**Fix:** `npm install sharp`
+
+### 2. Standalone Build
+**Status:** `output: 'standalone'` is configured.
+**Note:** Ensure `node_modules` are correctly copied or installed in the final container image for the standalone server to work if it relies on native modules (like `sharp` or `bcrypt`).
