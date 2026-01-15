@@ -42,7 +42,7 @@ export function Header() {
 
   const navLinks = [
     { href: "/work", label: "Work" },
-    { href: "/infrastructure", label: "System" }, // Renamed from Infrastructure
+    { href: "/performance", label: "System" }, // Renamed from Infrastructure
     { href: "/lab/revenue-leak", label: "Lab" },
     { href: "/process", label: "Process" },
     { href: "/trust", label: "Trust" },

@@ -8,6 +8,10 @@ import { Home, Briefcase, Activity, FlaskConical } from "lucide-react";
 export function MobileBottomNav() {
   const pathname = usePathname();
 
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/auth")) {
+    return null;
+  }
+
   // Hide on desktop
   // Also check if we are on admin pages? The prompt suggested moving admin nav to bottom too.
   // But for now let's stick to public/general structure or make it adaptive.
@@ -16,7 +20,7 @@ export function MobileBottomNav() {
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/work", label: "Work", icon: Briefcase },
-    { href: "/infrastructure", label: "System", icon: Activity },
+    { href: "/performance", label: "System", icon: Activity },
     { href: "/lab/revenue-leak", label: "Lab", icon: FlaskConical },
     // "Menu" could be a link to a full menu page or just trigger the header menu?
     // Since Header has the menu button, maybe we don't need it here, or we duplicate.
