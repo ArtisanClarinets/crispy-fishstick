@@ -176,7 +176,7 @@ export default function LoginPage() {
             )}
           </CardContent>
           <CardFooter>
-            <Button className="w-full" type="submit" disabled={isLoading}>
+            <Button className="w-full" type="submit" loading={isLoading}>
               {isLoading ? "Verifying..." : (showMFA ? "Verify Code" : "Sign In")}
             </Button>
           </CardFooter>
