@@ -1,5 +1,6 @@
-import { Shield, CheckCircle, AlertTriangle, Lock, FileText } from "lucide-react"
+import { Shield, CheckCircle, AlertTriangle, Lock, FileText, Scale } from "lucide-react"
 import { Metadata } from "next"
+import { BeforeAfterComparison } from "@/components/before-after-comparison"
 
 export const metadata: Metadata = {
   title: "Trust Center | Vantus Systems",
@@ -44,6 +45,15 @@ export default function TrustCenterPage() {
              </p>
           </div>
         </div>
+      </section>
+
+      {/* Comparison */}
+      <section className="space-y-8">
+        <h2 className="text-3xl font-bold flex items-center gap-3">
+          <Scale className="w-8 h-8 text-primary" />
+          The Difference
+        </h2>
+        <BeforeAfterComparison />
       </section>
 
       {/* 2. Predictability */}

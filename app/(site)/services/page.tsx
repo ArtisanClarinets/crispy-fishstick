@@ -1,10 +1,43 @@
 import type { Metadata } from "next";
-import { Code, Layers, ShieldCheck, Database } from "lucide-react";
+import { Code, Layers, Database, Box } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Services",
+  title: "Services & Packages",
   description: "Specialized engineering and design services for high-stakes digital products.",
 };
+
+const packages = [
+  {
+    title: "The Business OS",
+    description: "The complete technology foundation for your business. You get the site, the hosting, and the control panel.",
+    price: "Starting at $5,000",
+    features: [
+      "Custom Next.js Website (Fastest tech available)",
+      "Owner's Dashboard (Edit content instantly)",
+      "Google Core Web Vitals Optimization",
+      "Managed Hosting & Security Updates",
+      "Full Code Ownership (No lock-in)"
+    ],
+    cta: "Build My Foundation",
+    highlight: true,
+  },
+  {
+    title: "Audit & Rescue",
+    description: "Fixing your current site's speed, legal compliance, and lost leads.",
+    price: "Flat Fee: $1,500",
+    features: [
+      "ADA/WCAG Compliance Audit",
+      "Performance Optimization (Speed up load times)",
+      "Security Vulnerability Scan",
+      "SEO Technical Fixes",
+      "Detailed 'Plain English' Report"
+    ],
+    cta: "Fix My Site",
+    highlight: false,
+  }
+];
 
 const services = [
   {
@@ -17,7 +50,6 @@ const services = [
       "Design Systems",
       "Motion & Interaction",
       "Storybook Architecture",
-      "Token-based Theming",
     ],
   },
   {
@@ -30,7 +62,6 @@ const services = [
       "State Management",
       "Performance Optimization",
       "Type-Safe APIs",
-      "Legacy Migration",
     ],
   },
   {
@@ -43,20 +74,6 @@ const services = [
       "ERP Synchronization",
       "Inventory Management",
       "Payment Gateways",
-      "Custom Checkouts",
-    ],
-  },
-  {
-    icon: ShieldCheck,
-    title: "Audits & Rescue",
-    description:
-      "Deep-dive technical audits to identify bottlenecks, accessibility issues, and code debt.",
-    features: [
-      "Performance Audits",
-      "Accessibility (WCAG)",
-      "Code Quality Review",
-      "Security Assessment",
-      "SEO Technical Audit",
     ],
   },
 ];
@@ -66,42 +83,84 @@ export default function ServicesPage() {
     <div className="min-h-screen py-24 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-20">
+        <div className="mb-20 text-center max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-            Technical Services
+            Services & Packages
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
-            I don&apos;t just write code; I engineer systems. My services are designed for founders and companies who need production-grade quality from day one.
+          <p className="text-xl text-muted-foreground">
+            Whether you need a full digital transformation or just a specific technical problem solved, we have a package for you.
           </p>
         </div>
 
+        {/* SMB PACKAGES */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-32 max-w-5xl mx-auto">
+          {packages.map((pkg) => (
+             <div
+               key={pkg.title}
+               className={`relative p-8 rounded-3xl border flex flex-col ${pkg.highlight ? 'bg-secondary/10 border-primary/50 shadow-lg shadow-primary/5' : 'bg-card border-border'}`}
+             >
+                {pkg.highlight && (
+                   <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-2xl uppercase tracking-wider">
+                      Most Popular
+                   </div>
+                )}
+                <div className="mb-6">
+                   <h2 className="text-3xl font-bold mb-2">{pkg.title}</h2>
+                   <p className="text-lg font-medium text-primary">{pkg.price}</p>
+                </div>
+                <p className="text-muted-foreground mb-8 text-lg leading-relaxed flex-1">
+                   {pkg.description}
+                </p>
+                <ul className="space-y-4 mb-8">
+                   {pkg.features.map((f) => (
+                      <li key={f} className="flex items-start gap-3 text-sm">
+                         <div className="mt-1 min-w-4 h-4 rounded-full bg-green-500/20 text-green-600 flex items-center justify-center">
+                            <Box className="w-2.5 h-2.5" />
+                         </div>
+                         <span>{f}</span>
+                      </li>
+                   ))}
+                </ul>
+                <Button className={`w-full h-12 text-lg rounded-xl ${pkg.highlight ? 'default' : 'variant-outline'}`} asChild>
+                   <Link href="/contact">{pkg.cta}</Link>
+                </Button>
+             </div>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-4 mb-12">
+           <div className="h-px bg-border flex-1" />
+           <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Specialized Engineering</span>
+           <div className="h-px bg-border flex-1" />
+        </div>
+
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           {services.map((service) => {
             const Icon = service.icon;
             return (
               <div
                 key={service.title}
-                className="group bg-card rounded-3xl p-8 sm:p-10 border border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg"
+                className="group bg-card rounded-2xl p-6 border border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg"
               >
                 <div className="mb-6">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-secondary group-hover:bg-foreground/5 transition-colors">
-                    <Icon className="h-7 w-7 text-foreground" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-secondary group-hover:bg-foreground/5 transition-colors">
+                    <Icon className="h-6 w-6 text-foreground" />
                   </div>
                 </div>
 
-                <h2 className="text-2xl font-bold mb-4">{service.title}</h2>
-                <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
+                <h2 className="text-xl font-bold mb-3">{service.title}</h2>
+                <p className="text-muted-foreground mb-6 text-sm leading-relaxed">
                   {service.description}
                 </p>
 
-                <ul className="space-y-3">
+                <ul className="space-y-2">
                   {service.features.map((feature) => (
                     <li
                       key={feature}
-                      className="text-sm font-medium flex items-center gap-3 text-foreground/80"
+                      className="text-xs font-medium flex items-center gap-2 text-foreground/80"
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary/60"></span>
+                      <span className="w-1 h-1 rounded-full bg-primary/60"></span>
                       {feature}
                     </li>
                   ))}
@@ -112,21 +171,17 @@ export default function ServicesPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="border-t border-border pt-24">
-            <div className="max-w-3xl">
+        <div className="border-t border-border pt-24 text-center">
+            <div className="max-w-3xl mx-auto">
                 <h2 className="text-3xl font-bold mb-6">
-                  Have a specific challenge?
+                  Not sure what you need?
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8">
-                  I often take on custom engineering challenges that don&apos;t fit neatly into a bucket.
-                  If you need a reliable partner to solve a hard problem, let&apos;s talk.
+                  We often take on custom engineering challenges that don&apos;t fit neatly into a bucket.
                 </p>
-                <a
-                  href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all font-medium text-lg"
-                >
-                  Book a Consultation
-                </a>
+                <Button asChild size="lg" className="rounded-full px-8">
+                   <Link href="/contact">Book a Consultation</Link>
+                </Button>
             </div>
         </div>
       </div>
