@@ -1,3 +1,3 @@
-## 2024-05-22 - Standardizing Async Feedback
-**Learning:** The Button component lacked a native loading state, forcing manual implementation of spinners in consuming components.
-**Action:** Implemented `loading` prop in Button to enforce consistent spinner placement and interaction blocking across the app.
+## 2026-01-14 - Standardizing Button Loading States
+**Learning:** Inconsistent manual implementation of loading spinners in buttons leads to code duplication and visual inconsistencies (e.g., spacing, icon size).
+**Action:** Implemented a reusable `loading` prop in the core `Button` component that handles the spinner injection and disabled state automatically. Future forms should use this prop instead of manually rendering `Loader2`.

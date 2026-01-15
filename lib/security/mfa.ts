@@ -26,33 +26,7 @@ function getMFAEncryptionKey(): string {
   return key;
 }
 
-// Cache derived key to avoid recomputing the SHA-256 hash on every call
-let cachedKey: Buffer | null = null;
-
 // Lazy-load key to avoid build-time errors
-function getKey(): Buffer {
-  if (cachedKey) {
-    return cachedKey;
-  }
-
-  const derivedKey = createHash("sha256").update(String(getMFAEncryptionKey())).digest();
-  cachedKey = derivedKey;
-  return derivedKey;
- * Rationale:
- * - Accessing `process.env.MFA_ENCRYPTION_KEY` during module initialization can cause
- *   failures in environments where env vars are not yet available or are intentionally
- *   stubbed out (e.g. static analysis, test runners, or Next.js build/SSR analysis).
- * - By resolving the key only when encryption/decryption is actually performed, we
- *   avoid build-time initialization errors while still failing fast at runtime if the
- *   key is missing (via `getMFAEncryptionKey()`).
- *
- * Caching/performance:
- * - The key derivation uses a single SHA-256 hash over the env var and is inexpensive
- *   relative to network/IO, so recomputing it per call is acceptable for MFA flows.
- * - If future performance profiling shows this to be a hotspot, a safe in-process cache
- *   can be added, but care must be taken not to move env var access back into module
- *   top-level initialization, which would reintroduce build-time errors.
- */
 function getKey(): Buffer {
   return createHash("sha256").update(String(getMFAEncryptionKey())).digest();
 }
