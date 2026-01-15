@@ -1,9 +1,10 @@
 export const dynamic = "force-dynamic";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin/guards";
 import { createAuditLog } from "@/lib/admin/audit";
 import { assertSameOrigin } from "@/lib/security/origin";
+import { verifyCsrfToken } from "@/lib/security/csrf";
 import { z } from "zod";
 
 const updateRolesSchema = z.object({
@@ -24,12 +25,13 @@ const SAFE_USER_WITH_ROLES_SELECT = {
   },
 };
 
-export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   try {
     // CSRF protection
     try {
       assertSameOrigin(req);
+      await verifyCsrfToken(req);
     } catch (_error) {
       return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
     }
@@ -98,7 +100,12 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
     if (_error instanceof Error && _error.message === "Unauthorized") {
       return new NextResponse("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store" } });
     }
-    if (_error instanceof Error && _error.message === "Forbidden") {
+    if (_error instanceof Error && (
+        _error.message === "Forbidden" ||
+        _error.message.includes("Origin") ||
+        _error.message.includes("Referer") ||
+        _error.message.includes("CSRF")
+    )) {
       return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
     }
     console.error("Failed to update user roles:", _error);

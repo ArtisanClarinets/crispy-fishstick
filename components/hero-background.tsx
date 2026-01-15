@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionTemplate, useMotionValue, useScroll, useTransform, useAnimationFrame } from "framer-motion";
-import React, { MouseEvent, useState } from "react";
+import React, { MouseEvent, useState, useRef, useEffect } from "react";
 import Waves from "@/components/react-bits/Waves";
 
 type Trace = { id: string; label: string; d: string; speed: number; delay: number };
@@ -53,6 +53,8 @@ const TRACES: Trace[] = [
 ];
 
 export function HeroBackground() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const rectRef = useRef<DOMRect | null>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const [active, setActive] = useState<string | null>(null);
@@ -71,14 +73,38 @@ export function HeroBackground() {
   const gridY = useTransform(scrollY, [0, 1000], [0, 200]);
   const ambientY = useTransform(scrollY, [0, 1000], [0, 150]);
 
+  useEffect(() => {
+    const updateRect = () => {
+      if (containerRef.current) {
+        rectRef.current = containerRef.current.getBoundingClientRect();
+      }
+    };
+
+    updateRect();
+    window.addEventListener("resize", updateRect);
+    window.addEventListener("scroll", updateRect);
+
+    return () => {
+      window.removeEventListener("resize", updateRect);
+      window.removeEventListener("scroll", updateRect);
+    };
+  }, []);
+
   function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseX.set(e.clientX - rect.left);
-    mouseY.set(e.clientY - rect.top);
+    // Optimization: Use cached rect to prevent layout thrashing
+    if (!rectRef.current) {
+      rectRef.current = e.currentTarget.getBoundingClientRect();
+    }
+    const rect = rectRef.current;
+    if (rect) {
+      mouseX.set(e.clientX - rect.left);
+      mouseY.set(e.clientY - rect.top);
+    }
   }
 
   return (
     <div
+      ref={containerRef}
       className="absolute inset-0 -z-10 overflow-hidden bg-background"
       onMouseMove={handleMouseMove}
     >

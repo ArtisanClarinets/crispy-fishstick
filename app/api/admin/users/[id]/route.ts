@@ -6,6 +6,7 @@ import { SAFE_USER_WITH_ROLES_SELECT } from "@/lib/security/safe-user";
 import { jsonNoStore } from "@/lib/security/response";
 import * as z from "zod";
 import { assertSameOrigin } from "@/lib/security/origin";
+import { verifyCsrfToken } from "@/lib/security/csrf";
 import bcrypt from "bcryptjs";
 import { validatePasswordEnhanced, addToPasswordHistory } from "@/lib/security/password-enhanced";
 
@@ -48,6 +49,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     // Phase 6: CSRF/Origin Enforcement
     // @ts-ignore
     assertSameOrigin(req);
+    await verifyCsrfToken(req);
 
     const actor = await requireAdmin({ permissions: ["users.write"] });
     const body = await req.json();
@@ -126,7 +128,11 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     if (error instanceof z.ZodError) {
       return jsonNoStore({ error: error.errors }, { status: 400 });
     }
-    if (error instanceof Error && (error.message.includes("Origin") || error.message.includes("Referer"))) {
+    if (error instanceof Error && (
+        error.message.includes("Origin") ||
+        error.message.includes("Referer") ||
+        error.message.includes("CSRF")
+    )) {
         return jsonNoStore({ error: error.message }, { status: 403 });
     }
     return jsonNoStore({ error: "Internal Server Error" }, { status: 500 });
@@ -139,6 +145,7 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
     // Phase 6: CSRF/Origin Enforcement
     // @ts-ignore
     assertSameOrigin(request);
+    await verifyCsrfToken(request);
 
     const actor = await requireAdmin({ permissions: ["users.write"] });
     
@@ -183,7 +190,11 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
 
     return jsonNoStore({ success: true });
   } catch (error) {
-    if (error instanceof Error && (error.message.includes("Origin") || error.message.includes("Referer"))) {
+    if (error instanceof Error && (
+        error.message.includes("Origin") ||
+        error.message.includes("Referer") ||
+        error.message.includes("CSRF")
+    )) {
         return jsonNoStore({ error: error.message }, { status: 403 });
     }
     return jsonNoStore({ error: "Internal Server Error" }, { status: 500 });
