@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { authenticator } from 'otplib';
+import { generate as generateOtp } from 'otplib';
 
 test.describe('MFA Flow', () => {
   test('should enable, enforce, and disable MFA', async ({ page }) => {
@@ -35,7 +35,7 @@ test.describe('MFA Flow', () => {
     expect(secret).toBeTruthy();
 
     // 4. Verify with valid code
-    const token = authenticator.generate(secret);
+    const token = await generateOtp(secret);
     await page.getByLabel('Verification Code').fill(token);
     await page.getByRole('button', { name: 'Verify & Enable' }).click();
 
@@ -59,7 +59,7 @@ test.describe('MFA Flow', () => {
     await expect(page.getByText('Enter your 2FA code')).toBeVisible();
     
     // Enter code
-    const newToken = authenticator.generate(secret);
+    const newToken = await generateOtp(secret);
     await page.getByLabel('Two-Factor Code').fill(newToken);
     await page.getByRole('button', { name: 'Verify Code' }).click();
 

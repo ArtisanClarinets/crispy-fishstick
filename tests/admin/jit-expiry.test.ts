@@ -42,9 +42,17 @@ describe("JIT Access Expiry", () => {
   });
 
   afterEach(async () => {
-    await prisma.jitAccessRequest.deleteMany({ where: { id: testJitRequestId } });
-    await prisma.user.deleteMany({ where: { id: testUserId } });
-    await prisma.tenant.deleteMany({ where: { id: testTenantId } });
+    try {
+      // Delete all JIT access requests first (they have the foreign key dependency)
+      await prisma.jitAccessRequest.deleteMany({ where: { userId: testUserId } });
+      // Then delete the user
+      await prisma.user.deleteMany({ where: { id: testUserId } });
+      // Finally delete the tenant (after all dependent records are gone)
+      await prisma.tenant.deleteMany({ where: { id: testTenantId } });
+    } catch (error) {
+      // Silently handle cleanup errors in tests
+      console.warn('Cleanup error:', error);
+    }
   });
 
   it("should identify active JIT requests before expiry", async () => {

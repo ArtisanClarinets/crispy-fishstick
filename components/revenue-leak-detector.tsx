@@ -31,10 +31,11 @@ export function RevenueLeakDetector() {
             {/* Revenue Input */}
             <div className="space-y-4">
                <div className="flex justify-between text-sm font-medium">
-                  <label>Monthly Revenue</label>
+                  <label htmlFor="revenue-input">Monthly Revenue</label>
                   <span className="font-mono text-primary">${revenue.toLocaleString()}</span>
                </div>
                <input
+                  id="revenue-input"
                   type="range"
                   min="10000" max="1000000" step="5000"
                   value={revenue}
@@ -46,10 +47,11 @@ export function RevenueLeakDetector() {
              {/* Conversion Input */}
              <div className="space-y-4">
                <div className="flex justify-between text-sm font-medium">
-                  <label>Conversion Rate</label>
+                  <label htmlFor="conversion-input">Conversion Rate</label>
                   <span className="font-mono text-primary">{conversion.toFixed(1)}%</span>
                </div>
                <input
+                  id="conversion-input"
                   type="range"
                   min="0.1" max="10.0" step="0.1"
                   value={conversion}
@@ -61,10 +63,11 @@ export function RevenueLeakDetector() {
              {/* Response Time Input */}
              <div className="space-y-4">
                <div className="flex justify-between text-sm font-medium">
-                  <label>Lead Response Time</label>
+                  <label htmlFor="response-time-input">Lead Response Time</label>
                   <span className="font-mono text-primary">{responseTime} min</span>
                </div>
                <input
+                  id="response-time-input"
                   type="range"
                   min="1" max="120" step="1"
                   value={responseTime}

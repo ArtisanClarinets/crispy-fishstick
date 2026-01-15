@@ -2,7 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { authenticator } from "otplib";
+import { verify as verifyOtp } from "otplib";
 import Redis from "ioredis";
 import { decryptSecret } from "@/lib/security/mfa";
 import { updateSessionActivity } from "@/lib/security/session";
@@ -10,12 +10,12 @@ import { getRateLimiter } from "@/lib/security/rate-limit";
 import { authConfig } from "./auth.config";
 
 // Create Redis client for rate limiting
-let rateLimiterInstance: any = null;
+let rateLimiterInstance = null;
 
 if (process.env.DISABLE_RATE_LIMITING === "true") {
   console.warn('Rate limiting disabled via env var');
   rateLimiterInstance = {
-    checkLoginAttempt: async () => ({ success: true, remaining: 5 }),
+    checkLoginAttempt: async () => { return { success: true, remaining: 5 } as const },
     getClientIp: () => '127.0.0.1',
   };
 } else {
@@ -26,7 +26,7 @@ if (process.env.DISABLE_RATE_LIMITING === "true") {
     console.warn('Redis not available, rate limiting will be disabled');
     // Create a mock rate limiter for testing/fallback
     rateLimiterInstance = {
-      checkLoginAttempt: async () => ({ success: true, remaining: 5 }),
+      checkLoginAttempt: async () => { return { success: true, remaining: 5 }; },
       getClientIp: () => '127.0.0.1',
     };
   }
@@ -42,6 +42,15 @@ declare module "next-auth" {
       permissions: string[];
       tenantId?: string | null;
     };
+  }
+
+  interface User {
+    id: string;
+    email: string;
+    name?: string | null;
+    roles: string[];
+    permissions: string[];
+    tenantId?: string | null;
   }
 }
 
@@ -76,7 +85,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
             // Extract IP address from request context
-            const ip = (req as any)?.ip || "unknown";
+            const ip = (req as { ip?: string })?.ip || "unknown";
             const email = credentials.email;
             
             // Apply rate limiting for login attempts if rate limiter is available
@@ -86,7 +95,9 @@ export const authOptions: NextAuthOptions = {
               if (!rateLimitResult.success) {
                 // Rate limit exceeded
                 const error = new Error("RATE_LIMIT_EXCEEDED");
-                (error as any).retryAfter = rateLimitResult.retryAfter;
+                if ("retryAfter" in rateLimitResult && rateLimitResult.retryAfter) {
+                  (error as { retryAfter?: number }).retryAfter = rateLimitResult.retryAfter;
+                }
                 throw error;
               }
             }
@@ -132,7 +143,7 @@ export const authOptions: NextAuthOptions = {
                   throw new Error("MFA_ERROR");
               }
 
-              const isValidToken = authenticator.check(credentials.code, decryptedSecret);
+              const isValidToken = verifyOtp({ secret: decryptedSecret, token: credentials.code });
               if (!isValidToken) {
                 throw new Error("INVALID_MFA_CODE");
               }
@@ -160,22 +171,25 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             roles: user.RoleAssignment.map((r) => r.Role.name),
-            permissions: uniquePermissions as string[],
+            permissions: uniquePermissions,
             tenantId: user.tenantId,
           };
-        } catch (error: any) {
+        } catch (error) {
           // Handle rate limit errors
-          if (error.message === "RATE_LIMIT_EXCEEDED") {
+          if (error instanceof Error && error.message === "RATE_LIMIT_EXCEEDED") {
             throw error;
           }
  
           // Handle Prisma errors (P2021: Table does not exist)
-          if (error.code === 'P2021' || error.code === 'P2022') {
-            throw new Error("DB_SCHEMA_NOT_READY");
+          if (error && typeof error === "object" && "code" in error) {
+            const prismaError = error as any;
+            if (prismaError.code === 'P2021' || prismaError.code === 'P2022') {
+              throw new Error("DB_SCHEMA_NOT_READY");
+            }
           }
             
           // Re-throw known auth errors
-          if (error.message === "MFA_REQUIRED" || error.message === "INVALID_MFA_CODE" || error.message === "MFA_ERROR") {
+          if (error instanceof Error && (error.message === "MFA_REQUIRED" || error.message === "INVALID_MFA_CODE" || error.message === "MFA_ERROR")) {
             throw error;
           }
  
@@ -194,16 +208,16 @@ export const authOptions: NextAuthOptions = {
 
       if (user) {
         token.id = user.id;
-        token.roles = (user as any).roles || [];
-        token.permissions = (user as any).permissions || [];
-        token.tenantId = (user as any).tenantId;
+        token.roles = user.roles || [];
+        token.permissions = user.permissions || [];
+        token.tenantId = user.tenantId;
         
         // Add security metadata from request if available
-        if ((session as any)?.ip) {
-          token.ip = (session as any).ip;
+        if ((session as { ip?: string })?.ip) {
+          token.ip = (session as { ip?: string }).ip;
         }
-        if ((session as any)?.userAgent) {
-          token.userAgent = (session as any).userAgent;
+        if ((session as { userAgent?: string })?.userAgent) {
+          token.userAgent = (session as { userAgent?: string }).userAgent;
         }
       }
       
@@ -214,11 +228,11 @@ export const authOptions: NextAuthOptions = {
         token.sessionCreatedAt = Math.floor(Date.now() / 1000);
         
         // Add security metadata
-        if ((session as any)?.ip) {
-          token.ip = (session as any).ip;
+        if ((session as { ip?: string })?.ip) {
+          token.ip = (session as { ip?: string }).ip;
         }
-        if ((session as any)?.userAgent) {
-          token.userAgent = (session as any).userAgent;
+        if ((session as { userAgent?: string })?.userAgent) {
+          token.userAgent = (session as { userAgent?: string }).userAgent;
         }
       }
       
@@ -253,14 +267,14 @@ export const authOptions: NextAuthOptions = {
         session.user.tenantId = token.tenantId;
         
         // Add session security metadata (without exposing sensitive data)
-        (session as any).ip = token.ip;
-        (session as any).userAgent = token.userAgent;
-        (session as any).sessionCreatedAt = token.sessionCreatedAt;
+        (session as { ip?: string; userAgent?: string; sessionCreatedAt?: number }).ip = token.ip;
+        (session as { ip?: string; userAgent?: string; sessionCreatedAt?: number }).userAgent = token.userAgent;
+        (session as { ip?: string; userAgent?: string; sessionCreatedAt?: number }).sessionCreatedAt = token.sessionCreatedAt;
         
         // Prevent data leakage - ensure we don't expose internal token data
-        delete (session as any).iat;
-        delete (session as any).exp;
-        delete (session as any).jti;
+        delete (session as { iat?: number; exp?: number; jti?: string }).iat;
+        delete (session as { iat?: number; exp?: number; jti?: string }).exp;
+        delete (session as { iat?: number; exp?: number; jti?: string }).jti;
       }
       
       // Sanitize session data to prevent information leakage
@@ -283,7 +297,7 @@ export const authOptions: NextAuthOptions = {
   events: {
     async signIn(message) {
       // Log successful sign-in with security context
-      const ip = (message as any)?.ip || 'unknown IP';
+      const ip = (message as { ip?: string })?.ip || 'unknown IP';
       console.info(`Successful sign-in for ${message.user.email} from ${ip}`);
     },
     async signOut(message) {

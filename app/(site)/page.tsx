@@ -20,7 +20,7 @@ export default function Home() {
         <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center">
             <Reveal>
               <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-8 backdrop-blur-sm">
-                <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+                <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse" />
                 Ownership. Control. Peace of Mind.
               </div>
             </Reveal>

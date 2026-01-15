@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { authenticator } from "otplib";
+import { generateSecret, generateURI } from "otplib";
 import { rateLimit } from "@/lib/rate-limit";
 import { assertSameOrigin } from "@/lib/security/origin";
 
@@ -29,12 +29,12 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Too many requests", { status: 429, headers: { "Cache-Control": "no-store" } });
     }
 
-    const secret = authenticator.generateSecret();
-    const otpauth = authenticator.keyuri(
-      session.user.email,
-      "Vantus Systems",
-      secret
-    );
+    const secret = generateSecret();
+    const otpauth = generateURI({
+      issuer: "Vantus Systems",
+      label: session.user.email,
+      secret: secret,
+    });
 
     return NextResponse.json({ secret, otpauth }, {
       headers: { "Cache-Control": "no-store" },

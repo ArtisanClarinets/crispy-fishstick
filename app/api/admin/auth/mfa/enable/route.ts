@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { authenticator } from "otplib";
+import { verify as verifyOtp } from "otplib";
 import { z } from "zod";
 import { rateLimit } from "@/lib/rate-limit";
 import { encryptSecret, generateBackupCodes, generateRecoveryCode, generateDeviceFingerprint } from "@/lib/security/mfa";
@@ -40,7 +40,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { token, secret } = enableSchema.parse(body);
 
-    const isValid = authenticator.check(token, secret);
+    const isValid = verifyOtp({
+      token,
+      secret,
+    });
 
     if (!isValid) {
       return new NextResponse("Invalid token", { status: 400, headers: { "Cache-Control": "no-store" } });

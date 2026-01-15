@@ -59,9 +59,10 @@ export function WorkList() {
           {/* Text Column */}
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <span className="h-px w-12 bg-primary/20"></span>
+              <span className="h-px w-12 bg-primary/20" />
               <span className="text-sm font-medium uppercase tracking-widest text-muted-foreground">0{i + 1}</span>
             </div>
+            <span />
 
             <VTLink href={`/work/${project.slug}`} disableViewTransition>
               <motion.h2

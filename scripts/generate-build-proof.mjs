@@ -9,7 +9,7 @@ try {
     process.env.VERCEL_GIT_COMMIT_SHA ||
     process.env.GITHUB_SHA ||
     execSync("git rev-parse HEAD").toString().trim();
-} catch (e) {
+} catch (_e) {
   console.warn("Could not determine git commit hash");
 }
 

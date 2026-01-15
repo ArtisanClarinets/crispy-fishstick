@@ -91,7 +91,7 @@ export function ConsoleHud() {
   useEffect(() => {
     const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
     if (navEntry) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setTtfb(Math.round(navEntry.responseStart));
     }
 
@@ -145,7 +145,7 @@ export function ConsoleHud() {
   // Sync Blip on navigation
   useEffect(() => {
     if (prefersReducedMotion) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setSyncing(true);
     const t = setTimeout(() => setSyncing(false), 350);
     return () => clearTimeout(t);

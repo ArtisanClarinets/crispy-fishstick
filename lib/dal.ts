@@ -62,9 +62,9 @@ export const getCurrentUser = cache(async () => {
   }
 
   // Map to safe object (DTO-like)
-  const roles = user.RoleAssignment.map((ra: any) => ra.Role.name);
+  const roles = user.RoleAssignment.map((ra) => ra.Role.name);
   const permissions = Array.from(new Set(
-    user.RoleAssignment.flatMap((ra: any) => {
+    user.RoleAssignment.flatMap((ra) => {
       try {
         return JSON.parse(ra.Role.permissions);
       } catch {
@@ -113,7 +113,17 @@ export async function getLeads(params: {
   search?: string;
   tenantId?: string;
 }) {
-  const where: any = {
+  const where: {
+    deletedAt: null;
+    tenantId?: string;
+    status?: string;
+    source?: string;
+    OR?: Array<{
+      name?: { contains: string; mode: "insensitive" };
+      email?: { contains: string; mode: "insensitive" };
+      message?: { contains: string; mode: "insensitive" };
+    }>;
+  } = {
     deletedAt: null,
   };
 
@@ -149,7 +159,7 @@ export async function getUser(id: string) {
 }
 
 // ETag helper
-export function generateETag(data: any): string {
+export function generateETag(data: Record<string, unknown> | string | number): string {
   // Use the stronger 'sha256' hash instead of the insecure 'md5'
   return crypto.createHash("sha256").update(JSON.stringify(data)).digest("hex");
 }

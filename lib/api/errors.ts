@@ -21,7 +21,7 @@ export interface ApiError {
   error: {
     code: ErrorCode;
     message: string;
-    details?: any;
+    details?: Record<string, unknown>;
     requestId?: string;
   };
 }
@@ -29,7 +29,7 @@ export interface ApiError {
 export function createErrorResponse(
   code: ErrorCode,
   message: string,
-  details?: any,
+  details?: Record<string, unknown>,
   requestId?: string
 ): NextResponse<ApiError> {
   const statusMap: Record<ErrorCode, number> = {
@@ -90,7 +90,10 @@ export function normalizeError(error: unknown, requestId?: string): NextResponse
     return createErrorResponse(
       "UNPROCESSABLE_ENTITY",
       "Validation failed",
-      error.errors,
+      error.errors.reduce((acc, curr) => {
+        acc[curr.path.join('.')] = curr.message;
+        return acc;
+      }, {} as Record<string, string>),
       requestId
     );
   }

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import bcrypt from 'bcryptjs';
-import { authenticator } from 'otplib';
 
 // Mock prisma
 vi.mock('@/lib/prisma', () => ({
@@ -31,12 +30,21 @@ vi.mock('ioredis', () => {
 });
 
 // Create a persistent mock instance using vi.hoisted
-const { mockRateLimiterInstance } = vi.hoisted(() => ({
-  mockRateLimiterInstance: {
+const { mockRateLimiterInstance, mockAuthenticator } = vi.hoisted(() => {
+  const mockRateLimiterInst = {
     checkLoginAttempt: vi.fn().mockResolvedValue({ success: true, remaining: 5 }),
     getClientIp: vi.fn().mockReturnValue('127.0.0.1'),
-  },
-}));
+  };
+  
+  const mockAuthenticatorInst = {
+    check: vi.fn().mockReturnValue(true),
+  };
+
+  return {
+    mockRateLimiterInstance: mockRateLimiterInst,
+    mockAuthenticator: mockAuthenticatorInst,
+  };
+});
 
 vi.mock('@/lib/security/rate-limit', () => ({
   getRateLimiter: vi.fn().mockReturnValue(mockRateLimiterInstance),
@@ -51,8 +59,10 @@ vi.mock('@/lib/security/mfa', () => ({
   decryptSecret: vi.fn().mockResolvedValue('test-secret'),
 }));
 
-// Mock authenticator
-vi.spyOn(authenticator, 'check').mockReturnValue(true);
+// Mock authenticator - patch it after hoisting
+vi.mock('otplib', () => ({
+  authenticator: mockAuthenticator,
+}));
 
 // Import authOptions AFTER mocking dependencies
 import { authOptions } from '@/lib/auth';

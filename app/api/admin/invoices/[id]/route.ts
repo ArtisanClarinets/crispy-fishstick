@@ -12,9 +12,9 @@ const updateInvoiceSchema = z.object({
 
 export const dynamic = "force-dynamic";
 
-function generateETag(data: any) {
-// Updated to use SHA-256 for stronger ETag generation.
-return crypto.createHash("sha256").update(JSON.stringify(data)).digest("hex");
+function generateETag(data: Record<string, unknown> | string | number) {
+  // Updated to use SHA-256 for stronger ETag generation.
+  return crypto.createHash("sha256").update(JSON.stringify(data)).digest("hex");
 }
 
 // Wrapper to inject ETag

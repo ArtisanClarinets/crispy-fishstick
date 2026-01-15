@@ -27,8 +27,8 @@ export default function NotFound() {
       {/* Decorative calibration element */}
       <div className="absolute bottom-10 left-0 right-0 flex justify-center opacity-20 pointer-events-none">
         <div className="h-px w-24 bg-foreground/50 relative">
-          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-1 h-3 bg-foreground/50"></div>
-          <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1 h-3 bg-foreground/50"></div>
+          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-1 h-3 bg-foreground/50" />
+          <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1 h-3 bg-foreground/50" />
         </div>
       </div>
     </div>

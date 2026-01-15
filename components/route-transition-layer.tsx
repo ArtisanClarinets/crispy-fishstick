@@ -16,7 +16,7 @@ export function RouteTransitionLayer() {
     // However, the prompt asks for a fast transition.
     // Since we are inside the persisted layout, a pathname change means we just arrived.
     // We'll trigger a quick "scan" effect.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setKey(prev => prev + 1);
     setIsNavigating(true);
     const t = setTimeout(() => setIsNavigating(false), 600);

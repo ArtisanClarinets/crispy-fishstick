@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AboutPage from '@/app/(site)/about/page';
@@ -50,6 +51,16 @@ vi.mock('lucide-react', () => {
     AlertTriangle: IconMock,
     Lock: IconMock,
     FileText: IconMock,
+    Zap: IconMock,
+    Users: IconMock,
+    Box: IconMock,
+    Scale: IconMock,
+    Globe: IconMock,
+    Search: IconMock,
+    X: IconMock,
+    Hammer: IconMock,
+    Check: IconMock,
+    Key: IconMock,
   };
 });
 
@@ -83,9 +94,9 @@ describe('Site Pages', () => {
   describe('ServicesPage', () => {
     it('should render services page content', () => {
       render(<ServicesPage />);
-      expect(screen.getByText(/Technical Services/i)).toBeInTheDocument();
-      expect(screen.getByText(/Design Engineering/i)).toBeInTheDocument();
-      expect(screen.getByText(/Frontend Systems/i)).toBeInTheDocument();
+      expect(screen.getByText(/Services & Packages/i)).toBeInTheDocument();
+      expect(screen.getByText(/The Business OS/i)).toBeInTheDocument();
+      expect(screen.getByText(/Audit & Rescue/i)).toBeInTheDocument();
     });
   });
 

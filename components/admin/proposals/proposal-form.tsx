@@ -68,7 +68,19 @@ const TEMPLATES = [
   }
 ];
 
-export function ProposalForm({ initialData }: { initialData?: any }) {
+export function ProposalForm({ initialData }: { initialData?: {
+  id?: string;
+  title?: string;
+  status?: string;
+  clientEmail?: string;
+  content?: string;
+  validUntil?: string;
+  items?: Array<{
+    description: string;
+    hours: number;
+    rate: number;
+  }>;
+} }) {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -82,10 +94,19 @@ export function ProposalForm({ initialData }: { initialData?: any }) {
     formState: { errors },
   } = useForm<ProposalFormValues>({
     resolver: zodResolver(proposalSchema),
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      title: initialData.title || "",
+      status: (initialData.status as "draft" | "pending_approval" | "approved" | "rejected" | "sent") || "draft",
+      clientEmail: initialData.clientEmail || "",
+      content: initialData.content || "",
+      validUntil: initialData.validUntil || "",
+      items: initialData.items || [{ description: "", hours: 0, rate: 0 }],
+    } : {
+      title: "",
       status: "draft",
       clientEmail: "",
       content: "",
+      validUntil: "",
       items: [{ description: "", hours: 0, rate: 0 }],
     },
   });
@@ -111,7 +132,7 @@ export function ProposalForm({ initialData }: { initialData?: any }) {
     }
   };
 
-  async function onSubmit(data: ProposalFormValues) {
+  async function onSubmit(data: any) {
     setIsLoading(true);
 
     try {

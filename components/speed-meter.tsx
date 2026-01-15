@@ -3,7 +3,7 @@ export function SpeedMeter({ score = 98 }: { score?: number }) {
     <div className="flex flex-col items-center justify-center p-8 bg-card rounded-2xl border border-border/50">
       <div className="relative w-48 h-24 overflow-hidden mb-4">
         {/* Background Arc */}
-        <div className="absolute w-48 h-48 rounded-full border-[12px] border-muted top-0 box-border"></div>
+        <div className="absolute w-48 h-48 rounded-full border-[12px] border-muted top-0 box-border" />
         {/* Fill Arc - simplified visual representation using CSS gradient mask or just color segments */}
         {/* For a simple SVG implementation: */}
         <svg viewBox="0 0 100 50" className="w-full h-full transform transition-all duration-1000 ease-out">

@@ -103,8 +103,9 @@ function ConfiguratorContent() {
 
               <div className="grid grid-cols-2 gap-4">
                  <div className="p-4 border rounded bg-card/50">
-                    <label className="text-sm font-medium block mb-2">CPU Model</label>
+                    <label htmlFor="cpu-model" className="text-sm font-medium block mb-2">CPU Model</label>
                     <select
+                      id="cpu-model"
                       className="w-full bg-background border rounded p-2"
                       value={state.cpuModel}
                       onChange={e => setState({...state, cpuModel: e.target.value})}
@@ -116,8 +117,9 @@ function ConfiguratorContent() {
                  </div>
 
                  <div className="p-4 border rounded bg-card/50">
-                    <label className="text-sm font-medium block mb-2">RAM (GB)</label>
+                    <label htmlFor="ram-gb" className="text-sm font-medium block mb-2">RAM (GB)</label>
                     <input
+                      id="ram-gb"
                       type="range" min="8" max="1024" step="8"
                       className="w-full"
                       value={state.ramGB}
@@ -128,9 +130,10 @@ function ConfiguratorContent() {
               </div>
 
               <div className="p-4 border rounded bg-card/50">
-                 <label className="text-sm font-medium block mb-2">Accelerators (GPU)</label>
+                 <label htmlFor="gpu-count" className="text-sm font-medium block mb-2">Accelerators (GPU)</label>
                  <div className="flex gap-4 items-center">
                     <input
+                      id="gpu-count"
                       type="number" min="0" max="8"
                       className="w-20 bg-background border rounded p-2"
                       value={state.gpuCount}
@@ -138,6 +141,7 @@ function ConfiguratorContent() {
                     />
                     <span>units of</span>
                     <select
+                      id="gpu-type"
                       className="bg-background border rounded p-2 flex-1"
                       value={state.gpuType || ""}
                       onChange={e => setState({...state, gpuType: e.target.value})}

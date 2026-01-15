@@ -23,12 +23,10 @@ export async function GET() {
   try {
     const user = await requireAdmin({ permissions: ["users.read"] });
 
-    const where: any = {
-      deletedAt: null, // Filter out soft-deleted users
+    const where = {
+      deletedAt: null,
+      tenantId: user.tenantId ? (user.tenantId as string) : undefined,
     };
-    if (user.tenantId) {
-      where.tenantId = user.tenantId;
-    }
 
     const users = await prisma.user.findMany({
       where,

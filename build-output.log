@@ -1,0 +1,293 @@
+
+> crispy-fishstick@0.1.0 prebuild
+> npm run lint && npm run typecheck
+
+
+> crispy-fishstick@0.1.0 lint
+> eslint .
+
+
+/home/vantus/vantus/app/(admin)/admin/(dashboard)/contracts/page.tsx
+   34:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  135:76  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/(admin)/admin/(dashboard)/incidents/page.tsx
+  110:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/(admin)/admin/(dashboard)/proposals/page.tsx
+  33:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/(admin)/admin/(dashboard)/search/page.tsx
+  53:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/(admin)/admin/login/page.tsx
+  88:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/(site)/c/[code]/page.tsx
+  77:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/contracts/[id]/sign/route.ts
+  23:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/exports/audit-logs/route.ts
+  18:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/invoices/[id]/restore/route.ts
+  16:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/invoices/draft-from-time/route.ts
+  54:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/invoices/route.ts
+  39:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/jit/requests/route.ts
+  24:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/media/[id]/download/route.ts
+  18:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/media/route.ts
+  49:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/proposals/[id]/convert-to-project/route.ts
+  24:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/role-assignments/route.ts
+  26:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/search/route.ts
+   32:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/tenants/[id]/route.ts
+  15:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  64:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/tenants/route.ts
+  30:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/time-entries/[id]/route.ts
+  127:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/time-entries/route.ts
+  32:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/users/[id]/route.ts
+   89:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  157:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/users/route.ts
+  38:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/webhooks/deliveries/route.ts
+  18:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/app/api/admin/webhooks/endpoints/route.ts
+  56:19  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/home/vantus/vantus/app/api/webhooks/esign/route.ts
+  44:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/admin/content/content-form.tsx
+  86:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/admin/contracts/contract-form.tsx
+   45:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/admin/contracts/contract-signature.tsx
+  36:82  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/home/vantus/vantus/components/admin/incidents/incident-form.tsx
+  44:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/admin/proposals/proposal-form.tsx
+  135:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/admin/services/service-form.tsx
+  42:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/auth-provider.tsx
+  8:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/hero-background.tsx
+  234:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  235:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/infrastructure/estimator/wizard.tsx
+   73:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   90:80  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:91  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/lab/server-config/intent-form.tsx
+  37:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/components/react-bits/Waves.tsx
+   21:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:15  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  134:16  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  135:7   warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  136:7   warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  151:7   warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  153:11  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  154:11  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  157:7   warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  158:7   warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  162:19  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+
+/home/vantus/vantus/components/system-layer.tsx
+  111:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  114:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/e2e/admin-flow.spec.ts
+  44:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/admin/audit.ts
+  11:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/admin/guards.test.ts
+   35:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   41:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   42:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   49:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   67:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   95:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  135:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/admin/guards.ts
+  151:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  154:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  158:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/admin/route.ts
+   89:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:21  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  200:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  208:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  208:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  223:21  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+
+/home/vantus/vantus/lib/api/errors.ts
+  103:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/api/filters/common.ts
+  53:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/dto.ts
+  11:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/jobs/queue.ts
+  25:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/security/admin-protection.ts
+   61:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  132:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  189:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  254:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/security/audit.ts
+   22:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  252:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  291:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/security/redact.ts
+   1:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   1:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/security/response.ts
+  3:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/lib/server/auth.ts
+  102:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/prisma/seed.ts
+  36:26  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/home/vantus/vantus/scripts/smoke-test.ts
+  86:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/scripts/update-permissions.ts
+  105:99  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/scripts/verify-admin.ts
+  73:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/tests/admin/contract-concurrency.test.ts
+  95:45  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/home/vantus/vantus/tests/admin/csrf-enforcement.test.ts
+  12:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/tests/admin/tenant-isolation.test.ts
+   93:11  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   94:14  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   95:13  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   98:17  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  119:11  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  120:14  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  121:13  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  124:17  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/home/vantus/vantus/tests/auth.test.ts
+    3:10  error    'authenticator' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   54:32  warning  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+   73:31  warning  Forbidden non-null assertion                                                     @typescript-eslint/no-non-null-assertion
+  103:34  warning  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+  128:34  warning  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+  139:34  warning  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+  166:34  warning  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+  187:34  warning  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/tests/reload-loop.test.ts
+   46:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   55:31  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  129:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  184:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  201:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  254:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  260:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  277:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  299:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  327:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  353:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  367:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  382:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/vantus/vantus/tests/setup.ts
+  40:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 158 problems (1 error, 157 warnings)
+

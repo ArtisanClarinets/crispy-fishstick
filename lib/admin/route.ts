@@ -60,17 +60,17 @@ export interface AdminMutationOptions extends RequireAdminOptions {
  * Handler type for admin reads
  */
 export type AdminReadHandler = (
-  req: NextRequest,
-  context: { user: AdminUserContext; requestId: string; [key: string]: any }
-) => Promise<NextResponse> | NextResponse;
+   req: NextRequest,
+   context: { user: AdminUserContext; requestId: string; [key: string]: unknown }
+ ) => Promise<NextResponse> | NextResponse;
 
 /**
  * Handler type for admin mutations
  */
 export type AdminMutationHandler = (
-  req: NextRequest,
-  context: { user: AdminUserContext; requestId: string; [key: string]: any }
-) => Promise<NextResponse> | NextResponse;
+   req: NextRequest,
+   context: { user: AdminUserContext; requestId: string; [key: string]: unknown }
+ ) => Promise<NextResponse> | NextResponse;
 
 /**
  * Wrapper for admin read operations (GET)
@@ -102,11 +102,11 @@ export function adminRead(
  */
 export function adminRead(
   reqOrOptions: NextRequest | AdminReadOptions,
-  optionsOrHandler: AdminReadOptions | AdminReadHandler | ((user: AdminUserContext) => Promise<any>),
-  inlineHandler?: (user: AdminUserContext) => Promise<any>
-): ((req: NextRequest, context: any) => Promise<NextResponse>) | Promise<NextResponse> {
+  optionsOrHandler: AdminReadOptions | AdminReadHandler | ((user: AdminUserContext) => Promise<unknown>),
+  inlineHandler?: (user: AdminUserContext) => Promise<unknown>
+): ((req: NextRequest, context: unknown) => Promise<NextResponse>) | Promise<NextResponse> {
   // Check if first arg is a Request (inline style)
-  if (reqOrOptions instanceof Request || (reqOrOptions as any).nextUrl) {
+  if (reqOrOptions instanceof Request || (reqOrOptions as { nextUrl?: URL }).nextUrl) {
     const _req = reqOrOptions as NextRequest;
     const options = optionsOrHandler as AdminReadOptions;
     const handler = inlineHandler!;
@@ -116,30 +116,10 @@ export function adminRead(
       
       try {
         const user = await requireAdmin(options);
-        const result = await handler(user);
+        const result: NextResponse = (await handler(user)) as NextResponse;
         
-        if (result?.error) {
-          return NextResponse.json(
-            { error: result.error },
-            { 
-              status: result.status || 400,
-              headers: {
-                "Cache-Control": "no-store, max-age=0",
-                "X-Request-Id": requestId,
-              },
-            }
-          );
-        }
-        
-        return NextResponse.json(result.data || result, {
-          status: result.status || 200,
-          headers: {
-            "Cache-Control": options.cacheMaxAge !== undefined
-              ? `max-age=${options.cacheMaxAge}, private`
-              : "no-store, max-age=0",
-            "X-Request-Id": requestId,
-          },
-        });
+        // Handler returns NextResponse directly
+        return result;
       } catch (error) {
         return normalizeError(error, requestId);
       }
@@ -150,7 +130,7 @@ export function adminRead(
   const options = reqOrOptions as AdminReadOptions;
   const handler = optionsOrHandler as AdminReadHandler;
   
-  return async (req: NextRequest, context: any): Promise<NextResponse> => {
+  return async (req: NextRequest, context: unknown): Promise<NextResponse> => {
     const requestId = await getRequestId();
     
     try {
@@ -158,7 +138,7 @@ export function adminRead(
       const user = await requireAdmin(options);
       
       // Execute handler
-      const response = await handler(req, { user, requestId, ...context });
+      const response = await handler(req, { user, requestId, ...(context as Record<string, unknown>) });
       
       // Ensure no-store cache by default
       const cacheControl = options.cacheMaxAge !== undefined
@@ -209,11 +189,11 @@ export function adminMutation(
  */
 export function adminMutation(
   reqOrOptions: NextRequest | AdminMutationOptions,
-  optionsOrHandler: AdminMutationOptions | AdminMutationHandler | ((user: AdminUserContext, body: any) => Promise<any>),
-  inlineHandler?: (user: AdminUserContext, body: any) => Promise<any>
-): ((req: NextRequest, context: any) => Promise<NextResponse>) | Promise<NextResponse> {
+  optionsOrHandler: AdminMutationOptions | AdminMutationHandler | ((user: AdminUserContext, body: unknown) => Promise<unknown>),
+  inlineHandler?: (user: AdminUserContext, body: unknown) => Promise<unknown>
+): ((req: NextRequest, context: unknown) => Promise<NextResponse>) | Promise<NextResponse> {
   // Check if first arg is a Request (inline style)
-  if (reqOrOptions instanceof Request || (reqOrOptions as any).nextUrl) {
+  if (reqOrOptions instanceof Request || (reqOrOptions as { nextUrl?: URL }).nextUrl) {
     const req = reqOrOptions as NextRequest;
     const options = optionsOrHandler as AdminMutationOptions;
     const handler = inlineHandler!;
@@ -244,7 +224,7 @@ export function adminMutation(
         }
         
         // 5. Parse body if needed
-        let body: any = null;
+        let body: unknown = null;
         if (req.method !== "GET" && req.method !== "DELETE") {
           try {
             body = await req.json();
@@ -254,43 +234,38 @@ export function adminMutation(
         }
         
         // 6. Execute handler
-        const result = await handler(user, body);
+        const result: NextResponse = (await handler(user, body)) as NextResponse;
         
-        // 7. Handle result with audit
-        if (result?.error) {
-          return NextResponse.json(
-            { error: result.error },
-            { 
-              status: result.status || 400,
-              headers: {
-                "Cache-Control": "no-store, max-age=0",
-                "X-Request-Id": requestId,
-              },
+        // 7. Handler returns NextResponse directly, but audit if configured
+        let resourceId: string | undefined;
+        let _beforeState: unknown = null;
+        
+        // 7. Audit: capture "before" state if audit is configured
+        if (options.audit) {
+          // Try to extract resource ID from context.params, then URL
+          if ((req as any).params?.id) {
+            resourceId = (req as any).params?.id;
+          } else {
+            const urlParts = req.nextUrl.pathname.split("/");
+            const possibleId = urlParts[urlParts.length - 1];
+            if (possibleId && possibleId.length > 5 && !possibleId.includes(".")) {
+              resourceId = possibleId;
             }
-          );
+          }
+            
+          if (resourceId) {
+            // Attempt to fetch "before" state for updates/deletes
+            if (req.method === "PUT" || req.method === "PATCH" || req.method === "DELETE") {
+              _beforeState = await fetchResourceState(options.audit.resource, resourceId);
+            }
+          }
         }
         
-        // 8. Audit logging if configured
-        if (options.audit && result?.data) {
-          const resourceId = options.audit.resourceId || result.data?.id;
-          
-          await createAuditLog({
-            action: options.audit.action,
-            resource: options.audit.resource,
-            resourceId,
-            actorId: user.id,
-            actorEmail: user.email,
-            after: result.data,
-          });
-        }
+        // 8. Set security headers
+        result.headers.set("Cache-Control", "no-store, max-age=0");
+        result.headers.set("X-Request-Id", requestId);
         
-        return NextResponse.json(result.data || result, {
-          status: result.status || 200,
-          headers: {
-            "Cache-Control": "no-store, max-age=0",
-            "X-Request-Id": requestId,
-          },
-        });
+        return result;
       } catch (error) {
         return normalizeError(error, requestId);
       }
@@ -301,7 +276,7 @@ export function adminMutation(
   const options = reqOrOptions as AdminMutationOptions;
   const handler = optionsOrHandler as AdminMutationHandler;
   
-  return async (req: NextRequest, context: any): Promise<NextResponse> => {
+  return async (req: NextRequest, context: unknown): Promise<NextResponse> => {
     const requestId = await getRequestId();
     
     try {
@@ -328,12 +303,12 @@ export function adminMutation(
       
       // 5. Audit: capture "before" state if audit is configured
       let resourceId: string | undefined;
-      let beforeState: any = null;
+      let beforeState: unknown = null;
       
       if (options.audit) {
         // Try to extract resource ID from context.params, then URL
-        if (context?.params?.id) {
-          resourceId = context.params.id;
+        if ((context as { params?: { id?: string } })?.params?.id) {
+          resourceId = (context as { params?: { id?: string } }).params?.id;
         } else {
           const urlParts = req.nextUrl.pathname.split("/");
           const possibleId = urlParts[urlParts.length - 1];
@@ -351,11 +326,15 @@ export function adminMutation(
       }
       
       // 6. Execute handler
-      const response = await handler(req, { user, requestId, ...context });
+      const response = await handler(req, { 
+        user, 
+        requestId,
+        ...(context as Record<string, unknown>)
+      });
       
       // 7. Audit: capture "after" state and write audit log
       if (options.audit && response.ok) {
-        let afterState: any = null;
+        let afterState: unknown = null;
         
         // For successful creates/updates, try to get state from response
         if (req.method === "POST" || req.method === "PUT" || req.method === "PATCH") {
@@ -449,10 +428,10 @@ async function enforceRateLimit(
 /**
  * Fetch resource state for audit "before" snapshot
  */
-async function fetchResourceState(resource: string, id: string): Promise<any> {
+async function fetchResourceState(resource: string, id: string): Promise<unknown> {
   try {
     // Map resource names to Prisma models
-    const modelMap: Record<string, any> = {
+    const modelMap: Record<string, unknown> = {
       user: prisma.user,
       lead: prisma.lead,
       project: prisma.project,
@@ -476,7 +455,7 @@ async function fetchResourceState(resource: string, id: string): Promise<any> {
     const model = modelMap[resource];
     if (!model) return null;
     
-    return await model.findUnique({ where: { id } });
+    return await (model as { findUnique: (args: { where: { id: string } }) => Promise<unknown> }).findUnique({ where: { id } });
   } catch {
     return null;
   }

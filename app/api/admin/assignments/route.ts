@@ -25,7 +25,10 @@ export async function GET(req: NextRequest) {
     const projectId = searchParams.get("projectId");
     const userId = searchParams.get("userId");
 
-    const where: any = {};
+    const where: {
+      projectId?: string;
+      userId?: string;
+    } = {};
 
     // Tenant scoping via project
     if (projectId) {

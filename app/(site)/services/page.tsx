@@ -160,7 +160,7 @@ export default function ServicesPage() {
                       key={feature}
                       className="text-xs font-medium flex items-center gap-2 text-foreground/80"
                     >
-                      <span className="w-1 h-1 rounded-full bg-primary/60"></span>
+                      <span className="w-1 h-1 rounded-full bg-primary/60" />
                       {feature}
                     </li>
                   ))}

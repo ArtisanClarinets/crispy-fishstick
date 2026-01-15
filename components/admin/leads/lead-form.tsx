@@ -40,7 +40,16 @@ const leadSchema = z.object({
 type LeadFormValues = z.infer<typeof leadSchema>;
 
 interface LeadFormProps {
-  initialData?: any;
+  initialData?: {
+    id?: string;
+    name?: string;
+    email?: string;
+    status?: string;
+    source?: string;
+    budget?: string;
+    website?: string;
+    message?: string;
+  };
 }
 
 export function LeadForm({ initialData }: LeadFormProps) {

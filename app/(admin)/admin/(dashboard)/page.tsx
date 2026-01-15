@@ -40,7 +40,7 @@ export default async function AdminDashboard() {
         <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold tracking-tight">System Overview</h1>
             <div className="flex items-center gap-2">
-                <span className="flex h-2 w-2 rounded-full bg-[var(--signal-success)] animate-pulse"></span>
+                <span className="flex h-2 w-2 rounded-full bg-[var(--signal-success)] animate-pulse" />
                 <span className="text-sm font-medium text-[var(--signal-success)]">Operational</span>
             </div>
         </div>
@@ -177,7 +177,7 @@ export default async function AdminDashboard() {
               <CardContent>
                 <div className="flex items-center gap-2 mb-4">
                     <div className="w-full bg-secondary rounded-full h-2">
-                        <div className="bg-[var(--signal-success)] h-2 rounded-full" style={{ width: '99%' }}></div>
+                        <div className="bg-[var(--signal-success)] h-2 rounded-full" style={{ width: '99%' }} />
                     </div>
                     <span className="text-xs font-mono">99.9%</span>
                 </div>

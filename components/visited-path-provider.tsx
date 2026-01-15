@@ -18,7 +18,7 @@ export function VisitedPathProvider({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setVisitedPaths((prev) => {
       if (prev.has(pathname)) {
         return prev;

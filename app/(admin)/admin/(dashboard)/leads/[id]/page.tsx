@@ -22,7 +22,16 @@ export default async function EditLeadPage(props: { params: Promise<{ id: string
         <p className="text-muted-foreground">Update lead status and details.</p>
       </div>
 
-      <LeadForm initialData={lead} />
+      <LeadForm initialData={{
+        id: lead.id,
+        name: lead.name,
+        email: lead.email,
+        status: lead.status,
+        source: lead.source || undefined,
+        budget: lead.budget ? String(lead.budget) : undefined,
+        website: lead.website || undefined,
+        message: lead.message || undefined,
+      }} />
     </div>
   );
 }
