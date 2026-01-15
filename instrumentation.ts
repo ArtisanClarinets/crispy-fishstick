@@ -1,3 +1,16 @@
+import * as Sentry from '@sentry/nextjs';
+
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('./sentry.server.config');
+  }
+
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    await import('./sentry.edge.config');
+  }
+}
+
+export const onRequestError = Sentry.captureRequestError;
 export async function register() {
   const startTime = performance.now();
   
@@ -21,3 +34,15 @@ export async function register() {
     console.log(`[Telemetry] Service ready in ${duration.toFixed(2)}ms`);
   }
 }
+
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('./sentry.server.config');
+  }
+
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    await import('./sentry.edge.config');
+  }
+}
+
+export const onRequestError = Sentry.captureRequestError;

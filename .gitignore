@@ -56,3 +56,6 @@ uploads/
 server.log
 test_results.txt
 dev.db
+
+# Sentry Config File
+.env.sentry-build-plugin
