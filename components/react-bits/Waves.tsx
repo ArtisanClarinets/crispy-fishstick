@@ -110,6 +110,7 @@ export default function Waves({
     let mouseX = 0;
     let mouseY = 0;
     let cursorActive = false;
+    let rect = container.getBoundingClientRect();
 
     function getThemeColor() {
       const style = getComputedStyle(document.body);
@@ -122,11 +123,18 @@ export default function Waves({
 
     const effectiveLineColor = lineColor === "rgba(0, 0, 0, 0.1)" ? getThemeColor() : lineColor;
 
+    function updateRect() {
+      if (container) {
+        rect = container.getBoundingClientRect();
+      }
+    }
+
     function resize() {
       width = container!.clientWidth;
       height = container!.clientHeight;
       canvas!.width = width;
       canvas!.height = height;
+      updateRect();
       initLines();
     }
 
@@ -159,10 +167,15 @@ export default function Waves({
     }
 
     function onMouseMove(e: MouseEvent) {
-      const rect = container!.getBoundingClientRect();
-      mouseX = e.clientX - rect.left;
-      mouseY = e.clientY - rect.top;
-      cursorActive = true;
+      // Optimization: Use cached rect to prevent layout thrashing
+      if (!rect && container) {
+        rect = container.getBoundingClientRect();
+      }
+      if (rect) {
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+        cursorActive = true;
+      }
     }
 
     function onMouseLeave() {
@@ -170,6 +183,7 @@ export default function Waves({
     }
 
     window.addEventListener("resize", resize);
+    window.addEventListener("scroll", updateRect);
     container.addEventListener("mousemove", onMouseMove);
     container.addEventListener("mouseleave", onMouseLeave);
 
@@ -178,6 +192,7 @@ export default function Waves({
 
     return () => {
       window.removeEventListener("resize", resize);
+      window.removeEventListener("scroll", updateRect);
       container.removeEventListener("mousemove", onMouseMove);
       container.removeEventListener("mouseleave", onMouseLeave);
       cancelAnimationFrame(frameId);
