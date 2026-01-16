@@ -1,41 +1,30 @@
 # INFRASTRUCTURE DEFICIENCIES
 
-## 🏗️ Containerization & Deployment
+## Containerization
+- **Status**: ❌ MISSING
+- **Deficiency**: No `Dockerfile` or `docker-compose.yml`.
+- **Impact**: "Works on my machine" syndrome. The production environment (Ubuntu VM via script) differs significantly from local dev (Mac/Windows).
+- **Fix**: Create a multi-stage `Dockerfile` optimized for Next.js standalone output.
 
-### 1. Missing Docker Configuration
-**Issue:** No `Dockerfile` or `docker-compose.yml` found in the project root.
-**Impact:** Inconsistent environments between dev/staging/prod. "It works on my machine" syndrome. Harder to orchestrate with Kubernetes or ECS.
-**Fix:** Create a multi-stage `Dockerfile` optimized for `output: 'standalone'`.
+## CI/CD Pipeline
+- **Status**: ⚠️ PARTIAL
+- **Deficiency**: `ci.yml` exists and runs lint/test/e2e, which is good. However, there is **no deployment job**.
+- **Impact**: Deployments are likely manual (SSH -> `git pull` -> `npm build`), which is error-prone and slow.
+- **Fix**: Add a `deploy` job to `ci.yml` that builds the Docker image, pushes to a registry (ECR/GCR), and updates the orchestration layer (ECS/K8s/App Runner).
 
-### 2. Manual Shell Script Deployment
-**Issue:** Reliance on `scripts/bootstrap-ubuntu22.sh` implies a "pet" server approach (SSHing into a VPS) rather than immutable infrastructure.
-**Impact:** Server drift over time. Hard to scale horizontally.
-**Fix:** Move to Infrastructure as Code (Terraform/Pulumi) or PaaS (Vercel/AWS Amplify).
+## Database Management
+- **Status**: ❌ CRITICAL FAIL
+- **Deficiency**: SQLite is used. No backup strategy defined in code.
+- **Impact**: Data loss is one disk corruption away. Zero scalability.
+- **Fix**: Provision RDS (PostgreSQL). Add `pg_dump` automation or enabling Point-in-Time Recovery (PITR).
 
----
+## Monitoring & Logging
+- **Status**: ✅ PASSABLE
+- **Observation**: Sentry is configured (`sentry.server.config.ts`, etc). Winston is used.
+- **Gap**: No structured logging aggregation (e.g., Datadog, ELK) visible. Logs are likely written to disk on the VM (`/var/log/vantus`), which rotates and disappears.
 
-## 📡 Observability & Monitoring
-
-### 1. Missing Sentry/APM
-**Issue:** `env.example` lists `NEXT_PUBLIC_SENTRY_DSN`, but `@sentry/nextjs` is **NOT** in `package.json` dependencies.
-**Impact:** Blindness to runtime errors in production. You won't know when users are crashing.
-**Fix:** `npm install @sentry/nextjs` and configure `sentry.server.config.ts` / `sentry.client.config.ts`.
-
-### 2. No Health Check Endpoint
-**Issue:** No dedicated `/api/health` or `/healthz` endpoint found.
-**Impact:** Load balancers cannot reliably detect if the application is hung or unresponsive.
-**Fix:** Create `app/api/health/route.ts` that checks DB connectivity and Redis status.
-
----
-
-## 💾 Database & Backups
-
-### 1. Backup Strategy
-**Observation:** `scripts/database-backup.sh` exists.
-**Risk:** Verify where these backups go. If they stay on the same server (`./backups`), a server failure loses both app and data.
-**Requirement:** Ensure backups are piped to S3 or off-site storage.
-
-### 2. SQLite in Production?
-**Observation:** `schema.prisma` uses `provider = "sqlite"`.
-**CRITICAL:** SQLite is not suitable for a $10M+ enterprise deployment with high concurrency or horizontal scaling. It locks the file on write.
-**Fix:** Migrate to PostgreSQL (`provider = "postgresql"`).
+## Scalability
+- **Status**: ❌ NONE
+- **Deficiency**: Single VM architecture implied by `scripts/bootstrap-ubuntu22.sh`.
+- **Impact**: Cannot scale horizontally. If traffic spikes, the site dies.
+- **Fix**: Kubernetes or Serverless (Vercel/AWS Amplify) architecture.

@@ -1,83 +1,95 @@
-# SECURITY CRITICAL ISSUES AUDIT
+# SECURITY CRITICAL ISSUES
 
-## 🔴 CRITICAL RISK (Deploy Blocker)
+## 🔴 CRITICAL (Deploy Blocker)
 
-### 1. CSRF Vulnerability in Admin API
-**Location:** `app/api/admin/users/route.ts` (and potentially others not using `adminMutation`)
-**Issue:** The Admin API for user creation (`POST`) manually implements `requireAdmin` and `assertSameOrigin` but fails to invoke `verifyCsrfToken`. This allows attackers to forge requests if they can trick an admin into visiting a malicious site (CSRF), bypassing the Origin check if the browser doesn't send it or if it's spoofed in certain non-browser contexts (though Origin is robust in modern browsers, defense-in-depth is missing).
-**Code Evidence:**
+### 1. Hardcoded Secret Fallback in Auth Config
+**Risk**: Authentication Bypass / Session Forgery
+**Location**: `lib/auth.config.ts`
+**Description**: The authentication configuration includes a hardcoded fallback secret that is used when environment variables are missing. While it logs a warning, it returns the weak secret, allowing attackers who know this open-source default to forge session tokens.
+**Snippet**:
 ```typescript
-// app/api/admin/users/route.ts
-export async function POST(req: NextRequest) {
-  try {
-    // Phase 6: CSRF/Origin Enforcement
-    assertSameOrigin(req); // Good, but insufficient alone
-    const actor = await requireAdmin({ permissions: ["users.write"] });
-    // MISSING: await verifyCsrfToken(req);
+if (!secret) {
+  console.warn("No auth secret found. Using a development fallback secret.");
+  return "dev-secret-fallback-for-development-only";
+}
 ```
-**Fix:**
-Replace manual logic with the secure wrapper `adminMutation` which enforces CSRF:
+**Fix**:
 ```typescript
-import { adminMutation } from "@/lib/admin/route";
-
-export const POST = adminMutation({ permissions: ["users.write"] }, async (user, body) => {
-  // Handler logic...
-});
+if (!secret) {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("FATAL: NEXTAUTH_SECRET is missing in production");
+  }
+  console.warn("Using dev secret for local development only");
+  return "dev-secret-fallback-for-development-only";
+}
 ```
 
-### 2. Authentication Bypass / Weak Rate Limiting
-**Location:** `lib/auth.ts`
-**Issue:** The code allows disabling rate limiting via an environment variable `DISABLE_RATE_LIMITING`. Furthermore, the fallback mock rate limiter hardcodes `remaining: 5` and returns `success: true` always. If Redis fails or is disabled, brute force attacks are trivial.
-**Code Evidence:**
+### 2. Broken Rate Limiting (Fail-Open)
+**Risk**: DDoS Vulnerability
+**Location**: `lib/security/rate-limit.ts`
+**Description**: The rate limiter catches Redis connection errors and explicitly returns `{ success: true }`, effectively disabling protection when the infrastructure is under stress—exactly when it is needed most.
+**Snippet**:
 ```typescript
-// lib/auth.ts
-if (process.env.DISABLE_RATE_LIMITING === "true") {
-  console.warn('Rate limiting disabled via env var'); // DANGEROUS IN PROD
-  rateLimiterInstance = {
-    checkLoginAttempt: async () => ({ success: true, remaining: 5 }), // ALways allows
-    getClientIp: () => '127.0.0.1',
+} catch (error) {
+  console.error("Rate limiting error:", error);
+  // Fail open if Redis is unavailable
+  return {
+    success: true,
+    remaining: this.maxAttempts
   };
 }
 ```
-**Fix:**
-Remove the bypass. Fail securely if Redis is down (deny login) or fallback to an in-memory Map rate limiter, not a "always success" mock.
+**Fix**: Implement a memory-based fallback or fail-closed strategy for critical endpoints.
+
+### 3. Unconditional Deployment Failure
+**Risk**: Deployment Integrity
+**Location**: `scripts/bootstrap-ubuntu22.sh`
+**Description**: The bootstrap script contains an unconditional `exit 1` inside the package installation phase, preventing the script from ever completing the setup. This leaves the server in a partially configured, vulnerable state.
+**Snippet**:
+```bash
+    # Clean up node_modules to ensure fresh install
+    if [ -d "$APP_DIR/node_modules" ]; then
+        log_info "Cleaning up old node_modules directory..."
+        rm -rf "$APP_DIR/node_modules" "$APP_DIR/package-lock.json"
+    fi
+    exit 1
+fi
+```
+**Fix**: Remove the `exit 1` and fix the dangling `fi`.
 
 ---
 
 ## 🟡 HIGH RISK
 
-### 1. Weak Session Token Generation
-**Location:** `lib/auth.ts`
-**Issue:** Session tokens are generated using `Math.random()`, which is not cryptographically secure.
-**Code Evidence:**
-```typescript
-// lib/auth.ts
-token.sessionToken = `session_${Math.random().toString(36).substring(2, 15)}_${Date.now()}`;
+### 1. Stored XSS in CMS
+**Risk**: Cross-Site Scripting
+**Location**: `components/admin/content/content-form.tsx`
+**Description**: The Admin CMS uses `ReactMarkdown` to preview content without any sanitization plugins (like `rehype-sanitize`). If an admin account is compromised, malicious scripts can be stored and executed against other admins.
+**Snippet**:
+```tsx
+<ReactMarkdown>{field.value}</ReactMarkdown>
 ```
-**Fix:**
-Use `crypto.randomUUID()`:
-```typescript
-token.sessionToken = `session_${crypto.randomUUID()}`;
+**Fix**:
+```tsx
+import rehypeSanitize from 'rehype-sanitize';
+<ReactMarkdown rehypePlugins={[rehypeSanitize]}>{field.value}</ReactMarkdown>
 ```
 
-### 2. Fragile Admin Route Protection
-**Location:** `proxy.ts`
-**Issue:** Admin route protection relies on string matching `pathname.startsWith("/admin")`. While `pathname` is generally normalized by Next.js, reliance on string prefixes can be fragile if case-sensitivity handling varies or if new admin routes are introduced that don't match the pattern (e.g., `/api/v2/admin`).
-**Fix:**
-Use a robust matcher or move admin routes to a separate subdomain/app to enforce isolation. Ensure `pathname` is lowercased before check (it is in the current code, but the pattern is manual).
+### 2. Missing Containerization
+**Risk**: Environment Drift / RCE
+**Location**: Root
+**Description**: There is no `Dockerfile` or container strategy. The project relies on a fragile bash script for VM mutation, increasing the attack surface and risk of configuration drift compared to immutable containers.
 
 ---
 
 ## 🟠 MEDIUM RISK
 
-### 1. Graceful Degradation on Missing Secrets
-**Location:** `instrumentation.ts`
-**Issue:** The application logs a warning but continues startup if `NEXTAUTH_SECRET` or `DATABASE_URL` are missing in production. This can lead to runtime errors or insecure defaults.
-**Code Evidence:**
-```typescript
-if (missing.length > 0) {
-  console.warn(`⚠️ Missing required environment variables... continuing with graceful degradation`);
-}
-```
-**Fix:**
-Throw an error and halt startup in production if critical secrets are missing.
+### 1. Brittle CSRF Implementation
+**Risk**: CSRF Bypass
+**Location**: `app/api/admin/users/route.ts`
+**Description**: While `verifyCsrfToken(req)` is called, it is a manual invocation in the route handler. If a developer adds a new POST endpoint and forgets this line, the endpoint is vulnerable. Middleware-based enforcement is preferred for admin routes.
+
+### 2. Weak Middleware Admin Check
+**Risk**: Authorization Bypass
+**Location**: `proxy.ts`
+**Description**: The middleware checks `pathname.startsWith("/admin")` but relies on `token.roles.includes("Admin")`. While valid, complex role logic should be centralized in a guard function (like `lib/admin/guards.ts`) rather than duplicated in the edge middleware.

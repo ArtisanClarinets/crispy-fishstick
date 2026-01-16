@@ -1,62 +1,29 @@
-# REMEDIATION ROADMAP (28-Day Plan)
+# REMEDIATION ROADMAP
 
-## 📅 Week 1: Critical Security Hardening (P0)
+## Week 1: Security & Infrastructure Stabilization
+- [ ] **Day 1**: Remove hardcoded secrets from `lib/auth.config.ts` and fix `scripts/bootstrap-ubuntu22.sh`.
+- [ ] **Day 2**: Remove `export const dynamic = "force-dynamic"` from `app/layout.tsx`.
+- [ ] **Day 3**: Implement fail-closed logic in `lib/security/rate-limit.ts`.
+- [ ] **Day 4**: Dockerize the application (Create `Dockerfile`, `docker-compose.yml`).
+- [ ] **Day 5**: Migrate Database from SQLite to PostgreSQL (Local dev & Staging).
 
-### Day 1-2: Fix Authentication & CSRF
-- [ ] **Task:** Refactor all Admin API routes to use `adminMutation` wrapper.
-- [ ] **Task:** Implement `verifyCsrfToken` logic in `lib/security/csrf.ts` if missing (verified present, but ensure robust).
-- [ ] **Task:** Remove `DISABLE_RATE_LIMITING` logic and implement robust Redis fallback (fail closed).
+## Week 2: Performance & Code Quality
+- [ ] **Day 6**: Remove `gsap` and `@splinetool` dependencies.
+- [ ] **Day 7**: Refactor `HeroBackground` and `Waves` to use `framer-motion` or lightweight Canvas.
+- [ ] **Day 8**: Enable `rehype-sanitize` for `ReactMarkdown` in Admin CMS.
+- [ ] **Day 9**: Fix `tsconfig.json` (`skipLibCheck: false`) and resolve type errors.
+- [ ] **Day 10**: Add Unit Tests for `lib/security` and `lib/auth`.
 
-### Day 3: Session Security
-- [ ] **Task:** Replace `Math.random()` with `crypto.randomUUID()` for session tokens in `lib/auth.ts`.
-- [ ] **Task:** Enforce strict secrets validation in `instrumentation.ts` (halt startup if missing).
+## Week 3: Deployment Pipeline & Hardening
+- [ ] **Day 11**: Configure GitHub Actions to build and push Docker image.
+- [ ] **Day 12**: Set up Production Infrastructure (AWS/Vercel) with PostgreSQL RDS.
+- [ ] **Day 13**: Implement Centralized Logging (Datadog/CloudWatch).
+- [ ] **Day 14**: Run Load Tests (k6) against the new PostgreSQL setup.
+- [ ] **Day 15**: Pen-test API routes (specifically Admin mutations).
 
-### Day 4-5: Audit & Penetration Testing (Internal)
-- [ ] **Task:** Write unit tests for CSRF bypass scenarios (`tests/admin/csrf.test.ts`).
-- [ ] **Task:** Verify Admin route protection path matching in `proxy.ts`.
-
----
-
-## 📅 Week 2: Infrastructure & Database (P1)
-
-### Day 6-7: Database Migration
-- [ ] **Task:** Switch `schema.prisma` provider to `postgresql`.
-- [ ] **Task:** Provision RDS/Cloud SQL instance.
-- [ ] **Task:** Create migration scripts and verify data integrity.
-
-### Day 8-9: Containerization
-- [ ] **Task:** Create `Dockerfile` (multi-stage: deps, builder, runner).
-- [ ] **Task:** Create `docker-compose.yml` for local dev (App + Postgres + Redis).
-
-### Day 10: CI/CD Pipeline
-- [ ] **Task:** Implement GitHub Actions for Lint, Test, Build, and Push to Registry.
-- [ ] **Task:** Add Sentry source map upload step.
-
----
-
-## 📅 Week 3: Performance & Scalability (P2)
-
-### Day 11-12: Job Queue Implementation
-- [ ] **Task:** Install BullMQ.
-- [ ] **Task:** Refactor `app/api/cron/contract-reminders` to push jobs to queue.
-- [ ] **Task:** Create worker process to consume email jobs.
-
-### Day 13-14: Frontend Optimization
-- [ ] **Task:** Lazy load `@splinetool/react-spline`.
-- [ ] **Task:** Remove `gsap` (migrate to `framer-motion`) or vice-versa to remove duplication.
-- [ ] **Task:** Install `sharp` for image optimization.
-
-### Day 15: Caching Strategy
-- [ ] **Task:** Implement `stale-while-revalidate` headers for Admin Read APIs.
-- [ ] **Task:** Configure CDN caching rules.
-
----
-
-## 📅 Week 4: QA & Code Quality (P3)
-
-### Day 16-20: Testing & Documentation
-- [ ] **Task:** Increase test coverage to >80% for `lib/auth.ts` and `lib/admin`.
-- [ ] **Task:** Resolve all TypeScript `any` violations.
-- [ ] **Task:** Standardize dependency versions (`react-markdown`).
-- [ ] **Task:** Final Regression Test.
-- [ ] **Task:** **Sign-off for Production Deploy.**
+## Week 4: Documentation & Handover
+- [ ] **Day 16**: Document all Environment Variables in `README.md`.
+- [ ] **Day 17**: Create Runbooks for Incident Response.
+- [ ] **Day 18**: Final Code Freeze & Review.
+- [ ] **Day 19**: Training session for internal team.
+- [ ] **Day 20**: GO/NO-GO Meeting.
