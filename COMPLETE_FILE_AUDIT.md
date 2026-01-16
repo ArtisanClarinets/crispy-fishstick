@@ -1,97 +1,94 @@
-# COMPLETE FILE AUDIT
+## app/layout.tsx: Global Performance Killer
 
-## [API Route]: Admin User Creation
-
-**PATH:** `/app/api/admin/users/route.ts`
+**PATH:** `/app/layout.tsx`
 
 ### Issues Found:
-1. **Line 37:** Missing `verifyCsrfToken` invocation. - Severity: CRITICAL
-   - **Impact:** Allows Cross-Site Request Forgery (CSRF). An attacker can create admin users if a logged-in admin visits a malicious page.
-   - **Fix:**
+1. **Line 43:** Global Dynamic Forcing - Severity: CRITICAL
+   - **Impact**: Disables Static Site Generation (SSG) and Incremental Static Regeneration (ISR) for the entire application. Every page load hits the server CPU.
+   - **Fix**:
      ```typescript
-     // Use the wrapper
-     export const POST = adminMutation({ permissions: ["users.write"] }, async (user, body) => { ... })
+     // DELETE THIS LINE
+     // export const dynamic = "force-dynamic";
      ```
-   - **Estimated Time:** 2 hours
+   - **Estimated Time**: 0.5 hours
 
-2. **Line 11:** `const where: any` - Severity: LOW
-   - **Impact:** Loss of type safety.
-   - **Fix:** `const where: Prisma.UserWhereInput = ...`
-   - **Estimated Time:** 0.5 hours
+## scripts/bootstrap-ubuntu22.sh: Broken Deployment
 
-### Recommendations:
-- Refactor to use `adminMutation` wrapper consistently.
-
----
-
-## [Library]: Authentication Logic
-
-**PATH:** `/lib/auth.ts`
+**PATH:** `/scripts/bootstrap-ubuntu22.sh`
 
 ### Issues Found:
-1. **Line 15:** `process.env.DISABLE_RATE_LIMITING === "true"` - Severity: HIGH
-   - **Impact:** Allows bypassing security controls via simple env var change, often left on by mistake.
-   - **Fix:** Remove this block. Rate limiting should always be enabled in production.
-   - **Estimated Time:** 1 hour
+1. **Line 605-612:** Logic Error & Early Exit - Severity: CRITICAL
+   - **Impact**: The script attempts to remove `middleware.ts`, then unconditionally exits with `exit 1` before installing Node.js or the app.
+   - **Fix**:
+     ```bash
+     if [ -f "$APP_DIR/middleware.ts" ]; then
+         log_info "Removing legacy middleware.ts (Next.js 16 uses proxy.ts only)"
+         rm -f "$APP_DIR/middleware.ts"
+     fi
 
-2. **Line 18:** Mock Rate Limiter always returns success - Severity: HIGH
-   - **Impact:** If Redis fails, the system fails open (allows all requests), enabling brute force attacks.
-   - **Fix:** Fail closed or implement a memory-based fallback with actual limits.
-   - **Estimated Time:** 4 hours
+     # Clean up node_modules to ensure fresh install
+     if [ -d "$APP_DIR/node_modules" ]; then
+         log_info "Cleaning up old node_modules directory..."
+         rm -rf "$APP_DIR/node_modules" "$APP_DIR/package-lock.json"
+     fi
+     # REMOVE THE 'exit 1' AND THE EXTRA 'fi' if present
+     ```
+   - **Estimated Time**: 1 hour
 
-3. **Line 132:** `Math.random()` for session token - Severity: HIGH
-   - **Impact:** Predictable session tokens allow session hijacking.
-   - **Fix:**
+## lib/auth.config.ts: Security Backdoor
+
+**PATH:** `/lib/auth.config.ts`
+
+### Issues Found:
+1. **Line 45:** Hardcoded Secret Return - Severity: CRITICAL
+   - **Impact**: Allows session hijacking if `NEXTAUTH_SECRET` is unset.
+   - **Fix**:
      ```typescript
-     token.sessionToken = `session_${crypto.randomUUID()}`;
+     if (!secret) {
+        if (process.env.NODE_ENV === "production") {
+            throw new Error("Missing NEXTAUTH_SECRET in production");
+        }
+        return "dev-fallback...";
+     }
      ```
-   - **Estimated Time:** 1 hour
+   - **Estimated Time**: 0.5 hours
 
-### Recommendations:
-- Switch to `crypto.randomUUID()`.
-- Implement robust fallback for Redis unavailability.
+## lib/security/rate-limit.ts: Fail-Open Vulnerability
 
----
-
-## [Middleware]: Security Proxy
-
-**PATH:** `/proxy.ts`
+**PATH:** `/lib/security/rate-limit.ts`
 
 ### Issues Found:
-1. **Line 45:** `pathname.startsWith("/admin")` - Severity: MEDIUM
-   - **Impact:** Fragile route protection. If an admin route is created at `/api/admin` (not covered by `matcher` exclusion?) or `/Admin` (if case sensitive), it might be bypassed.
-   - **Fix:** Use a robust pattern matcher or centralize admin routes.
-   - **Estimated Time:** 2 hours
+1. **Line 115:** Fail-Open Logic - Severity: HIGH
+   - **Impact**: Rate limiting is completely bypassed if Redis is down/unreachable.
+   - **Fix**:
+     ```typescript
+     } catch (error) {
+       console.error("Rate limiting error:", error);
+       // Fail CLOSED for critical security, or implement in-memory fallback
+       return { success: false, retryAfter: 60 };
+     }
+     ```
+   - **Estimated Time**: 2 hours
 
-### Recommendations:
-- Ensure strict lowercase comparison or use a dedicated `isAdminRoute(pathname)` helper with comprehensive logic.
+## package.json: Dependency Bloat
 
----
-
-## [API Route]: Cron Contract Reminders
-
-**PATH:** `/app/api/cron/contract-reminders/route.ts`
+**PATH:** `/package.json`
 
 ### Issues Found:
-1. **Loop:** `for (const contract of expiringContracts) { await sendEmail(...) }` - Severity: HIGH
-   - **Impact:** Serial execution will timeout with large datasets (performance/reliability).
-   - **Fix:** Use `Promise.all` for batches or a job queue.
-   - **Estimated Time:** 6 hours
+1. **Dependencies:** Duplicate Animation Libs - Severity: HIGH
+   - **Impact**: Massive bundle size.
+   - **Fix**: Remove `gsap`, `@gsap/react`, `@splinetool/react-spline` and refactor components to use `framer-motion` exclusively.
+   - **Estimated Time**: 16 hours (Refactoring required)
 
-### Recommendations:
-- Move email sending to a background job (BullMQ).
-
----
-
-## [Database]: Prisma Schema
+## prisma/schema.prisma: Scalability Block
 
 **PATH:** `/prisma/schema.prisma`
 
 ### Issues Found:
-1. **Line 5:** `provider = "sqlite"` - Severity: HIGH (for Enterprise)
-   - **Impact:** Non-scalable, no concurrent writes.
-   - **Fix:** Change to `postgresql`.
-   - **Estimated Time:** 16 hours (migration + testing)
-
-### Recommendations:
-- Plan migration to Postgres immediately.
+1. **Line 6:** SQLite Provider - Severity: CRITICAL
+   - **Impact**: Cannot handle concurrent writes.
+   - **Fix**:
+     ```prisma
+     provider = "postgresql"
+     ```
+   - **Estimated Time**: 4 hours (plus migration setup)
