@@ -1,62 +1,49 @@
-# REMEDIATION ROADMAP (28-Day Plan)
+# REMEDIATION ROADMAP
 
-## 📅 Week 1: Critical Security Hardening (P0)
+**GOAL:** Secure and Optimize Vantus Systems for Production ($10M+ Scale)
+**TIMELINE:** 28 Days
 
-### Day 1-2: Fix Authentication & CSRF
-- [ ] **Task:** Refactor all Admin API routes to use `adminMutation` wrapper.
-- [ ] **Task:** Implement `verifyCsrfToken` logic in `lib/security/csrf.ts` if missing (verified present, but ensure robust).
-- [ ] **Task:** Remove `DISABLE_RATE_LIMITING` logic and implement robust Redis fallback (fail closed).
+## Phase 1: Critical Security Fixes (Days 1-3)
+*   **Day 1:**
+    *   [ ] Remove `api` exclusion from `proxy.ts` matcher.
+    *   [ ] Implement `rehype-sanitize` in `ContentForm`.
+    *   [ ] Remove hardcoded secrets from `package.json`.
+*   **Day 2:**
+    *   [ ] Fix "Fail Open" logic in `rate-limit.ts`.
+    *   [ ] Rotate `NEXTAUTH_SECRET` and `mfaSecret`.
+*   **Day 3:**
+    *   [ ] Run full penetration test on API routes.
 
-### Day 3: Session Security
-- [ ] **Task:** Replace `Math.random()` with `crypto.randomUUID()` for session tokens in `lib/auth.ts`.
-- [ ] **Task:** Enforce strict secrets validation in `instrumentation.ts` (halt startup if missing).
+## Phase 2: Infrastructure & Database (Days 4-10)
+*   **Day 4:**
+    *   [ ] Dockerize application (Multi-stage build).
+    *   [ ] Create `docker-compose.yml` for local dev.
+*   **Day 5-7:**
+    *   [ ] Provision PostgreSQL (RDS).
+    *   [ ] Migrate Prisma schema from SQLite to Postgres.
+    *   [ ] Run data migration scripts.
+*   **Day 8-10:**
+    *   [ ] Set up CI/CD (GitHub Actions) with proper secrets management.
+    *   [ ] Fix `bootstrap-ubuntu22.sh` (or replace with Ansible/Terraform).
 
-### Day 4-5: Audit & Penetration Testing (Internal)
-- [ ] **Task:** Write unit tests for CSRF bypass scenarios (`tests/admin/csrf.test.ts`).
-- [ ] **Task:** Verify Admin route protection path matching in `proxy.ts`.
+## Phase 3: Performance Optimization (Days 11-17)
+*   **Day 11:**
+    *   [ ] Remove `export const dynamic = "force-dynamic"` from `app/layout.tsx`.
+    *   [ ] Identify pages needing `revalidate` (ISR).
+*   **Day 12-14:**
+    *   [ ] Remove `gsap`. Refactor animations to `framer-motion`.
+    *   [ ] Lazy load `@splinetool/react-spline`.
+*   **Day 15-17:**
+    *   [ ] Optimize `Waves.tsx` (Move to Worker or optimize loop).
 
----
-
-## 📅 Week 2: Infrastructure & Database (P1)
-
-### Day 6-7: Database Migration
-- [ ] **Task:** Switch `schema.prisma` provider to `postgresql`.
-- [ ] **Task:** Provision RDS/Cloud SQL instance.
-- [ ] **Task:** Create migration scripts and verify data integrity.
-
-### Day 8-9: Containerization
-- [ ] **Task:** Create `Dockerfile` (multi-stage: deps, builder, runner).
-- [ ] **Task:** Create `docker-compose.yml` for local dev (App + Postgres + Redis).
-
-### Day 10: CI/CD Pipeline
-- [ ] **Task:** Implement GitHub Actions for Lint, Test, Build, and Push to Registry.
-- [ ] **Task:** Add Sentry source map upload step.
-
----
-
-## 📅 Week 3: Performance & Scalability (P2)
-
-### Day 11-12: Job Queue Implementation
-- [ ] **Task:** Install BullMQ.
-- [ ] **Task:** Refactor `app/api/cron/contract-reminders` to push jobs to queue.
-- [ ] **Task:** Create worker process to consume email jobs.
-
-### Day 13-14: Frontend Optimization
-- [ ] **Task:** Lazy load `@splinetool/react-spline`.
-- [ ] **Task:** Remove `gsap` (migrate to `framer-motion`) or vice-versa to remove duplication.
-- [ ] **Task:** Install `sharp` for image optimization.
-
-### Day 15: Caching Strategy
-- [ ] **Task:** Implement `stale-while-revalidate` headers for Admin Read APIs.
-- [ ] **Task:** Configure CDN caching rules.
-
----
-
-## 📅 Week 4: QA & Code Quality (P3)
-
-### Day 16-20: Testing & Documentation
-- [ ] **Task:** Increase test coverage to >80% for `lib/auth.ts` and `lib/admin`.
-- [ ] **Task:** Resolve all TypeScript `any` violations.
-- [ ] **Task:** Standardize dependency versions (`react-markdown`).
-- [ ] **Task:** Final Regression Test.
-- [ ] **Task:** **Sign-off for Production Deploy.**
+## Phase 4: Quality & Testing (Days 18-28)
+*   **Day 18-20:**
+    *   [ ] Fix strict type errors. Remove `any`.
+    *   [ ] Enable `"skipLibCheck": false` in `tsconfig.json`.
+*   **Day 21-25:**
+    *   [ ] Write integration tests for Rate Limiter and Auth.
+    *   [ ] Add E2E tests for Admin flows.
+*   **Day 26-28:**
+    *   [ ] Final Security Audit.
+    *   [ ] Load Testing (k6).
+    *   [ ] Go/No-Go Decision.
