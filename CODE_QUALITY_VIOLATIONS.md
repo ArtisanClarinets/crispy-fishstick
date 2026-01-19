@@ -1,65 +1,56 @@
-# CODE QUALITY VIOLATIONS
+# 🧹 Code Quality Violations
 
-## 🚨 TypeScript & Type Safety
+**STATUS: POOR**
 
-### 1. Excessive Use of `any`
-**Count:** Multiple occurrences in critical paths.
-**Locations:**
-- `lib/auth.ts`: `let rateLimiterInstance: any = null;`
-- `lib/admin/route.ts`: `context: any`, `error: any`
-- `app/api/admin/users/route.ts`: `const where: any = ...`
-**Impact:** Defeats the purpose of TypeScript. "Any" types propagate, leading to runtime crashes when properties are accessed on undefined values.
-**Fix:** Define proper interfaces.
-```typescript
-interface RateLimiter {
-  checkLoginAttempt: (ip: string, email: string) => Promise<{ success: boolean; remaining: number }>;
-  getClientIp: () => string;
-}
-```
+The codebase exhibits signs of rapid prototyping rather than engineering discipline. Type safety is compromised, and logging is improper.
 
-### 2. Magic Strings & Hardcoded Roles
-**Location:** `proxy.ts`
-**Issue:** `userRoles.includes("Admin") || userRoles.includes("Owner")`
-**Impact:** Renaming a role in the DB requires grepping the codebase. Typos ("admin" vs "Admin") cause security bugs.
-**Fix:** Use an Enum or Constant object.
-```typescript
-export enum ROLES {
-  ADMIN = "Admin",
-  OWNER = "Owner",
-  USER = "User"
-}
-```
+## 🚨 TypeScript Errors
 
----
+- **`any` Usage:** **790+ instances**
+  - **Impact:** TypeScript's safety guarantees are effectively nullified in large parts of the app.
+  - **Examples:**
+    - `lib/admin/route.ts`: `return jsonNoStore(users);` (implicit any on return?)
+    - `app/api/admin/users/route.ts`: `catch (error: any)`
+  - **Recommendation:** Enable `noImplicitAny` in `tsconfig.json` and fix the types. Use `unknown` instead of `any` for error catching.
 
-## 🧹 Maintainability & Structure
+## 🐛 Error Handling
 
-### 1. Inconsistent API Patterns
-**Issue:**
-- `app/api/admin/users/route.ts` uses direct `requireAdmin` + `assertSameOrigin`.
-- `lib/admin/route.ts` provides `adminMutation` / `adminRead` wrappers.
-**Impact:** Developers are confused about which pattern to use. Security features (CSRF) implemented in the wrapper are missed in the direct implementation.
-**Fix:** Enforce usage of `adminMutation`/`adminRead` wrappers for all admin routes via linting or code review.
+- **Generic Catch Blocks:**
+  ```typescript
+  catch (error) {
+      return jsonNoStore({ error: "Internal Server Error" }, { status: 500 });
+  }
+  ```
+  - **Issue:** Swallows the actual error stack trace. Debugging production issues will be impossible.
+  - **Fix:** Log the error to a monitoring service (Sentry) before returning the generic message.
 
-### 2. Dependency Version Mismatches
-**Issue:**
-- `react-markdown`: ^10.1.0
-- `next-mdx-remote`: ^5.0.0
-- `@mdx-js/react`: ^3.0.1
-**Impact:** Potential conflicts between MDX/Markdown parsing versions, leading to rendering bugs or bundle duplication.
-**Fix:** Audit and align versions.
+- **Missing Error Boundaries:**
+  - While `app/error.tsx` exists, granular error boundaries around widgets (e.g., `DashboardChart`) are missing. One widget failure crashes the whole page.
 
-### 3. "Console.log" Debugging
-**Location:** `lib/auth.ts`, `app/api/cron/contract-reminders/route.ts`
-**Issue:** `console.log("Password invalid for user", user.email);`
-**Impact:** Clutters production logs. Can leak PII (email addresses) to log aggregators.
-**Fix:** Use a proper logger (`winston` is in dependencies) with log levels and redaction.
+## 👃 Code Smells
 
----
+- **Console Logging:** **135 instances**
+  - **Issue:** `console.log` left in production code.
+  - **Impact:** Performance drag (synchronous I/O in Node.js) and log pollution.
+  - **Fix:** Use a proper logger (`winston` or `pino`) and lint rule `no-console`.
+
+- **Duplicate Logic:**
+  - **Rate Limiting:** Implemented in `lib/auth.ts` AND `middleware.ts` (if it worked) AND `lib/security/rate-limit.ts`.
+  - **Animation:** `gsap` and `framer-motion` doing similar things.
+
+- **Hardcoded Magic Strings:**
+  - Role names ("Admin", "Owner") scattered across checks.
+  - **Fix:** Use an Enum: `export enum UserRole { ADMIN = 'Admin', OWNER = 'Owner' }`.
+
+## 📚 Documentation
+
+- **JSDoc:** Missing on most complex logic in `lib/`.
+- **README:** `scripts/README.md` exists but root `README.md` is minimal.
+- **API Docs:** No Swagger/OpenAPI spec generated from code (though `docs/openapi.yaml` exists, is it in sync?).
 
 ## 🧪 Testing
 
-### 1. Test Coverage Gaps
-**Observation:** `vitest` and `playwright` are installed.
-**Gap:** Critical paths like `lib/auth.ts` fallback logic (mock rate limiter) and `app/api/admin/users` manual checks need rigorous unit tests.
-**Action:** Ensure `tests/admin/` covers the CSRF bypass scenario to confirm the vulnerability.
+- **Coverage:** Low.
+- **Unit Tests:** `tests/` folder exists but `grep` shows limited test files.
+- **E2E Tests:** `e2e/` folder exists (Playwright), which is good.
+- **Recommendation:** Enforce coverage thresholds in CI.

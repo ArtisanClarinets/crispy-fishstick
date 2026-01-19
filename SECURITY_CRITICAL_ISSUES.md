@@ -1,83 +1,75 @@
-# SECURITY CRITICAL ISSUES AUDIT
+# 🛡️ Security Critical Issues Audit
 
-## 🔴 CRITICAL RISK (Deploy Blocker)
+**STATUS: 🔴 CRITICAL - DO NOT DEPLOY**
 
-### 1. CSRF Vulnerability in Admin API
-**Location:** `app/api/admin/users/route.ts` (and potentially others not using `adminMutation`)
-**Issue:** The Admin API for user creation (`POST`) manually implements `requireAdmin` and `assertSameOrigin` but fails to invoke `verifyCsrfToken`. This allows attackers to forge requests if they can trick an admin into visiting a malicious site (CSRF), bypassing the Origin check if the browser doesn't send it or if it's spoofed in certain non-browser contexts (though Origin is robust in modern browsers, defense-in-depth is missing).
-**Code Evidence:**
-```typescript
-// app/api/admin/users/route.ts
-export async function POST(req: NextRequest) {
-  try {
-    // Phase 6: CSRF/Origin Enforcement
-    assertSameOrigin(req); // Good, but insufficient alone
-    const actor = await requireAdmin({ permissions: ["users.write"] });
-    // MISSING: await verifyCsrfToken(req);
-```
-**Fix:**
-Replace manual logic with the secure wrapper `adminMutation` which enforces CSRF:
-```typescript
-import { adminMutation } from "@/lib/admin/route";
+This codebase contains multiple **severity-critical vulnerabilities** that would lead to immediate compromise if deployed.
 
-export const POST = adminMutation({ permissions: ["users.write"] }, async (user, body) => {
-  // Handler logic...
-});
-```
+## 🔴 CRITICAL (Deploy Blocker)
 
-### 2. Authentication Bypass / Weak Rate Limiting
+### 1. Middleware Security Bypass & Dead Code
+**Location:** `proxy.ts` (Root)
+- **Vulnerability:** The project uses `proxy.ts` instead of `middleware.ts`. Next.js **does not load** `proxy.ts` by default, meaning **NO middleware is running**.
+- **Impact:** All security headers (CSP, HSTS, X-Frame-Options), authentication checks, and rate limiting intended to be global are **completely bypassed**.
+- **Configuration Flaw:** Even if renamed to `middleware.ts`, the matcher explicitly **excludes** API routes:
+  ```typescript
+  // proxy.ts:63
+  '/((?!api|_next/static|...))'
+  ```
+  This means `/api/*` endpoints have **zero protection** from the middleware.
+- **Fix:** Rename to `middleware.ts` and fix the matcher.
+
+### 2. Hardcoded Secrets in Build Script
+**Location:** `package.json`
+- **Vulnerability:**
+  ```json
+  "build": "node scripts/generate-build-proof.mjs && NEXTAUTH_URL=https://vantus.systems NEXTAUTH_SECRET=12345678901234567890123456789012 next build",
+  ```
+- **Impact:** The `NEXTAUTH_SECRET` is committed to version control. Anyone with read access to the repo can forge session tokens and takeover admin accounts.
+- **Fix:** Remove secrets from `package.json`. Use `.env` or CI/CD secrets.
+
+### 3. Fail-Open Rate Limiting
 **Location:** `lib/auth.ts`
-**Issue:** The code allows disabling rate limiting via an environment variable `DISABLE_RATE_LIMITING`. Furthermore, the fallback mock rate limiter hardcodes `remaining: 5` and returns `success: true` always. If Redis fails or is disabled, brute force attacks are trivial.
-**Code Evidence:**
-```typescript
-// lib/auth.ts
-if (process.env.DISABLE_RATE_LIMITING === "true") {
-  console.warn('Rate limiting disabled via env var'); // DANGEROUS IN PROD
-  rateLimiterInstance = {
-    checkLoginAttempt: async () => ({ success: true, remaining: 5 }), // ALways allows
-    getClientIp: () => '127.0.0.1',
-  };
-}
-```
-**Fix:**
-Remove the bypass. Fail securely if Redis is down (deny login) or fallback to an in-memory Map rate limiter, not a "always success" mock.
+- **Vulnerability:**
+  ```typescript
+  if (process.env.DISABLE_RATE_LIMITING === "true") {
+    // ... returns success: true
+  } else {
+    try {
+      const redis = new Redis(...);
+    } catch (_error) {
+      // Returns success: true
+    }
+  }
+  ```
+- **Impact:** If Redis fails or isn't configured (which is true, as there's no Redis service in `bootstrap-ubuntu22.sh`), rate limiting defaults to **allowing all requests**. This leaves login endpoints vulnerable to brute-force attacks.
+- **Fix:** Fail closed (deny access) if security infrastructure is missing.
 
----
+### 4. Admin API CSRF vulnerability
+**Location:** `app/api/admin/users/route.ts` (and others)
+- **Vulnerability:** Admin routes manually implement `verifyCsrfToken(req)`.
+- **Impact:** This relies on developer discipline. If a developer forgets to add this line to a new mutation route, the endpoint is immediately vulnerable to CSRF.
+- **Fix:** Enforce CSRF checks in `middleware.ts` for all non-GET requests to `/api`.
 
 ## 🟡 HIGH RISK
 
-### 1. Weak Session Token Generation
+### 1. SQLite in Production
+**Location:** `prisma/schema.prisma`
+- **Issue:** `provider = "sqlite"`
+- **Impact:** SQLite is not suitable for a Fortune 500 multi-tenant application. It lacks concurrency handling, connection pooling, and will lock under load, causing downtime.
+- **Fix:** Migrate to PostgreSQL.
+
+### 2. Sensitive Data Logging
 **Location:** `lib/auth.ts`
-**Issue:** Session tokens are generated using `Math.random()`, which is not cryptographically secure.
-**Code Evidence:**
-```typescript
-// lib/auth.ts
-token.sessionToken = `session_${Math.random().toString(36).substring(2, 15)}_${Date.now()}`;
-```
-**Fix:**
-Use `crypto.randomUUID()`:
-```typescript
-token.sessionToken = `session_${crypto.randomUUID()}`;
-```
-
-### 2. Fragile Admin Route Protection
-**Location:** `proxy.ts`
-**Issue:** Admin route protection relies on string matching `pathname.startsWith("/admin")`. While `pathname` is generally normalized by Next.js, reliance on string prefixes can be fragile if case-sensitivity handling varies or if new admin routes are introduced that don't match the pattern (e.g., `/api/v2/admin`).
-**Fix:**
-Use a robust matcher or move admin routes to a separate subdomain/app to enforce isolation. Ensure `pathname` is lowercased before check (it is in the current code, but the pattern is manual).
-
----
+- **Issue:**
+  ```typescript
+  console.log("Password invalid for user", user.email);
+  ```
+- **Impact:** Login failures are logged to stdout. In some logging configurations, this could leak valid usernames (enumeration) or clutter logs with PII.
+- **Fix:** Use a structured logger (e.g., Winston) and avoid logging specific failure reasons or user emails in plain text.
 
 ## 🟠 MEDIUM RISK
 
-### 1. Graceful Degradation on Missing Secrets
-**Location:** `instrumentation.ts`
-**Issue:** The application logs a warning but continues startup if `NEXTAUTH_SECRET` or `DATABASE_URL` are missing in production. This can lead to runtime errors or insecure defaults.
-**Code Evidence:**
-```typescript
-if (missing.length > 0) {
-  console.warn(`⚠️ Missing required environment variables... continuing with graceful degradation`);
-}
-```
-**Fix:**
-Throw an error and halt startup in production if critical secrets are missing.
+### 1. Missing CSP for API
+**Location:** `proxy.ts` (Logic)
+- **Issue:** CSP is only applied to HTML pages (if middleware ran). API responses return JSON without security headers.
+- **Impact:** While less critical for JSON, lack of headers like `Cache-Control` or `X-Content-Type-Options` on API routes can lead to mime-sniffing attacks or stale data caching.
