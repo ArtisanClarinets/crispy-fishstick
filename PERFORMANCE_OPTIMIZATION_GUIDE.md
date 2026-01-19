@@ -1,59 +1,66 @@
-# PERFORMANCE OPTIMIZATION GUIDE
+# 🚀 Performance Optimization Guide
 
-## ⚡ Bundle Analysis & Bloat
+**STATUS: NEEDS REMEDIATION**
 
-### 1. Duplicate Animation Libraries (Waste: ~150KB+)
-**Issue:** The project includes both `framer-motion` (approx 50KB gzipped) and `gsap` (approx 60KB+ gzipped depending on plugins). Both serve similar purposes (complex animations).
-**Recommendation:** Standardize on one. `framer-motion` is more "React-native", while `GSAP` is more powerful for timeline sequencing.
-**Action:** Remove `gsap` if possible, or `framer-motion` if GSAP is the primary driver.
-**Files:** `package.json`
+The application suffers from significant performance bottlenecks due to incorrect rendering strategies, bloated bundles, and sub-optimal database usage.
 
-### 2. Heavy 3D Runtime
-**Issue:** `@splinetool/react-spline` and `@splinetool/runtime` are included. These runtimes are extremely heavy (>500KB - 1MB parsed).
-**Impact:** Significant Time-To-Interactive (TTI) delay on pages using 3D elements.
-**Action:** Lazy load the Spline component using `next/dynamic` with `ssr: false`.
-```tsx
-const Spline = dynamic(() => import('@splinetool/react-spline'), {
-  ssr: false,
-  loading: () => <div>Loading 3D...</div>
-})
-```
+## 📦 Bundle Analysis
 
----
+**Total Estimated Bundle Size:** >500KB (gzip) initial load.
 
-## 🐢 Database & Backend Bottlenecks
+| Library | Size (Est.) | Status | Issue |
+|---------|-------------|--------|-------|
+| `three` (via spline) | ~600KB | 🔴 Critical | Huge dependency for background effects. |
+| `framer-motion` | ~100KB | 🟡 Warning | Heavy animation library. |
+| `gsap` | ~60KB | 🟡 Warning | **Duplicate** animation library. |
+| `@splinetool/react-spline`| ~50KB | 🔴 Critical | Loads `three.js` and runtime. |
+| `lucide-react` | Tree-shakable | ✅ OK | Good icon usage. |
 
-### 1. Synchronous Email Loop in Cron
-**Location:** `app/api/cron/contract-reminders/route.ts`
-**Issue:** The route fetches all expiring contracts and iterates through them, `await`ing `sendEmail` for each one.
-```typescript
-for (const contract of expiringContracts) {
-  await sendEmail({...}); // API call per iteration
-}
-```
-**Impact:** If 500 contracts expire, and email sending takes 200ms, the request takes 100 seconds. This will likely time out Vercel/AWS Lambda functions (default 10-60s limit).
-**Fix:**
-1.  **Queueing:** Push jobs to Redis/BullMQ.
-2.  **Batching:** Send emails in parallel chunks (e.g., `Promise.all` with concurrency limit).
-```typescript
-// Better approach (simple concurrency)
-await Promise.all(expiringContracts.map(c => sendEmail(...)));
-```
+**Recommendations:**
+1.  **Eliminate Duplicates:** Choose **ONE** animation library. Remove `gsap` if `framer-motion` is the primary choice (or vice-versa).
+2.  **Lazy Load Spline:** The 3D background is blocking the main thread. Lazy load `HeroBackground` or `SplineBlueprintCanvas`.
+3.  **Optimize Fonts:** `Inter` is loaded via `next/font/google`, which is good, but check `display: swap`.
 
-### 2. Missing Caching on Admin Reads
-**Location:** `app/api/admin/users/route.ts`
-**Issue:** `export const dynamic = "force-dynamic"` is used. While correct for real-time data, frequent polling by the admin dashboard will hammer the database.
-**Fix:** Implement `stale-while-revalidate` caching headers or Redis caching for list views where realtime consistency isn't strictly required (e.g., 60s cache).
+## ⚡ Rendering Performance
 
----
+### 🔴 Force Dynamic Everywhere
+**Location:** Multiple files (`app/layout.tsx`, `app/api/**/*.ts`)
+- **Issue:** `export const dynamic = "force-dynamic"` is used extensively.
+- **Impact:** This **disables** Next.js Static Site Generation (SSG) and Incremental Static Regeneration (ISR). Every request hits the server, increasing TTFB (Time To First Byte) and database load.
+- **Fix:** Remove `force-dynamic`. Use `revalidate = 0` only where strictly necessary (e.g., specific admin dashboard data), but prefer granular revalidation tags.
 
-## 🏗️ Infrastructure & Rendering
+### 🟡 Client-Side Bloat
+**Location:** `app/layout.tsx`
+- **Issue:** Heavy providers (`AppMotionConfig`, `PointerSignalProvider`) wrap the entire app.
+- **Impact:** Increases TTI (Time To Interactive) as React hydrates the entire tree.
+- **Fix:** Push providers down the tree. Only wrap components that actually need the context.
 
-### 1. Image Optimization
-**Status:** `next/image` is used, but `sharp` is missing from `package.json`.
-**Impact:** Next.js's built-in image optimization is slower in production without `sharp`.
-**Fix:** `npm install sharp`
+## 🗄️ Database & Backend
 
-### 2. Standalone Build
-**Status:** `output: 'standalone'` is configured.
-**Note:** Ensure `node_modules` are correctly copied or installed in the final container image for the standalone server to work if it relies on native modules (like `sharp` or `bcrypt`).
+### 🔴 N+1 Query Issues
+**Location:** `lib/auth.ts`
+- **Code:**
+  ```typescript
+  // Fetches user, then roles, then parses permissions
+  const user = await prisma.user.findUnique({ ... include: { RoleAssignment: ... } });
+  ```
+- **Impact:** While `include` prevents SQL N+1, the permission parsing logic inside the auth handler (which runs on every session check if not cached) is CPU intensive.
+- **Fix:** Cache permissions in the session token (already partially done) or Redis.
+
+### 🔴 SQLite Bottleneck
+**Location:** Database
+- **Issue:** SQLite writes lock the entire database file.
+- **Impact:** Concurrent admin actions (e.g., one user updating a contract while another updates a user) will block each other, causing timeouts (HTTP 504).
+- **Fix:** Switch to PostgreSQL with connection pooling (e.g., PgBouncer or Neon).
+
+## 🌐 Infrastructure
+
+### 🔴 No CDN Configuration
+- **Issue:** No `next.config.js` `images` configuration for remote CDNs (AWS S3, Cloudinary).
+- **Impact:** Images are served from the Next.js server (or local filesystem), consuming bandwidth and CPU for optimization.
+- **Fix:** Configure `images.remotePatterns` and use a CDN for assets.
+
+### 🔴 Missing Cache Headers
+- **Issue:** API routes lack `Cache-Control` headers.
+- **Impact:** Browsers re-fetch data on every navigation, even for static-like data (e.g., `services` list).
+- **Fix:** Add `Cache-Control: public, s-maxage=60, stale-while-revalidate=300` to `GET` routes.

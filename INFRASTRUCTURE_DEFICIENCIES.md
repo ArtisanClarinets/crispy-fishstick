@@ -1,41 +1,46 @@
-# INFRASTRUCTURE DEFICIENCIES
+# 🏗️ Infrastructure Deficiencies
 
-## 🏗️ Containerization & Deployment
+**STATUS: INCOMPLETE**
 
-### 1. Missing Docker Configuration
-**Issue:** No `Dockerfile` or `docker-compose.yml` found in the project root.
-**Impact:** Inconsistent environments between dev/staging/prod. "It works on my machine" syndrome. Harder to orchestrate with Kubernetes or ECS.
-**Fix:** Create a multi-stage `Dockerfile` optimized for `output: 'standalone'`.
+The infrastructure setup is naive and lacks the robustness required for a Fortune 500 environment.
 
-### 2. Manual Shell Script Deployment
-**Issue:** Reliance on `scripts/bootstrap-ubuntu22.sh` implies a "pet" server approach (SSHing into a VPS) rather than immutable infrastructure.
-**Impact:** Server drift over time. Hard to scale horizontally.
-**Fix:** Move to Infrastructure as Code (Terraform/Pulumi) or PaaS (Vercel/AWS Amplify).
+## 🐳 Containerization
 
----
+- **🔴 Missing Dockerfile:** No `Dockerfile` found in the root.
+- **Impact:** Deployment is not reproducible. "It works on my machine" issues will plague production.
+- **Fix:** Create a multi-stage `Dockerfile` optimized for Next.js standalone output.
 
-## 📡 Observability & Monitoring
+## 🔄 CI/CD
 
-### 1. Missing Sentry/APM
-**Issue:** `env.example` lists `NEXT_PUBLIC_SENTRY_DSN`, but `@sentry/nextjs` is **NOT** in `package.json` dependencies.
-**Impact:** Blindness to runtime errors in production. You won't know when users are crashing.
-**Fix:** `npm install @sentry/nextjs` and configure `sentry.server.config.ts` / `sentry.client.config.ts`.
+- **🔴 No Deployment Pipeline:** `.github/workflows` exists but seemingly only for linting/testing (based on inventory). No artifact build or deploy step.
+- **Impact:** Manual deployments are prone to human error.
+- **Fix:** Add a GitHub Action to build the Docker image and push to ECR/Registry.
 
-### 2. No Health Check Endpoint
-**Issue:** No dedicated `/api/health` or `/healthz` endpoint found.
-**Impact:** Load balancers cannot reliably detect if the application is hung or unresponsive.
-**Fix:** Create `app/api/health/route.ts` that checks DB connectivity and Redis status.
+## 📊 Monitoring & Observability
 
----
+- **🔴 No Health Checks:** No `/health` or `/api/health` endpoint found.
+- **Impact:** Load balancers cannot detect if the app is unresponsive.
+- **Fix:** Add `app/api/health/route.ts` checking DB connectivity.
 
-## 💾 Database & Backups
+- **🟡 Logging:** No centralized logging configuration (e.g., to Datadog/CloudWatch).
+- **Impact:** Logs are lost on container restart.
 
-### 1. Backup Strategy
-**Observation:** `scripts/database-backup.sh` exists.
-**Risk:** Verify where these backups go. If they stay on the same server (`./backups`), a server failure loses both app and data.
-**Requirement:** Ensure backups are piped to S3 or off-site storage.
+## 🗄️ Database
 
-### 2. SQLite in Production?
-**Observation:** `schema.prisma` uses `provider = "sqlite"`.
-**CRITICAL:** SQLite is not suitable for a $10M+ enterprise deployment with high concurrency or horizontal scaling. It locks the file on write.
-**Fix:** Migrate to PostgreSQL (`provider = "postgresql"`).
+- **🔴 No Backup Strategy:** Using SQLite file.
+- **Impact:** If the disk fails, data is lost.
+- **Fix:** PostgreSQL with point-in-time recovery (PITR).
+
+## 🚀 Scalability
+
+- **🔴 Single Node:** The current setup (SQLite + Local Filesystem) prevents horizontal scaling.
+- **Impact:** The app cannot scale beyond a single server instance.
+- **Fix:**
+  1.  Move DB to RDS/Cloud SQL.
+  2.  Move uploads to S3 (`assets/uploads` logic needs refactoring).
+  3.  Move session/rate-limit state to Redis.
+
+## 📜 Scripts
+
+- **🔴 Broken Bootstrap Script:** `scripts/bootstrap-ubuntu22.sh` has a critical syntax error (dangling `fi`, unconditional `exit 1`) and will **FAIL** to provision the server.
+- **Impact:** Automated provisioning is broken.
