@@ -1,97 +1,107 @@
 # COMPLETE FILE AUDIT
 
-## [API Route]: Admin User Creation
-
-**PATH:** `/app/api/admin/users/route.ts`
-
-### Issues Found:
-1. **Line 37:** Missing `verifyCsrfToken` invocation. - Severity: CRITICAL
-   - **Impact:** Allows Cross-Site Request Forgery (CSRF). An attacker can create admin users if a logged-in admin visits a malicious page.
-   - **Fix:**
-     ```typescript
-     // Use the wrapper
-     export const POST = adminMutation({ permissions: ["users.write"] }, async (user, body) => { ... })
-     ```
-   - **Estimated Time:** 2 hours
-
-2. **Line 11:** `const where: any` - Severity: LOW
-   - **Impact:** Loss of type safety.
-   - **Fix:** `const where: Prisma.UserWhereInput = ...`
-   - **Estimated Time:** 0.5 hours
-
-### Recommendations:
-- Refactor to use `adminMutation` wrapper consistently.
-
----
-
-## [Library]: Authentication Logic
-
-**PATH:** `/lib/auth.ts`
-
-### Issues Found:
-1. **Line 15:** `process.env.DISABLE_RATE_LIMITING === "true"` - Severity: HIGH
-   - **Impact:** Allows bypassing security controls via simple env var change, often left on by mistake.
-   - **Fix:** Remove this block. Rate limiting should always be enabled in production.
-   - **Estimated Time:** 1 hour
-
-2. **Line 18:** Mock Rate Limiter always returns success - Severity: HIGH
-   - **Impact:** If Redis fails, the system fails open (allows all requests), enabling brute force attacks.
-   - **Fix:** Fail closed or implement a memory-based fallback with actual limits.
-   - **Estimated Time:** 4 hours
-
-3. **Line 132:** `Math.random()` for session token - Severity: HIGH
-   - **Impact:** Predictable session tokens allow session hijacking.
-   - **Fix:**
-     ```typescript
-     token.sessionToken = `session_${crypto.randomUUID()}`;
-     ```
-   - **Estimated Time:** 1 hour
-
-### Recommendations:
-- Switch to `crypto.randomUUID()`.
-- Implement robust fallback for Redis unavailability.
-
----
-
-## [Middleware]: Security Proxy
+## proxy.ts: Security Middleware
 
 **PATH:** `/proxy.ts`
 
 ### Issues Found:
-1. **Line 45:** `pathname.startsWith("/admin")` - Severity: MEDIUM
-   - **Impact:** Fragile route protection. If an admin route is created at `/api/admin` (not covered by `matcher` exclusion?) or `/Admin` (if case sensitive), it might be bypassed.
-   - **Fix:** Use a robust pattern matcher or centralize admin routes.
-   - **Estimated Time:** 2 hours
+1. **Line 66-77:** Middleware Matcher Bypass - Severity: CRITICAL
+   - **Impact:** API routes (`/api/*`) are explicitly excluded from the middleware. This means security headers (CSP, HSTS) and authentication checks are NOT applied to the most sensitive endpoints.
+   - **Fix:** Update matcher to include API routes.
+     ```typescript
+     matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+     ```
+   - **Estimated Time:** 1 Hour
+
+2. **Line 37:** Console Log in Production - Severity: LOW
+   - **Impact:** `console.log("Proxy checking admin access...")` pollutes logs.
+   - **Fix:** Remove the log line.
+   - **Estimated Time:** 0.2 Hours
 
 ### Recommendations:
-- Ensure strict lowercase comparison or use a dedicated `isAdminRoute(pathname)` helper with comprehensive logic.
+- Centralize route protection logic.
+- Remove debug logging.
 
 ---
 
-## [API Route]: Cron Contract Reminders
+## package.json: Project Configuration
 
-**PATH:** `/app/api/cron/contract-reminders/route.ts`
+**PATH:** `/package.json`
 
 ### Issues Found:
-1. **Loop:** `for (const contract of expiringContracts) { await sendEmail(...) }` - Severity: HIGH
-   - **Impact:** Serial execution will timeout with large datasets (performance/reliability).
-   - **Fix:** Use `Promise.all` for batches or a job queue.
-   - **Estimated Time:** 6 hours
+1. **Line 9:** Hardcoded Secrets in Build Script - Severity: CRITICAL
+   - **Impact:** `NEXTAUTH_SECRET` is visible in the codebase.
+   - **Fix:** Remove inline secrets.
+     ```json
+     "build": "node scripts/generate-build-proof.mjs && next build",
+     ```
+   - **Estimated Time:** 0.5 Hours
+
+2. **Lines 50-52:** Duplicate Animation Libraries - Severity: MEDIUM
+   - **Impact:** Bloated bundle size (~600KB extra).
+   - **Fix:** Remove `@gsap/react`, `gsap`, and `@splinetool/*` if possible, consolidating on `framer-motion`.
+   - **Estimated Time:** 4 Hours
 
 ### Recommendations:
-- Move email sending to a background job (BullMQ).
+- Audit dependencies and remove unused/duplicate libraries.
+- Move secrets to `.env` files.
 
 ---
 
-## [Database]: Prisma Schema
+## prisma/schema.prisma: Database Schema
 
 **PATH:** `/prisma/schema.prisma`
 
 ### Issues Found:
-1. **Line 5:** `provider = "sqlite"` - Severity: HIGH (for Enterprise)
-   - **Impact:** Non-scalable, no concurrent writes.
-   - **Fix:** Change to `postgresql`.
-   - **Estimated Time:** 16 hours (migration + testing)
+1. **Line 6:** SQLite Provider - Severity: CRITICAL
+   - **Impact:** Database does not support concurrent writes, blocking scaling.
+   - **Fix:** Change provider to `postgresql`.
+   - **Estimated Time:** 8 Hours (including migration setup)
+
+2. **Line 411:** JSON Permission Storage - Severity: HIGH
+   - **Impact:** `permissions String` (JSON) prevents efficient DB-level filtering.
+   - **Fix:** Create a `Permission` model and `RolePermission` relation.
+   - **Estimated Time:** 8 Hours
 
 ### Recommendations:
-- Plan migration to Postgres immediately.
+- Migrate to a production-grade database (Postgres).
+- Normalize data structures.
+
+---
+
+## app/api/admin/users/route.ts: Admin API
+
+**PATH:** `/app/api/admin/users/route.ts`
+
+### Issues Found:
+1. **Line 41:** Generic Error Swallowing - Severity: MEDIUM
+   - **Impact:** Errors are caught as `any`, and unknown errors return generic 500 without logging to Sentry/monitoring in the catch block.
+   - **Fix:** Add structured error logging.
+     ```typescript
+     console.error("User fetch error:", error); // Or Sentry.captureException(error)
+     ```
+   - **Estimated Time:** 1 Hour
+
+### Recommendations:
+- Implement a global error handler wrapper for API routes.
+
+---
+
+## components/living-blueprint-section.tsx: UI Component
+
+**PATH:** `/components/living-blueprint-section.tsx`
+
+### Issues Found:
+1. **Lines 4-6 & 11:** Heavy Imports - Severity: HIGH
+   - **Impact:** Imports `gsap`, `@gsap/react`, and dynamically imports `@splinetool/react-spline`. This one component likely contributes >1MB to the bundle.
+   - **Fix:** Replace GSAP with Framer Motion. Only load Spline on desktop + idle.
+   - **Estimated Time:** 8 Hours
+
+2. **Line 81:** Magic Number Coupling - Severity: LOW
+   - **Impact:** `const rawPhase = p * 7;` creates brittle logic tied to array length.
+   - **Fix:** Use `STEPS.length`.
+   - **Estimated Time:** 0.5 Hours
+
+### Recommendations:
+- Refactor to use a single animation library.
+- optimize `SplineBlueprintCanvas` loading strategy.

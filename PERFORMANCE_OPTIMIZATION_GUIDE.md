@@ -1,59 +1,87 @@
 # PERFORMANCE OPTIMIZATION GUIDE
 
-## ⚡ Bundle Analysis & Bloat
-
-### 1. Duplicate Animation Libraries (Waste: ~150KB+)
-**Issue:** The project includes both `framer-motion` (approx 50KB gzipped) and `gsap` (approx 60KB+ gzipped depending on plugins). Both serve similar purposes (complex animations).
-**Recommendation:** Standardize on one. `framer-motion` is more "React-native", while `GSAP` is more powerful for timeline sequencing.
-**Action:** Remove `gsap` if possible, or `framer-motion` if GSAP is the primary driver.
-**Files:** `package.json`
-
-### 2. Heavy 3D Runtime
-**Issue:** `@splinetool/react-spline` and `@splinetool/runtime` are included. These runtimes are extremely heavy (>500KB - 1MB parsed).
-**Impact:** Significant Time-To-Interactive (TTI) delay on pages using 3D elements.
-**Action:** Lazy load the Spline component using `next/dynamic` with `ssr: false`.
-```tsx
-const Spline = dynamic(() => import('@splinetool/react-spline'), {
-  ssr: false,
-  loading: () => <div>Loading 3D...</div>
-})
-```
+**DATE:** 2026-05-21
+**STATUS:** NEEDS IMMEDIATE ATTENTION
 
 ---
 
-## 🐢 Database & Backend Bottlenecks
+## 1. Bundle Analysis & Bloat
 
-### 1. Synchronous Email Loop in Cron
-**Location:** `app/api/cron/contract-reminders/route.ts`
-**Issue:** The route fetches all expiring contracts and iterates through them, `await`ing `sendEmail` for each one.
-```typescript
-for (const contract of expiringContracts) {
-  await sendEmail({...}); // API call per iteration
+**Critical Finding: Triplicate Animation Libraries**
+The codebase imports three separate, heavy animation libraries, causing massive bundle fragmentation and bloat.
+
+| Library | Estimated Size (Gzipped) | Status |
+| :--- | :--- | :--- |
+| `@splinetool/react-spline` (+ `three`) | ~600KB+ | **CRITICAL WASTE** |
+| `gsap` | ~25KB | Redundant |
+| `framer-motion` | ~30KB | Primary System |
+
+**Impact:** Initial load time for `LivingBlueprintSection` (and thus the landing page) is unacceptable (>3s on 4G).
+**Fix:**
+1.  **Remove GSAP:** Refactor `components/living-blueprint-section.tsx` to use `framer-motion` (already present).
+2.  **Lazy Load Spline:** Ensure `@splinetool` is strictly lazy-loaded and only for desktop users if possible.
+3.  **Standardize:** Enforce `framer-motion` as the single source of truth for UI animations.
+
+**Time to Fix:** 16 Hours
+
+---
+
+## 2. Database Performance Bottlenecks
+
+**Critical Finding: SQLite in Production Schema**
+**Location:** `prisma/schema.prisma`
+```prisma
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 ```
-**Impact:** If 500 contracts expire, and email sending takes 200ms, the request takes 100 seconds. This will likely time out Vercel/AWS Lambda functions (default 10-60s limit).
-**Fix:**
-1.  **Queueing:** Push jobs to Redis/BullMQ.
-2.  **Batching:** Send emails in parallel chunks (e.g., `Promise.all` with concurrency limit).
-```typescript
-// Better approach (simple concurrency)
-await Promise.all(expiringContracts.map(c => sendEmail(...)));
-```
+**Impact:** SQLite supports only one writer at a time. This will cause `SQLITE_BUSY` errors immediately under concurrent load (e.g., >10 req/sec).
+**Fix:** Migrate to PostgreSQL.
+1.  Update `provider = "postgresql"`.
+2.  Provision AWS RDS or generic Postgres instance.
+3.  Update Prisma schema (handle Enum differences).
 
-### 2. Missing Caching on Admin Reads
-**Location:** `app/api/admin/users/route.ts`
-**Issue:** `export const dynamic = "force-dynamic"` is used. While correct for real-time data, frequent polling by the admin dashboard will hammer the database.
-**Fix:** Implement `stale-while-revalidate` caching headers or Redis caching for list views where realtime consistency isn't strictly required (e.g., 60s cache).
+**Time to Fix:** 8 Hours
+
+**Query Inefficiency:**
+**Location:** `lib/admin/guards.ts`
+The permission check fetches `user`, then `RoleAssignment`, then `Role`, then parses JSON in memory.
+**Fix:** Normalize schema to allow `WHERE permission IN (...)` SQL queries.
 
 ---
 
-## 🏗️ Infrastructure & Rendering
+## 3. Rendering & React Performance
 
-### 1. Image Optimization
-**Status:** `next/image` is used, but `sharp` is missing from `package.json`.
-**Impact:** Next.js's built-in image optimization is slower in production without `sharp`.
-**Fix:** `npm install sharp`
+**Issue: Dynamic Import Overuse / Misuse**
+`app/globals.css` includes complex CSS animations (`system-layer`, `border-beam`) that trigger layout thrashing on low-end devices.
 
-### 2. Standalone Build
-**Status:** `output: 'standalone'` is configured.
-**Note:** Ensure `node_modules` are correctly copied or installed in the final container image for the standalone server to work if it relies on native modules (like `sharp` or `bcrypt`).
+**Metric:**
+- **LCP (Largest Contentful Paint):** Estimated > 2.5s due to client-side hydration of heavy Spline canvas on the fold.
+- **TBT (Total Blocking Time):** High due to main-thread JSON parsing of permissions and hydration of multiple animation libs.
+
+**Fix:**
+- Extract critical CSS.
+- Disable Spline on mobile (already partially done via CSS `lg:hidden` but JS still loads). Use `next/dynamic` with a `media` query check if possible, or conditional rendering based on `window.matchMedia`.
+
+---
+
+## 4. Infrastructure & Caching
+
+**Issue: No Caching Strategy**
+- `app/api/admin/users/route.ts` explicitly uses `jsonNoStore`. While good for security, aggressive "no-store" on *all* admin data without e-tags leads to unnecessary DB load.
+- **Missing CDN:** No configuration for serving static assets via CloudFront/Vercel Edge.
+
+**Fix:**
+- Implement `stale-while-revalidate` for non-critical admin reads.
+- Configure `next.config.mjs` `images` to use a dedicated CDN domain.
+
+---
+
+## 5. Specific Route Metrics (Estimated)
+
+| Route | Est. Latency | Target | Bottleneck |
+| :--- | :--- | :--- | :--- |
+| `GET /` | 1200ms | <200ms | Spline JS Bundle, Font Loading |
+| `POST /api/auth/signin` | 450ms | <100ms | SQLite Write Lock, bcrypt (CPU) |
+| `GET /admin/users` | 300ms | <150ms | In-memory JSON parsing of permissions |

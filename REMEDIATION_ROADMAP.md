@@ -1,62 +1,77 @@
-# REMEDIATION ROADMAP (28-Day Plan)
+# REMEDIATION ROADMAP (28-DAY PLAN)
 
-## 📅 Week 1: Critical Security Hardening (P0)
-
-### Day 1-2: Fix Authentication & CSRF
-- [ ] **Task:** Refactor all Admin API routes to use `adminMutation` wrapper.
-- [ ] **Task:** Implement `verifyCsrfToken` logic in `lib/security/csrf.ts` if missing (verified present, but ensure robust).
-- [ ] **Task:** Remove `DISABLE_RATE_LIMITING` logic and implement robust Redis fallback (fail closed).
-
-### Day 3: Session Security
-- [ ] **Task:** Replace `Math.random()` with `crypto.randomUUID()` for session tokens in `lib/auth.ts`.
-- [ ] **Task:** Enforce strict secrets validation in `instrumentation.ts` (halt startup if missing).
-
-### Day 4-5: Audit & Penetration Testing (Internal)
-- [ ] **Task:** Write unit tests for CSRF bypass scenarios (`tests/admin/csrf.test.ts`).
-- [ ] **Task:** Verify Admin route protection path matching in `proxy.ts`.
+**GOAL:** Bring codebase to Fortune 500 production standards.
 
 ---
 
-## 📅 Week 2: Infrastructure & Database (P1)
+## WEEK 1: SECURITY & INFRASTRUCTURE (CRITICAL)
 
-### Day 6-7: Database Migration
-- [ ] **Task:** Switch `schema.prisma` provider to `postgresql`.
-- [ ] **Task:** Provision RDS/Cloud SQL instance.
-- [ ] **Task:** Create migration scripts and verify data integrity.
+**Day 1: Security Triage**
+- [ ] **Fix Middleware:** Update `proxy.ts` matcher to include API routes. (1h)
+- [ ] **Secrets:** Remove hardcoded secrets from `package.json` and setup `.env`. (1h)
+- [ ] **Docker:** Create `Dockerfile` and `docker-compose.yml`. (4h)
 
-### Day 8-9: Containerization
-- [ ] **Task:** Create `Dockerfile` (multi-stage: deps, builder, runner).
-- [ ] **Task:** Create `docker-compose.yml` for local dev (App + Postgres + Redis).
+**Day 2: Database Migration**
+- [ ] **Postgres:** Provision RDS/Postgres instance. (2h)
+- [ ] **Schema:** Update `schema.prisma` to Postgres provider. (2h)
+- [ ] **Migration:** Run initial migration and verify data types. (4h)
 
-### Day 10: CI/CD Pipeline
-- [ ] **Task:** Implement GitHub Actions for Lint, Test, Build, and Push to Registry.
-- [ ] **Task:** Add Sentry source map upload step.
+**Day 3: CI/CD Pipeline**
+- [ ] **Fix CI:** Correct ports in `ci.yml` for Lighthouse. (1h)
+- [ ] **Deploy Job:** Add GitHub Action for building and pushing Docker image. (4h)
 
----
+**Day 4: Auth Hardening**
+- [ ] **Rate Limiting:** Fix "Fail Open" Redis strategy. (4h)
+- [ ] **XSS:** Implement `rehype-sanitize` in Admin forms. (2h)
 
-## 📅 Week 3: Performance & Scalability (P2)
-
-### Day 11-12: Job Queue Implementation
-- [ ] **Task:** Install BullMQ.
-- [ ] **Task:** Refactor `app/api/cron/contract-reminders` to push jobs to queue.
-- [ ] **Task:** Create worker process to consume email jobs.
-
-### Day 13-14: Frontend Optimization
-- [ ] **Task:** Lazy load `@splinetool/react-spline`.
-- [ ] **Task:** Remove `gsap` (migrate to `framer-motion`) or vice-versa to remove duplication.
-- [ ] **Task:** Install `sharp` for image optimization.
-
-### Day 15: Caching Strategy
-- [ ] **Task:** Implement `stale-while-revalidate` headers for Admin Read APIs.
-- [ ] **Task:** Configure CDN caching rules.
+**Day 5: Validation**
+- [ ] Run full security scan (OWASP ZAP).
+- [ ] Verify all API routes reject unauthenticated requests.
 
 ---
 
-## 📅 Week 4: QA & Code Quality (P3)
+## WEEK 2: PERFORMANCE & BLOAT REMOVAL
 
-### Day 16-20: Testing & Documentation
-- [ ] **Task:** Increase test coverage to >80% for `lib/auth.ts` and `lib/admin`.
-- [ ] **Task:** Resolve all TypeScript `any` violations.
-- [ ] **Task:** Standardize dependency versions (`react-markdown`).
-- [ ] **Task:** Final Regression Test.
-- [ ] **Task:** **Sign-off for Production Deploy.**
+**Day 6-7: Animation Refactor**
+- [ ] **Remove GSAP:** Rewrite `LivingBlueprintSection` using `framer-motion`. (8h)
+- [ ] **Optimize Spline:** Implement strict lazy loading for Spline canvas. (4h)
+
+**Day 8: Bundle Optimization**
+- [ ] **Audit:** Run `@next/bundle-analyzer`.
+- [ ] **Tree Shaking:** Ensure unused Shadcn components are not bundled.
+
+**Day 9: CSS Optimization**
+- [ ] **Tailwind:** Extract critical CSS from `globals.css`.
+- [ ] **Refactor:** Simplify complex CSS animations causing layout thrashing.
+
+**Day 10: Performance Testing**
+- [ ] Run Lighthouse CI and verify Score > 90.
+
+---
+
+## WEEK 3: CODE QUALITY & STABILITY
+
+**Day 11-12: TypeScript Strictness**
+- [ ] **Config:** Set `skipLibCheck: false` and `no-explicit-any: error`.
+- [ ] **Refactor:** Fix ~77 `any` types and ~10 `@ts-ignore`. (16h)
+
+**Day 13: Testing Strategy**
+- [ ] **Fix Tests:** Remove unsafe casting in `auth.test.ts`.
+- [ ] **E2E:** Ensure Playwright tests run against the Docker container.
+
+**Day 14: Logging & Monitoring**
+- [ ] **Structured Logs:** Replace `console.log` with a logger lib.
+- [ ] **Alerts:** Verify Sentry integration for backend errors.
+
+**Day 15: Documentation**
+- [ ] Update `README.md` with setup/deploy instructions.
+- [ ] Document API authentication flows.
+
+---
+
+## WEEK 4: FINAL POLISH & LAUNCH PREP
+
+**Day 16-20: Final Review**
+- [ ] Load Testing (k6).
+- [ ] Disaster Recovery Drill (Restore DB from backup).
+- [ ] Executive Sign-off.
