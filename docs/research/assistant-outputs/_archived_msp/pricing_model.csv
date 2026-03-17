@@ -1,0 +1,4 @@
+tier,monthly_price,annual_price,included_servers,server_basic,server_application,server_database,server_compliance,gross_margin_target
+Foundation,99,89,0,129,199,279,349,0.40
+Professional,149,134,1,0,99,149,199,0.50
+Enterprise,199,179,2,0,0,99,149,0.55

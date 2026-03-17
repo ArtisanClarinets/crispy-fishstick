@@ -1,0 +1,11 @@
+phase,week,task,owner,deadline,status
+Foundation,1,Finalize pricing structure,CFO,2026-03-05,complete
+Foundation,1,Build pricing calculator,Engineering,2026-03-07,in_progress
+Foundation,1,Create service catalog documentation,CTO,2026-03-07,complete
+Foundation,1,Set up PSA/RMM tools,Operations,2026-03-10,scheduled
+Foundation,2,Establish vendor partnerships,Procurement,2026-03-14,scheduled
+Documentation,3,Create SOP template,COO,2026-03-20,complete
+Documentation,3,Document first 10 SOPs,COO,2026-03-21,complete
+Documentation,3,Build knowledge base,Engineering,2026-03-22,scheduled
+Service Launch,5,Deploy security stack,Security Lead,2026-03-30,scheduled
+Service Launch,7,Train team on SOPs,HR/COO,2026-04-05,scheduled

@@ -1,10 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, ShieldAlert, LayoutDashboard, ShieldCheck } from "lucide-react";
+import { ShieldAlert, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { HeroBackground } from "@/components/hero-background";
-import { AmbientBackground } from "@/components/ui/kinetic/ambient-background";
-import { HeroBadge } from "@/components/ui/kinetic/hero-badge";
-import { TextReveal } from "@/components/ui/kinetic/text-reveal";
 import { Reveal } from "@/components/reveal";
 import { DashboardPreview } from "@/components/dashboard-preview";
 import { RiskCards } from "@/components/risk-cards";
@@ -14,6 +10,9 @@ import { AuditModal } from "@/components/audit-modal";
 import { TrustWidget } from "@/components/trust-widget";
 import { RevenueLeakDetector } from "@/components/revenue-leak-detector";
 import { BuildPlanModule } from "@/components/build-plan-module";
+import { AmbientBackground } from "@/components/ui/kinetic/ambient-background";
+import { HeroBadge } from "@/components/ui/kinetic/hero-badge";
+import { TextReveal } from "@/components/ui/kinetic/text-reveal";
 
 export default function Home() {
   return (
@@ -25,8 +24,8 @@ export default function Home() {
           <HeroBadge>
             <span className="flex items-center gap-2">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-signal-success opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-signal-success"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-signal-success opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-signal-success" />
               </span>
               Accepting New Clients for Q3
             </span>

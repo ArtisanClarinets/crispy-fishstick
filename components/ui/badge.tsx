@@ -21,9 +21,6 @@ const badgeVariants = cva(
         info:
           "border-transparent bg-blue-500 text-white hover:bg-blue-500/80 dark:bg-blue-600 dark:hover:bg-blue-600/80",
         outline: "text-foreground",
-        success: "border-transparent bg-signal-success text-signal-success-foreground hover:bg-signal-success/80",
-        warning: "border-transparent bg-signal-warning text-signal-warning-foreground hover:bg-signal-warning/80",
-        info: "border-transparent bg-signal-info text-signal-info-foreground hover:bg-signal-info/80",
       },
     },
     defaultVariants: {

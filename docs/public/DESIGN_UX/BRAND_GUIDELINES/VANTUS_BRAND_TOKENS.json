@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "updated": "2026-03-06",
+  "scope": "apps/public",
+  "color": {
+    "ink950": "#0C131A",
+    "navy900": "#10283B",
+    "navy800": "#16334F",
+    "blue700": "#244A6D",
+    "blue600": "#2E6B94",
+    "sky500": "#50A5D0",
+    "steel400": "#6C92A6",
+    "cream050": "#F9F8F4",
+    "white": "#FFFFFF",
+    "slate200": "#D8DEE2",
+    "slate500": "#4F6170",
+    "slate700": "#334657",
+    "success": "#2F7A63",
+    "warning": "#B67A2A",
+    "danger": "#B34747",
+    "info": "#2E6B94"
+  },
+  "theme": {
+    "light": {
+      "bgCanvas": "#F9F8F4",
+      "bgSurface": "#FFFFFF",
+      "textPrimary": "#0C131A",
+      "textSecondary": "#4F6170",
+      "borderDefault": "#D8DEE2",
+      "brandPrimary": "#10283B",
+      "brandSecondary": "#244A6D",
+      "brandAccent": "#50A5D0"
+    },
+    "dark": {
+      "bgCanvas": "#0C131A",
+      "bgSurface": "#10283B",
+      "textPrimary": "#F9F8F4",
+      "textSecondary": "#AFC1CC",
+      "borderDefault": "#244A6D",
+      "brandPrimary": "#2E6B94",
+      "brandSecondary": "#6C92A6",
+      "brandAccent": "#50A5D0"
+    }
+  },
+  "typography": {
+    "fontHeading": ["Poppins", "Arial", "Helvetica", "sans-serif"],
+    "fontBody": ["Lora", "Georgia", "Times New Roman", "serif"],
+    "scale": {
+      "display": {
+        "size": 56,
+        "lineHeight": 64,
+        "weight": 700
+      },
+      "h1": {
+        "size": 44,
+        "lineHeight": 52,
+        "weight": 700
+      },
+      "h2": {
+        "size": 36,
+        "lineHeight": 44,
+        "weight": 700
+      },
+      "h3": {
+        "size": 28,
+        "lineHeight": 36,
+        "weight": 600
+      },
+      "h4": {
+        "size": 22,
+        "lineHeight": 30,
+        "weight": 600
+      },
+      "bodyL": {
+        "size": 20,
+        "lineHeight": 32,
+        "weight": 400
+      },
+      "bodyM": {
+        "size": 18,
+        "lineHeight": 28,
+        "weight": 400
+      },
+      "bodyS": {
+        "size": 16,
+        "lineHeight": 24,
+        "weight": 400
+      },
+      "label": {
+        "size": 14,
+        "lineHeight": 20,
+        "weight": 600
+      }
+    }
+  },
+  "spacing": {
+    "1": 4,
+    "2": 8,
+    "3": 12,
+    "4": 16,
+    "5": 20,
+    "6": 24,
+    "8": 32,
+    "10": 40,
+    "12": 48,
+    "16": 64
+  },
+  "radius": {
+    "sm": 8,
+    "md": 10,
+    "lg": 12,
+    "pill": 999
+  },
+  "motion": {
+    "fastMs": 120,
+    "baseMs": 180,
+    "slowMs": 260,
+    "easing": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+  }
+}

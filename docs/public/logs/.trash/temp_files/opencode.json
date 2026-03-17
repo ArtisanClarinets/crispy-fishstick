@@ -1,0 +1,684 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "logLevel": "INFO",
+  "autoupdate": "notify",
+  "share": "manual",
+  "server": {
+    "port": 4096,
+    "mdns": true
+  },
+  "watcher": {
+    "ignore": [
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.turbo/**",
+      "**/.git/**",
+      "**/.cache/**",
+      "**/.venv/**",
+      "**/__pycache__/**",
+      "**/*.log"
+    ]
+  },
+  "instructions": [
+    "./AGENTS.md",
+    "./CONTRIBUTING.md",
+    "./docs/**/*.md",
+    ".cursor/rules/*.md"
+  ],
+  "model": "anthropic/claude-sonnet-4-5",
+  "small_model": "anthropic/claude-haiku-4-5",
+  "default_agent": "foundry",
+  "tools": {
+    "read": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "edit": true,
+    "write": true,
+    "patch": true,
+    "bash": true,
+    "skill": true,
+    "todowrite": true,
+    "todoread": true,
+    "webfetch": true,
+    "websearch": true,
+    "question": true,
+    "lsp": false
+  },
+  "permission": {
+    "read": "allow",
+    "grep": "allow",
+    "glob": "allow",
+    "list": "allow",
+    "skill": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "question": "allow",
+    "edit": "ask",
+    "bash": "ask"
+  },
+  "agent": {
+    "foundry": {
+      "description": "Foundry Orchestrator — primary agent that plans, delegates to subagents via Task, enforces quality gates, and coordinates delivery.",
+      "mode": "primary",
+      "model": "anthropic/claude-sonnet-4-5",
+      "temperature": 0.1,
+      "steps": 2000,
+      "prompt": "You are Foundry, an enterprise orchestrator for software delivery.\nOperating principles:\n1) Clarify intent and success criteria; if ambiguous, ask with the Question tool.\n2) Decompose work into a plan with milestones, risks, and acceptance tests.\n3) Delegate parallel work to subagents using the Task tool:\n   - @arch for system design and tradeoffs\n   - @research for external docs/benchmarks and citations\n   - @impl for production code changes\n   - @qa for tests and verification\n   - @sec for threat modeling and vulnerability review\n   - @docs for docs/runbooks\n   - @ux for UI/UX and component composition\n4) Enforce quality gates before merging: lint/build/test, security checks, and peer review.\n5) Prefer safe defaults: do not run destructive bash commands or edit sensitive files without explicit approval.\n6) Keep an audit-style change log: what changed, why, and how verified.\nDeliver results as: (a) plan, (b) implementation, (c) verification evidence, (d) next steps.\n",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "edit": true,
+        "write": true,
+        "patch": true,
+        "bash": true,
+        "todowrite": true,
+        "todoread": true,
+        "webfetch": true,
+        "websearch": true,
+        "question": true
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": {
+          "*": "ask",
+          "pwd": "allow",
+          "ls*": "allow",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "git show*": "allow",
+          "cat*": "allow",
+          "rg *": "allow",
+          "grep *": "allow",
+          "npm test*": "allow",
+          "npm run test*": "allow",
+          "pnpm test*": "allow",
+          "yarn test*": "allow"
+        },
+        "task": {
+          "*": "deny",
+          "arch": "allow",
+          "research": "allow",
+          "impl": "allow",
+          "qa": "allow",
+          "sec": "allow",
+          "docs": "allow",
+          "ux": "allow",
+          "ops": "allow"
+        }
+      },
+      "color": "accent"
+    },
+    "plan": {
+      "description": "Plan — read-only planning and analysis agent (no code changes).",
+      "mode": "primary",
+      "model": "anthropic/claude-haiku-4-5",
+      "temperature": 0.1,
+      "steps": 800,
+      "prompt": "You are Plan. Produce high-quality plans, threat models, and checklists. Do not modify files or run commands.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "webfetch": true,
+        "websearch": true,
+        "question": true,
+        "edit": false,
+        "write": false,
+        "patch": false,
+        "bash": false,
+        "todowrite": true,
+        "todoread": true
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "build": {
+      "description": "Build — hands-on primary agent for implementation work with guarded permissions.",
+      "mode": "primary",
+      "model": "anthropic/claude-sonnet-4-5",
+      "temperature": 0.25,
+      "steps": 15000,
+      "prompt": "You are Build. Implement changes in the codebase, write tests, and run verification steps. Prefer minimal diffs and strong error handling.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "edit": true,
+        "write": true,
+        "patch": true,
+        "bash": true,
+        "todowrite": true,
+        "todoread": true,
+        "webfetch": true,
+        "websearch": true,
+        "question": true
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": {
+          "*": "ask",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "npm *": "allow",
+          "pnpm *": "allow",
+          "yarn *": "allow"
+        }
+      },
+      "color": "primary"
+    },
+    "autopilot": {
+      "description": "Autopilot — high-autonomy primary agent. Uses allow permissions; enable only in trusted repos/sandboxes.",
+      "mode": "primary",
+      "model": "anthropic/claude-sonnet-4-5",
+      "temperature": 0.3,
+      "steps": 30000,
+      "prompt": "You are Autopilot. Execute end-to-end tasks autonomously: plan → implement → test → iterate.\nYou must still avoid destructive operations (rm -rf, force pushes, dropping DBs) unless explicitly requested.\nAlways run tests and provide verification evidence.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "edit": true,
+        "write": true,
+        "patch": true,
+        "bash": true,
+        "todowrite": true,
+        "todoread": true,
+        "webfetch": true,
+        "websearch": true,
+        "question": true
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "*": "ask",
+          "npm *": "allow",
+          "pnpm *": "allow",
+          "yarn *": "allow",
+          "git *": "ask",
+          "docker *": "ask",
+          "kubectl *": "ask"
+        },
+        "task": {
+          "*": "allow"
+        }
+      },
+      "color": "warning"
+    },
+    "arch": {
+      "description": "Architecture — designs scalable, secure systems and produces ADRs, diagrams, and API contracts.",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-5",
+      "temperature": 0.15,
+      "steps": 120,
+      "prompt": "You are the Architecture subagent. Provide system design, data flows, threat modeling, and tradeoffs. Prefer explicit assumptions and ADR format.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "webfetch": true,
+        "websearch": true,
+        "question": true,
+        "edit": false,
+        "write": false,
+        "patch": false,
+        "bash": false
+      }
+    },
+    "research": {
+      "description": "Research — gathers authoritative sources, compares options, and produces cited recommendations.",
+      "mode": "subagent",
+      "temperature": 0.3,
+      "steps": 120,
+      "prompt": "You are Research. Use websearch for discovery and webfetch for retrieval. Provide citations and do not speculate beyond sources.",
+      "tools": {
+        "webfetch": true,
+        "websearch": true,
+        "question": true,
+        "read": false,
+        "grep": false,
+        "glob": false,
+        "list": false,
+        "edit": false,
+        "write": false,
+        "patch": false,
+        "bash": false
+      }
+    },
+    "impl": {
+      "description": "Implementation — writes production code with tests, logging, and secure defaults.",
+      "mode": "subagent",
+      "temperature": 0.25,
+      "steps": 200,
+      "prompt": "You are Implementation. Make small, reviewable commits. Add tests and run them. Prefer secure-by-default patterns and clear error messages.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "edit": true,
+        "write": true,
+        "patch": true,
+        "bash": true,
+        "todowrite": true,
+        "todoread": true
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "*": "ask",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "npm *": "allow",
+          "pnpm *": "allow",
+          "yarn *": "allow"
+        }
+      }
+    },
+    "qa": {
+      "description": "QA — creates test plans, writes tests, and verifies behavior (including regression and edge cases).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 160,
+      "prompt": "You are QA. Create a test plan, implement tests, and provide evidence (commands run + outputs). Look for edge cases and regressions.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "edit": true,
+        "write": true,
+        "patch": true,
+        "bash": true,
+        "todowrite": true,
+        "todoread": true
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "*": "ask",
+          "npm test*": "allow",
+          "npm run test*": "allow",
+          "pnpm test*": "allow",
+          "yarn test*": "allow",
+          "pytest*": "allow"
+        }
+      }
+    },
+    "sec": {
+      "description": "Security — threat models, code audits, dependency risk checks, and hardening recommendations.",
+      "mode": "subagent",
+      "temperature": 0.15,
+      "steps": 140,
+      "prompt": "You are Security. Audit for OWASP risks, secrets leaks, supply chain risk, and prompt-injection risk. Recommend mitigations and safe permissions.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "bash": true,
+        "webfetch": true,
+        "websearch": true
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "ask",
+          "git diff*": "allow",
+          "git status*": "allow",
+          "npm audit*": "allow",
+          "pnpm audit*": "allow",
+          "yarn audit*": "allow"
+        }
+      }
+    },
+    "docs": {
+      "description": "Docs — produces README updates, runbooks, API docs, and release notes.",
+      "mode": "subagent",
+      "temperature": 0.35,
+      "steps": 120,
+      "prompt": "You are Docs. Write clear, concise documentation, runbooks, and release notes. Keep examples runnable.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "edit": true,
+        "write": true,
+        "patch": true
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": "deny"
+      }
+    },
+    "ux": {
+      "description": "UX — UI composition, accessibility, and design-system alignment.",
+      "mode": "subagent",
+      "temperature": 0.4,
+      "steps": 1200,
+      "prompt": "You are UX. Propose UX flows, component choices, and accessibility considerations. Prefer design-system components and consistent patterns.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "edit": true,
+        "write": true,
+        "patch": true,
+        "webfetch": true,
+        "websearch": true
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": "deny"
+      }
+    },
+    "ops": {
+      "description": "Ops — deployment guidance, CI/CD, Docker, NGINX, and production runbooks.",
+      "mode": "subagent",
+      "temperature": 0.25,
+      "steps": 160,
+      "prompt": "You are Ops. Prepare deployment manifests, CI pipelines, environment parity, and operational runbooks. Avoid destructive infra commands without approval.",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "edit": true,
+        "write": true,
+        "patch": true,
+        "bash": true
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "*": "ask",
+          "docker *": "ask",
+          "kubectl *": "ask",
+          "systemctl *": "ask"
+        }
+      }
+    }
+  },
+  "command": {
+    "new": {
+      "template": "Start a new project. Ask clarifying questions first, then create a plan and scaffold the repository. Project: {{input}}",
+      "description": "Bootstrap a new app/site/project end-to-end",
+      "agent": "foundry"
+    },
+    "feature": {
+      "template": "Implement this feature end-to-end with tests and documentation: {{input}}",
+      "description": "Add a feature with tests and docs",
+      "agent": "foundry",
+      "subtask": false
+    },
+    "review": {
+      "template": "Review the following change or diff for correctness, security, performance, and maintainability: {{input}}",
+      "description": "Deep code review",
+      "agent": "plan",
+      "subtask": false
+    },
+    "release": {
+      "template": "Prepare a release: generate changelog, run verification, and create a release checklist. Notes: {{input}}",
+      "description": "Release readiness checklist + notes",
+      "agent": "foundry"
+    },
+    "triage": {
+      "template": "Triage and debug this issue. Reproduce if possible, identify root cause, propose fix and tests. Issue: {{input}}",
+      "description": "Bug triage and fix plan",
+      "agent": "foundry"
+    }
+  },
+  "plugin": [
+    "@mohak34/opencode-notifier@latest",
+    "opencode-scheduler",
+    "octto",
+    "@nick-vi/opencode-type-inject",
+    "opencode-websearch-cited@1.1.1",
+    "@tarquinen/opencode-dcp@latest",
+    "@franlol/opencode-md-table-formatter",
+    "oh-my-opencode",
+    "opencode-lmstudio",
+    "@0xsero/open-queue",
+    "micode",
+    "opencode-smart-voice-notify@latest",
+    "ralph-wiggum",
+    "@opencode/plugin-github-copilot-chat",
+    "opencode-agent-memory",
+    "opencode-caffeinate"
+  ],
+  "provider": {
+    "lmstudio": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LM Studio (local)",
+      "options": {
+        "baseURL": "http://100.100.57.84:1234/v1"
+      }
+    }
+  },
+  "mcp": {
+    "Blender MCP": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "blender-mcp"
+      ],
+      "enabled": true,
+      "timeout": 5000
+    },
+    "opencode_tools": {
+      "type": "local",
+      "command": [
+        "opencode-tools",
+        "mcp"
+      ],
+      "enabled": true,
+      "timeout": 5000
+    },
+    "memory": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-memory@latest"
+      ],
+      "enabled": true,
+      "timeout": 5000,
+      "environment": {
+        "MEMORY_FILE_PATH": "{env:OPENCODE_MEMORY_PATH}"
+      }
+    },
+    "sequential_thinking": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "enabled": true,
+      "timeout": 8000
+    },
+    "critical_thinking": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-actor-critic-thinking"
+      ],
+      "enabled": true,
+      "timeout": 15000
+    },
+    "serena": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server"
+      ],
+      "enabled": true,
+      "timeout": 15000
+    },
+    "shadcn": {
+      "type": "local",
+      "command": [
+        "npx",
+        "shadcn@latest",
+        "mcp"
+      ],
+      "enabled": true,
+      "timeout": 15000
+    },
+    "magicui": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@magicuidesign/mcp@latest"
+      ],
+      "enabled": true,
+      "timeout": 15000
+    },
+    "desktop_commander": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@wonderwhy-er/desktop-commander"
+      ],
+      "enabled": true,
+      "timeout": 15000
+    },
+    "next_devtools": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "next-devtools-mcp@latest"
+      ],
+      "enabled": true,
+      "timeout": 15000
+    },
+    "prisma": {
+      "type": "remote",
+      "url": "https://mcp.prisma.io/mcp",
+      "enabled": true,
+      "oauth": {}
+    },
+    "stripe": {
+      "type": "remote",
+      "url": "https://mcp.stripe.com",
+      "enabled": true,
+      "oauth": {}
+    },
+    "deepwiki": {
+      "type": "remote",
+      "url": "https://mcp.deepwiki.com/mcp",
+      "enabled": true
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "enabled": false,
+      "oauth": {}
+    },
+    "sentry": {
+      "type": "remote",
+      "url": "https://mcp.sentry.dev/mcp",
+      "enabled": false,
+      "oauth": {}
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": false,
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      }
+    },
+    "gh_grep": {
+      "type": "remote",
+      "url": "https://mcp.grep.app",
+      "enabled": false
+    },
+    "cf_docs": {
+      "type": "remote",
+      "url": "https://docs.mcp.cloudflare.com/mcp",
+      "enabled": false,
+      "oauth": {}
+    },
+    "redis": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-redis"
+      ],
+      "enabled": false,
+      "timeout": 15000,
+      "environment": {
+        "REDIS_URL": "http://localhost:6379"
+      }
+    },
+    "slack": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-slack"
+      ],
+      "enabled": false,
+      "timeout": 15000,
+      "environment": {
+        "SLACK_BOT_TOKEN": "{env:SLACK_BOT_TOKEN}",
+        "SLACK_APP_TOKEN": "{env:SLACK_APP_TOKEN}"
+      }
+    },
+    "gdrive": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-gdrive"
+      ],
+      "enabled": false,
+      "timeout": 20000,
+      "environment": {
+        "GDRIVE_OAUTH_KEYS_FILE": "{env:GDRIVE_OAUTH_KEYS_FILE}"
+      }
+    },
+    "time": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "mcp-server-time"
+      ],
+      "enabled": false,
+      "timeout": 8000
+    },
+    "git": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "mcp-server-git"
+      ],
+      "enabled": false,
+      "timeout": 15000
+    }
+  }
+}

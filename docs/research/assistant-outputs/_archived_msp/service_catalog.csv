@@ -1,0 +1,7 @@
+service_id,service_name,category,tier,description,monthly_price
+SVC-HELP-001,Unlimited Remote Help Desk,Help Desk,Foundation,"Remote support during business hours",0
+SVC-HELP-002,24/7 Emergency Line,Help Desk,Foundation,"Emergency phone support outside hours",0
+SVC-MON-001,Infrastructure Monitoring,Monitoring,Foundation,"24/7 monitoring and alerts",0
+SVC-SEC-EDR,Endpoint Detection & Response,Security,Foundation,"Next-gen EDR licensing",6
+SVC-VOIP-001,VoIP Phone Service,Communications,Professional,"Unlimited US/Canada calling",0
+SVC-BACKUP-1TB,Backup Storage (1TB),Backup,Foundation,"1TB per user included",0

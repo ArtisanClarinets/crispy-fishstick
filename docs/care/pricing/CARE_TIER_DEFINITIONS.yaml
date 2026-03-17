@@ -1,0 +1,77 @@
+meta:
+  version: "2026.03.07"
+  last_updated: "2026-03-07"
+  scope: "Vantus Care managed services only"
+  canonical_tier_names:
+    - Foundation
+    - Advanced
+    - Sovereign
+  note: "This file is the Care-local tier baseline and should be used with CARE_PRICING_PUBLIC.md and CARE_ADDON_MATRIX.md."
+
+care:
+  foundation:
+    name: "Vantus Care - Foundation"
+    pricing_model: "per_user_with_minimum"
+    usd_per_user_per_month: 175
+    minimum_usd_per_month: 2500
+    target_segment: "Smaller environments that need reliable day-to-day support"
+    typical_services:
+      - "Help desk coordination"
+      - "Monitoring and alert routing"
+      - "Patch oversight"
+      - "Backup oversight"
+      - "Baseline monthly reporting"
+      - "Quarterly operating review"
+    gross_margin_target_percent: 62
+
+  advanced:
+    name: "Vantus Care - Advanced"
+    pricing_model: "per_user_with_minimum"
+    usd_per_user_per_month: 225
+    minimum_usd_per_month: 5000
+    target_segment: "Growing environments that need stronger security and reporting depth"
+    typical_services:
+      - "Everything in Foundation"
+      - "Security operations support"
+      - "Compliance-support coordination"
+      - "Expanded reporting cadence"
+      - "Priority response handling"
+      - "Structured planning"
+    gross_margin_target_percent: 65
+
+  sovereign:
+    name: "Vantus Care - Sovereign"
+    pricing_model: "per_user_with_minimum"
+    usd_per_user_per_month: 300
+    minimum_usd_per_month: 10000
+    target_segment: "Higher-governance environments with strategic and specialized support needs"
+    typical_services:
+      - "Everything in Advanced"
+      - "Strategic governance rhythm"
+      - "Lifecycle and risk planning"
+      - "Specialized escalation support"
+      - "Higher-touch stakeholder reporting"
+      - "Deeper quarterly roadmap work"
+    gross_margin_target_percent: 68
+
+pricing_rules:
+  billing_cadence:
+    - "Monthly default"
+    - "Annual prepay discount available by approval"
+  commitment_rules:
+    - "Written scope and commercial schedule required"
+    - "Minimum term and termination language defined in service order"
+  exclusions:
+    - "Major project work is not included in recurring scope"
+    - "Hardware leasing is prohibited"
+    - "Legal, audit, or certification guarantees are excluded"
+
+validation:
+  authoritative_for:
+    - "Tier names"
+    - "Base recurring pricing"
+    - "Tier positioning"
+  linked_documents:
+    - "CARE_PRICING_PUBLIC.md"
+    - "CARE_ADDON_MATRIX.md"
+    - "catalogs/pricing_catalog_v3.json"

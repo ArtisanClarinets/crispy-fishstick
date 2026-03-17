@@ -1,0 +1,59 @@
+# Vantus Systems — Public Pricing Anchors
+# Version: 2.1
+# Last updated: 2026-03-07
+# NOTE: These are public-facing anchors / starting prices.
+# Final quotes are confirmed after discovery, written scope, and complexity scoring.
+#
+# IMPORTANT:
+# - Build/Project pricing: This file (No-Care scope)
+# - Care/Managed Services pricing: See care/pricing/CARE_TIER_DEFINITIONS.yaml
+
+version: "2.1"
+last_updated: "2026-03-07"
+
+offers:
+  website_rebuild:
+    name: "Website Rebuild (Modern + Complete)"
+    starting_at_usd: 15000
+    typical_range_usd: [15000, 55000]
+  website_plus_cms:
+    name: "Website + CMS (Recommended)"
+    starting_at_usd: 32000
+    typical_range_usd: [32000, 125000]
+  website_plus_portal:
+    name: "Website + Business Portal"
+    starting_at_usd: 90000
+    typical_range_usd: [90000, 400000]
+
+infrastructure:
+  cloud_deploy_baseline:
+    name: "Cloud deployment baseline (VPS + Docker + NGINX)"
+    typical_range_usd: [7000, 30000]
+  on_prem_install:
+    name: "On-prem install + hardening (client-owned hardware)"
+    typical_range_usd: [15000, 70000]
+
+add_ons:
+  discovery_solution_blueprint:
+    name: "Discovery + Solution Blueprint"
+    typical_range_usd: [5000, 20000]
+  data_and_content_migration:
+    name: "Data and Content Migration"
+    typical_range_usd: [4000, 30000]
+  integration_per_system:
+    name: "Integration (per system)"
+    typical_range_usd: [8000, 35000]
+  sso_and_rbac_hardening:
+    name: "SSO and RBAC Hardening"
+    typical_range_usd: [12000, 50000]
+  analytics_and_dashboarding:
+    name: "Analytics and Dashboarding"
+    typical_range_usd: [7000, 30000]
+  localization_framework:
+    name: "Localization Framework"
+    typical_range_usd: [8000, 40000]
+
+# NOTE: Care pricing has been moved to care/pricing/CARE_TIER_DEFINITIONS.yaml
+# See: vantus_enterprise_docs\care\pricing\CARE_TIER_DEFINITIONS.yaml
+
+# version: "2.0"

@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "generated_at": "2026-03-07T00:00:00Z",
+    "version": "2026.03.07-v4",
+    "currency": "USD",
+    "region": "United States",
+    "last_updated": "2026-03-07",
+    "canonical_tiers": ["Foundation", "Advanced", "Sovereign"],
+    "notes": [
+      "Vantus Care add-on pricing catalog for active Care tiers.",
+      "Use with CARE_PRICING_PUBLIC.md and CARE_ADDON_MATRIX.md.",
+      "Deprecated tier labels such as Professional, Enterprise, and Premier are not active Care names."
+    ]
+  },
+  "catalog": [
+    {
+      "sku": "CARE_FOUNDATION_ADDON_BASIC_MO",
+      "tier": "Foundation",
+      "name": "Basic Server add-on - Foundation (monthly)",
+      "category": "care_addon_server",
+      "billing_cadence": "monthly",
+      "unit": "per_server",
+      "list_price_cents": 12900,
+      "public_display": true,
+      "requires_assessment": false,
+      "margin_target": 0.62,
+      "version": "2026.03.07-v4"
+    },
+    {
+      "sku": "CARE_ADVANCED_ADDON_BASIC_MO",
+      "tier": "Advanced",
+      "name": "Basic Server add-on - Advanced (monthly)",
+      "category": "care_addon_server",
+      "billing_cadence": "monthly",
+      "unit": "per_server",
+      "list_price_cents": 9900,
+      "public_display": true,
+      "requires_assessment": false,
+      "margin_target": 0.65,
+      "version": "2026.03.07-v4"
+    },
+    {
+      "sku": "CARE_ADVANCED_ADDON_APPLICATION_MO",
+      "tier": "Advanced",
+      "name": "Application Server add-on - Advanced (monthly)",
+      "category": "care_addon_application_server",
+      "billing_cadence": "monthly",
+      "unit": "per_server",
+      "list_price_cents": 9900,
+      "public_display": true,
+      "requires_assessment": false,
+      "margin_target": 0.65,
+      "version": "2026.03.07-v4"
+    },
+    {
+      "sku": "CARE_SOVEREIGN_ADDON_BASIC_MO",
+      "tier": "Sovereign",
+      "name": "Basic Server add-on - Sovereign (monthly)",
+      "category": "care_addon_server",
+      "billing_cadence": "monthly",
+      "unit": "per_server",
+      "list_price_cents": 7900,
+      "public_display": true,
+      "requires_assessment": false,
+      "margin_target": 0.68,
+      "version": "2026.03.07-v4"
+    },
+    {
+      "sku": "CARE_SOVEREIGN_ADDON_APPLICATION_MO",
+      "tier": "Sovereign",
+      "name": "Application Server add-on - Sovereign (monthly)",
+      "category": "care_addon_application_server",
+      "billing_cadence": "monthly",
+      "unit": "per_server",
+      "list_price_cents": 7900,
+      "public_display": true,
+      "requires_assessment": false,
+      "margin_target": 0.68,
+      "version": "2026.03.07-v4"
+    },
+    {
+      "sku": "CARE_SOVEREIGN_ADDON_DATABASE_MO",
+      "tier": "Sovereign",
+      "name": "Database Server add-on - Sovereign (monthly)",
+      "category": "care_addon_database_server",
+      "billing_cadence": "monthly",
+      "unit": "per_server",
+      "list_price_cents": 9900,
+      "public_display": true,
+      "requires_assessment": false,
+      "margin_target": 0.68,
+      "version": "2026.03.07-v4"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+# Public Master Index
+
+**Version:** 2.1
+**Last updated:** 2026-03-08
+**Scope:** Public-facing documentation for `apps/web`
+
+## Core specifications
+
+- `CORE_SPECIFICATIONS/PUBLIC_WEBSITE_IMPLEMENTATION_SPEC.md`
+- `CORE_SPECIFICATIONS/PUBLIC.PRD.md`
+- `CORE_SPECIFICATIONS/PUBLIC.SITE_MAP.md`
+- `CORE_SPECIFICATIONS/SITEMAP_AND_NAV.md`
+- `CORE_SPECIFICATIONS/ARCHITECTURE.md`
+- `CORE_SPECIFICATIONS/ARCHITECTURE_DETAILED.md`
+- `CORE_SPECIFICATIONS/DATA_MODEL.md`
+- `CORE_SPECIFICATIONS/FEATURE_LIST.md`
+- `CORE_SPECIFICATIONS/COPY_BRIEF.md`
+- `CORE_SPECIFICATIONS/SEO_LOCAL_STRATEGY.md`
+- `CORE_SPECIFICATIONS/CONTENT_WORKFLOW.md`
+- `CORE_SPECIFICATIONS/PROOF_PAGE_SPEC.md`
+- `CORE_SPECIFICATIONS/CASE_STUDY_SPEC.md`
+
+## Implementation guides
+
+- `IMPLEMENTATION_GUIDES/DEVELOPMENT.md`
+- `IMPLEMENTATION_GUIDES/CODING_GUIDE.md`
+- `IMPLEMENTATION_GUIDES/IMPLEMENTATION_ROADMAP.md`
+- `IMPLEMENTATION_GUIDES/QUICKSTART_CHECKLIST.md`
+- `IMPLEMENTATION_GUIDES/APPS_PUBLIC_PRICING_PAGE_CONTENT.md`
+- `IMPLEMENTATION_GUIDES/APPS_PUBLIC_PRICING_COMPONENT_MODEL.ts`
+- `IMPLEMENTATION_GUIDES/APPS_PUBLIC_PRICING_COMPONENT_MODEL.json`
+- `IMPLEMENTATION_GUIDES/APPS_PUBLIC_GLOBAL_STYLES_CONVENTION.md`
+
+## Design and UX
+
+- `DESIGN_UX/DESIGN_DNA.md`
+- `DESIGN_UX/CONTENT_MAP.md`
+- `DESIGN_UX/PUBLIC.DIRECTORY-TREE.md`
+- `DESIGN_UX/BRAND_GUIDELINES/README.md`
+- `PUBLIC.DIRECTORY_TREE.md`
+
+## Governance and process
+
+- `GOVERNANCE_PROCESS/QUALITY_GATES.md`
+- `GOVERNANCE_PROCESS/RELEASE_PROCESS.md`
+- `GOVERNANCE_PROCESS/TASK_SCHEMA.md`
+- `GOVERNANCE_PROCESS/ENV_MANIFEST.md`
+- `GOVERNANCE_PROCESS/AGENTS.md`
+- `GOVERNANCE_PROCESS/CHANGELOG.md`
+
+## Security and operations
+
+- `SECURITY_COMPLIANCE/SECURITY.md`
+- `SECURITY_COMPLIANCE/GOVERNANCE.md`
+- `OPERATIONS_RELIABILITY/NON_FUNCTIONAL.md`
+- `OPERATIONS_RELIABILITY/RUNBOOK.md`
+- `OPERATIONS_RELIABILITY/INCIDENT_RESPONSE.md`
+
+## Orchestration prompts
+
+- `prompts/README.md`
+- `prompts/00_MAIN_ORCHESTRATOR_SYSTEM_PROMPT.md`
+- `prompts/03_ROUTE_CONTRACT_AND_ROUTE_LEVEL_REQUIREMENTS.md`
+- `prompts/50_PHASE_HARDENING_SECURITY_PERF_A11Y_SEO_OBSERVABILITY.md`
+- `prompts/60_PHASE_QA_RELEASE_READINESS.md`
+- `prompts/70_PHASE_LAUNCH_HANDOFF.md`
+
+## Canonical internal references
+
+- `../enterprise_pack/03_offers/SERVICE_CATALOG_PUBLIC.md`
+- `../enterprise_pack/03_offers/PRICING_RANGES.md`
+- `../enterprise_pack/05_architecture/ADR-0001-CMS-Choice.md`
+- `../pricing/pricing_public.yaml`
+- `../pricing/pricing_ops.yaml`
+
+## Route contract
+
+- Core: `/`, `/services`, `/pricing`, `/proof`, `/standards`, `/learn`, `/about`, `/contact`, `/start-audit`, `/status`
+- Legal: `/legal/privacy`, `/legal/terms`, `/legal/cookies`
+- Dynamic: `/services/[offerSlug]`, `/proof/case-studies/[slug]`, `/learn/[collection]/[slug]`
+
+Offer slugs for `/services/[offerSlug]`:
+
+- `website-rebuild`
+- `website-plus-cms`
+- `website-plus-portal`
+
+Use `CORE_SPECIFICATIONS/PUBLIC.SITE_MAP.md` as the coding route source of truth.

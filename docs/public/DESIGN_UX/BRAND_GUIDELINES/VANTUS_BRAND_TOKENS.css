@@ -1,0 +1,90 @@
+:root {
+  --vantus-color-ink-950: #0c131a;
+  --vantus-color-navy-900: #10283b;
+  --vantus-color-navy-800: #16334f;
+  --vantus-color-blue-700: #244a6d;
+  --vantus-color-blue-600: #2e6b94;
+  --vantus-color-sky-500: #50a5d0;
+  --vantus-color-steel-400: #6c92a6;
+  --vantus-color-cream-050: #f9f8f4;
+  --vantus-color-white: #ffffff;
+  --vantus-color-slate-200: #d8dee2;
+  --vantus-color-slate-500: #4f6170;
+  --vantus-color-slate-700: #334657;
+
+  --vantus-color-success: #2f7a63;
+  --vantus-color-warning: #b67a2a;
+  --vantus-color-danger: #b34747;
+  --vantus-color-info: #2e6b94;
+
+  --vantus-bg-canvas: var(--vantus-color-cream-050);
+  --vantus-bg-surface: var(--vantus-color-white);
+  --vantus-text-primary: var(--vantus-color-ink-950);
+  --vantus-text-secondary: var(--vantus-color-slate-500);
+  --vantus-border-default: var(--vantus-color-slate-200);
+
+  --vantus-brand-primary: var(--vantus-color-navy-900);
+  --vantus-brand-secondary: var(--vantus-color-blue-700);
+  --vantus-brand-accent: var(--vantus-color-sky-500);
+
+  --vantus-font-heading: "Poppins", Arial, Helvetica, sans-serif;
+  --vantus-font-body: "Lora", Georgia, "Times New Roman", serif;
+
+  --vantus-space-1: 4px;
+  --vantus-space-2: 8px;
+  --vantus-space-3: 12px;
+  --vantus-space-4: 16px;
+  --vantus-space-5: 20px;
+  --vantus-space-6: 24px;
+  --vantus-space-8: 32px;
+  --vantus-space-10: 40px;
+  --vantus-space-12: 48px;
+  --vantus-space-16: 64px;
+
+  --vantus-radius-sm: 8px;
+  --vantus-radius-md: 10px;
+  --vantus-radius-lg: 12px;
+  --vantus-radius-pill: 999px;
+
+  --vantus-motion-fast: 120ms;
+  --vantus-motion-base: 180ms;
+  --vantus-motion-slow: 260ms;
+  --vantus-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --vantus-bg-canvas: var(--vantus-color-ink-950);
+  --vantus-bg-surface: var(--vantus-color-navy-900);
+  --vantus-text-primary: var(--vantus-color-cream-050);
+  --vantus-text-secondary: #afc1cc;
+  --vantus-border-default: var(--vantus-color-blue-700);
+
+  --vantus-brand-primary: var(--vantus-color-blue-600);
+  --vantus-brand-secondary: var(--vantus-color-steel-400);
+  --vantus-brand-accent: var(--vantus-color-sky-500);
+}
+
+body {
+  background: var(--vantus-bg-canvas);
+  color: var(--vantus-text-primary);
+  font-family: var(--vantus-font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--vantus-text-primary);
+  font-family: var(--vantus-font-heading);
+}
+
+a {
+  color: var(--vantus-brand-secondary);
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--vantus-brand-accent);
+}

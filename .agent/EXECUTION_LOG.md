@@ -119,3 +119,27 @@
   - Wrapped all new sections in `<Reveal>` components for animation consistency.
   - Standardized indentation to 2 spaces throughout the file.
 **[RESULT]** Landing page aligned with PRD conversion goals and AXIOM design system.
+
+### Session 7 (Runtime/Dev Error Fixes)
+
+**[PLAN]** Fix runtime errors observed in `npm run dev`:
+1. `ReferenceError: AmbientBackground is not defined` at `app/(site)/page.tsx:18`
+2. NextAuth environment validation errors for `NEXTAUTH_SECRET` and `NEXTAUTH_URL`
+
+**[EXEC]** Fixed `app/(site)/page.tsx`:
+- Added missing imports for `AmbientBackground`, `HeroBadge`, `TextReveal` from `@/components/ui/kinetic/*`
+- Fixed unused imports (`ArrowRight`, `HeroBackground`) 
+- Fixed empty self-closing components (lines 27-28)
+
+**[EXEC]** Fixed pre-existing type error in `components/ui/badge.tsx`:
+- Removed duplicate variant properties causing `TS1117: An object literal cannot have multiple properties with the same name`
+
+**[EXEC]** Verified fixes:
+- `npm run dev`: Server starts successfully, `/` returns 200 OK
+- `npm run typecheck`: Passes with zero errors
+- Homepage loads without `ReferenceError: AmbientBackground` error
+- NextAuth shows expected dev fallback warnings (not noisy errors)
+
+**[RESULT]** Runtime errors resolved. TypeScript typecheck passes. Dev server verified working.
+
+**[NOTE]** Build fails due to pre-existing malformed directory `app/\(site\)` causing `Cannot find module for page: /(site/)` - this is a pre-existing issue outside scope of this fix.

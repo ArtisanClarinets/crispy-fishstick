@@ -1,0 +1,49 @@
+# Vantus Systems — Pricing Operations Rules
+# Version: 2.0
+# Last updated: 2026-03-06
+
+version: "2.0"
+last_updated: "2026-03-06"
+
+rules:
+  quoting:
+    - "No quote is valid without written scope + page inventory + acceptance criteria."
+    - "All projects require a deposit unless explicitly waived (waivers are rare)."
+    - "Portals are MVP-scoped unless a separate enterprise engagement is signed."
+  deposit:
+    default_percent: 40
+    minimum_usd: 2500
+  change_requests:
+    - "Out-of-scope work is quoted as a change request before starting."
+    - "Change requests include time impact and (if applicable) cost impact."
+  discounts:
+    max_percent_without_approval: 5
+    max_percent_with_founder_approval: 15
+    disallowed:
+      - "Discounts in exchange for vague promises (ex: 'more work later')."
+      - "Discounts that push gross margin below 50%."
+  gross_margin_floor:
+    minimum_percent: 50
+
+rate_cards:
+  internal_blended_rate_usd_per_hour: 150
+  portal_complexity_multiplier:
+    low: 1.0
+    medium: 1.35
+    high: 1.75
+
+qualification_gates:
+  website_rebuild:
+    max_integrations_without_change_order: 1
+    max_unique_page_templates_without_change_order: 8
+  website_plus_cms:
+    max_roles_without_change_order: 4
+    max_content_types_without_change_order: 8
+  website_plus_portal:
+    default_scope: "single workflow MVP"
+    additional_workflow_requires_change_order: true
+
+sales_positioning:
+  pricing_model: "package_pricing"
+  hero_offer: "website_plus_cms"
+  enterprise_motion: "website_plus_portal_or_custom_program"
