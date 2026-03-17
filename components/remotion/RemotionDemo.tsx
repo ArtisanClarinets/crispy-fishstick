@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense } from 'react';
 import { Player } from '@remotion/player';
 import { VantusDynamicHero } from './VantusDynamicHero';
 import { DataStreamAnimation } from './DataStreamAnimation';

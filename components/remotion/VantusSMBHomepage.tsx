@@ -1,6 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
-import { Check, Zap, Shield, BarChart3 } from 'lucide-react';
 
 export const VantusSMBHomepage = () => {
     return (
@@ -43,7 +41,7 @@ export const VantusSMBHomepage = () => {
                             fontWeight: 400
                         }}
                     >
-                        Running a business is hard. Your tech shouldn't be. We fix your digital leaks and help you grow without the headache.
+                        Running a business is hard. Your tech shouldn&apos;t be. We fix your digital leaks and help you grow without the headache.
                     </p>
                     <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                         <span
@@ -100,7 +98,7 @@ export const VantusSMBHomepage = () => {
                             margin: '0 0 48px 0'
                         }}
                     >
-                        Sound like your situation? Here's what we hear from business owners like you:
+                        Sound like your situation? Here&apos;s what we hear from business owners like you:
                     </p>
 
                     <div
@@ -113,7 +111,7 @@ export const VantusSMBHomepage = () => {
                         {[
                             'Slow websites lose customers before they even say hello.',
                             'Tech breaks at the worst times. Your team scrambles.',
-                            'Nobody explains what\'s happening. It\'s all confusing jargon.'
+                            'Nobody explains what&apos;s happening. It&apos;s all confusing jargon.'
                         ].map((problem, idx) => (
                             <div
                                 key={idx}
@@ -222,7 +220,7 @@ export const VantusSMBHomepage = () => {
                             marginRight: 'auto'
                         }}
                     >
-                        We take the complexity out. Here's what changes:
+                        We take the complexity out. Here&apos;s what changes:
                     </p>
 
                     <div
@@ -370,7 +368,7 @@ export const VantusSMBHomepage = () => {
                             opacity: 0.95
                         }}
                     >
-                        Get a free tech audit and see exactly where you're losing time and money.
+                        Get a free tech audit and see exactly where you&apos;re losing time and money.
                     </p>
 
                     <button

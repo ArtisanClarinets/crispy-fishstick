@@ -244,6 +244,7 @@
         // Calculate total
         const monthlyTotal = monthlyUsersCost + serverCostMonthly;
         const annualTotal = annualUsersCost + serverCostAnnual;
+        const annualTotalWithDiscount = calculateAnnualPrice(monthlyTotal);
 
         return {
             tier: tier.name,
@@ -256,8 +257,10 @@
             totals: {
                 monthly: monthlyTotal,
                 annual: annualTotal,
+                annualWithDiscount: annualTotalWithDiscount,
                 monthlyPerUser: users > 0 ? monthlyTotal / users : 0
             },
+            totalServers,
             savings: {
                 annualVsMonthly: (monthlyTotal * 12) - annualTotal,
                 includedServers: includedCount

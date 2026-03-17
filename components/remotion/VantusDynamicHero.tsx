@@ -1,9 +1,8 @@
 import React from 'react';
-import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
 
 export const VantusDynamicHero: React.FC = () => {
     const frame = useCurrentFrame();
-    const { fps, width, height } = useVideoConfig();
 
     // Subtle drift animation
     const driftY = Math.sin(frame / 60) * 10;
