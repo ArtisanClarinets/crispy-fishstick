@@ -22,7 +22,12 @@ function getAuthSecret(): string {
 
   if (!envValidation.success) {
     const errors = envValidation.error.format();
-    console.error("Environment validation errors:", errors);
+    // In production, log errors prominently; in development, use debug to reduce noise
+    if (process.env.NODE_ENV === "production") {
+      console.error("Environment validation errors:", errors);
+    } else {
+      console.debug("Environment validation errors (using dev fallbacks):", errors);
+    }
 
     // In production, fail fast on validation errors
     if (process.env.NODE_ENV === "production") {
@@ -31,7 +36,7 @@ function getAuthSecret(): string {
       );
     }
 
-    console.warn("Using development fallback due to environment validation errors");
+    console.debug("Using development fallback due to environment validation errors");
   }
 
   const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
@@ -43,7 +48,12 @@ function getAuthSecret(): string {
   }
 
   if (!secret) {
-    console.warn("No auth secret found. Generating a random fallback secret for development.");
+    // In development, use debug to reduce noise; in production, warn about missing secret
+    if (process.env.NODE_ENV === "production") {
+      console.warn("No auth secret found. Generating a random fallback secret for development.");
+    } else {
+      console.debug("No auth secret found. Generating a random fallback secret for development.");
+    }
     // Generate a random 32-byte hex string (64 characters)
     if (typeof crypto !== "undefined" && crypto.getRandomValues) {
       const array = new Uint8Array(32);
@@ -55,7 +65,12 @@ function getAuthSecret(): string {
   }
 
   if (secret.length < 32) {
-    console.warn("Auth secret should be at least 32 characters for production security");
+    // In development, use debug to reduce noise; in production, warn about short secret
+    if (process.env.NODE_ENV === "production") {
+      console.warn("Auth secret should be at least 32 characters for production security");
+    } else {
+      console.debug("Auth secret should be at least 32 characters for production security");
+    }
     if (process.env.NODE_ENV === "production") {
       throw new Error("NEXTAUTH_SECRET must be at least 32 characters in production");
     }
