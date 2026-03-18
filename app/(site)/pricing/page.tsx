@@ -1,131 +1,175 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Info } from "lucide-react";
+import { OFFERS, INFRASTRUCTURE, ADD_ONS, PRICING_NOTE } from "@/lib/pricing";
+
+export const metadata: Metadata = {
+  title: "Pricing | Vantus Systems",
+  description:
+    "Transparent, project-based pricing for web engineering. Website rebuilds starting at $15,000. No retainers, no surprises.",
+};
 
 export default function PricingPage() {
-  const packages = [
-    {
-      name: "Starter",
-      description: "Perfect for a launch or refresh.",
-      price: "$2,500",
-      features: [
-        "High-performance Landing Page",
-        "CMS Integration (Sanity/Contentful)",
-        "Basic SEO Setup",
-        "Contact Form & Lead Capture",
-        "Mobile Optimized",
-        "1 Month Support"
-      ],
-      notIncluded: [
-        "Complex backend logic",
-        "User accounts/Auth",
-        "Payment processing"
-      ]
-    },
-    {
-      name: "Growth",
-      description: "Systems & Automation for scaling.",
-      price: "$5,000",
-      popular: true,
-      features: [
-        "Everything in Starter",
-        "Booking/Scheduling System",
-        "Payment Integration (Stripe)",
-        "Automated Email Notifications",
-        "CRM Integration (HubSpot/Salesforce)",
-        "3 Months Support"
-      ],
-      notIncluded: [
-        "Custom mobile app",
-        "Enterprise SSO"
-      ]
-    },
-    {
-      name: "Scale",
-      description: "Advanced custom engineering.",
-      price: "$10,000+",
-      features: [
-        "Everything in Growth",
-        "Multi-location support",
-        "Custom Database Architecture",
-        "User Authentication & Portals",
-        "Advanced Analytics Dashboard",
-        "Priority Support SLA"
-      ],
-      notIncluded: []
-    }
-  ];
-
   return (
-    <div className="container py-12 md:py-24 space-y-16">
-      <div className="text-center max-w-3xl mx-auto space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Transparent Pricing</h1>
-        <p className="text-xl text-muted-foreground">
-          Fixed prices. Clear scope. No surprise invoices.
+    <div className="flex flex-col gap-16 md:gap-24 pb-24">
+      {/* Header */}
+      <section className="pt-16 md:pt-24 px-4 md:px-6 lg:px-8 max-w-5xl mx-auto w-full text-center space-y-4">
+        <Badge variant="secondary" className="uppercase tracking-wider text-xs font-semibold">
+          Transparent Pricing
+        </Badge>
+        <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance">
+          Fixed scope. Clear investment.
+        </h1>
+        <p className="font-body text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed text-balance">
+          All pricing is project-based. Ranges reflect typical investment based on scope complexity.
+          You receive a written, fixed-price proposal before any work begins.
         </p>
-      </div>
+      </section>
 
-      <div className="grid md:grid-cols-3 gap-8 items-start">
-        {packages.map((pkg, index) => (
-          <Card key={index} className={`flex flex-col h-full card-precision relative ${pkg.popular ? 'border-primary ring-1 ring-primary shadow-lg' : ''}`}>
-            {pkg.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
-                    Most Popular
+      {/* Core Offers — price-focused comparison table rows */}
+      <section className="px-4 md:px-6 lg:px-8 max-w-5xl mx-auto w-full space-y-4">
+        <h2 className="font-heading text-2xl font-bold">Core offers</h2>
+        <p className="font-body text-sm text-muted-foreground">
+          Ranges reflect scope complexity. Your written proposal contains a single fixed price.
+        </p>
+        <div className="divide-y divide-border rounded-2xl border border-border overflow-hidden">
+          {OFFERS.map((offer) => (
+            <div
+              key={offer.slug}
+              className={`flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 p-6 bg-card ${
+                offer.featured ? "bg-[var(--vantus-sky)]/5" : ""
+              }`}
+            >
+              <div className="flex-1 min-w-0 space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-heading font-bold">{offer.name}</h3>
+                  {offer.featured && (
+                    <span className="text-xs font-semibold bg-[var(--vantus-sky)]/15 text-[var(--vantus-sky)] px-2 py-0.5 rounded-full">
+                      Most common
+                    </span>
+                  )}
                 </div>
-            )}
-            <CardHeader>
-              <CardTitle className="text-2xl">{pkg.name}</CardTitle>
-              <CardDescription>{pkg.description}</CardDescription>
-              <div className="mt-4">
-                  <span className="text-4xl font-bold">{pkg.price}</span>
-                  <span className="text-muted-foreground text-sm ml-2">/ project</span>
+                <p className="font-body text-sm text-muted-foreground">{offer.tagline}</p>
               </div>
-            </CardHeader>
-            <CardContent className="flex-1 space-y-6">
-               <div>
-                   <h4 className="font-semibold text-sm mb-3">Includes:</h4>
-                   <ul className="space-y-2">
-                       {pkg.features.map((feature, i) => (
-                           <li key={i} className="flex items-start gap-2 text-sm">
-                               <Check className="h-4 w-4 text-signal-success mt-0.5 shrink-0" />
-                               <span>{feature}</span>
-                           </li>
-                       ))}
-                   </ul>
-               </div>
-               {pkg.notIncluded.length > 0 && (
-                   <div>
-                       <h4 className="font-semibold text-sm mb-3 text-muted-foreground">Not included:</h4>
-                       <ul className="space-y-2">
-                           {pkg.notIncluded.map((feature, i) => (
-                               <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                   <X className="h-4 w-4 mt-0.5 shrink-0 opacity-50" />
-                                   <span>{feature}</span>
-                               </li>
-                           ))}
-                       </ul>
-                   </div>
-               )}
-            </CardContent>
-            <CardFooter>
-                <Button asChild className="w-full btn-precision" variant={pkg.popular ? "default" : "outline"}>
-                    <Link href="/contact">Select Package</Link>
-                </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
 
-      {/* Budget Reality Check */}
-      <section className="bg-muted/30 rounded-2xl p-8 md:p-12">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-              <h2 className="text-2xl md:text-3xl font-bold">Budget Reality Check</h2>
-              <p className="text-muted-foreground">
-                  We believe in financial transparency. If your budget is under $2,500, we might not be the best fit right now.
-                  However, we highly recommend <Link href="/resources" className="underline underline-offset-4 decoration-primary/50 hover:decoration-primary">launching with these free tools</Link> instead of hiring a cheap freelancer who might deliver broken code.
-              </p>
+              <div className="sm:text-right shrink-0 space-y-0.5">
+                <p className="font-heading text-2xl font-black text-[var(--vantus-sky)]">{offer.rangeLabel}</p>
+                <p className="text-xs text-muted-foreground">Typical investment · {offer.timeline}</p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                <Button asChild size="sm" className="rounded-full">
+                  <Link href="/start-audit">
+                    Start audit <ArrowRight className="h-3 w-3 ml-1" />
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" size="sm" className="rounded-full text-xs">
+                  <Link href={`/services/${offer.slug}`}>Scope details →</Link>
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Infrastructure Add-ons */}
+      <section className="bg-muted/30 border-y border-border py-16 px-4 md:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          <div className="space-y-2">
+            <h2 className="font-heading text-2xl font-bold">Infrastructure</h2>
+            <p className="font-body text-muted-foreground text-sm">
+              Hosting and deployment are scoped separately and added to any core offer.
+            </p>
           </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {INFRASTRUCTURE.map((infra) => (
+              <div key={infra.slug} className="rounded-xl border border-border bg-card p-6 space-y-2">
+                <div className="flex justify-between items-start gap-4">
+                  <h3 className="font-heading font-bold">{infra.name}</h3>
+                  <span className="font-semibold text-sm text-[var(--vantus-sky)] whitespace-nowrap">
+                    {infra.rangeLabel}
+                  </span>
+                </div>
+                <p className="font-body text-sm text-muted-foreground">{infra.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Add-ons */}
+      <section className="px-4 md:px-6 lg:px-8 max-w-5xl mx-auto w-full space-y-8">
+        <div className="space-y-2">
+          <h2 className="font-heading text-2xl font-bold">Optional Add-ons</h2>
+          <p className="font-body text-muted-foreground text-sm">
+            Scoped and priced after core project discovery. All add-ons are optional.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {ADD_ONS.map((addon) => (
+            <div key={addon.slug} className="rounded-xl border border-border bg-card p-5 space-y-2">
+              <div className="flex justify-between items-start gap-2">
+                <h3 className="font-heading font-semibold text-sm">{addon.name}</h3>
+                <span className="text-xs font-semibold text-[var(--vantus-sky)] whitespace-nowrap">
+                  {addon.rangeLabel}
+                </span>
+              </div>
+              <p className="font-body text-xs text-muted-foreground leading-relaxed">{addon.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Legal Note */}
+      <section className="px-4 md:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+        <div className="rounded-2xl border border-border bg-muted/30 p-6 flex gap-4 items-start">
+          <Info className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
+          <p className="font-body text-sm text-muted-foreground leading-relaxed">{PRICING_NOTE}</p>
+        </div>
+      </section>
+
+      {/* FAQ strip */}
+      <section className="px-4 md:px-6 lg:px-8 max-w-4xl mx-auto w-full space-y-8">
+        <h2 className="font-heading text-2xl font-bold">Common questions</h2>
+        <dl className="space-y-6">
+          {[
+            {
+              q: "Do you offer monthly retainers?",
+              a: "Our core offers are project-based with a fixed price and fixed scope. We do offer optional support agreements after handoff—ask during discovery.",
+            },
+            {
+              q: "Why are ranges so wide?",
+              a: "Scope varies significantly. A 5-page brochure site and a 50-page multi-language site are both website rebuilds. Your written proposal will contain a single fixed price, not a range.",
+            },
+            {
+              q: "Can we start small and expand later?",
+              a: "Yes. We design systems to be extended. Many clients begin with a Website Rebuild and add a CMS or portal in a subsequent engagement.",
+            },
+            {
+              q: "What happens if scope changes?",
+              a: "Any scope change is agreed in writing with a change order and adjusted price. We do not absorb undiscovered requirements without a formal agreement.",
+            },
+          ].map(({ q, a }) => (
+            <div key={q} className="space-y-2 border-b border-border pb-6 last:border-0 last:pb-0">
+              <dt className="font-heading font-bold">{q}</dt>
+              <dd className="font-body text-muted-foreground leading-relaxed">{a}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {/* CTA */}
+      <section className="px-4 md:px-6 lg:px-8 max-w-3xl mx-auto w-full text-center space-y-6">
+        <h2 className="font-heading text-2xl md:text-3xl font-bold">Get a written proposal</h2>
+        <p className="font-body text-muted-foreground">
+          Start with a free audit. We review your current setup and return a fixed-price proposal
+          within five business days.
+        </p>
+        <Button asChild size="lg" className="rounded-full px-10 font-semibold">
+          <Link href="/start-audit">Start Your Free Audit</Link>
+        </Button>
       </section>
     </div>
   );

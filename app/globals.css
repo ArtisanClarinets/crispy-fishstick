@@ -4,7 +4,10 @@
 
 @theme {
   /* Fonts */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
+  --font-heading: var(--font-poppins), Arial, Helvetica, sans-serif;
+  --font-body: var(--font-lora), Georgia, "Times New Roman", serif;
 
   /* Radius */
   --radius-lg: var(--radius);
@@ -54,6 +57,22 @@
   --color-surface-50: var(--surface-50);
   --color-surface-100: var(--surface-100);
   --color-surface-200: var(--surface-200);
+
+  /* Vantus Brand Colors */
+  --color-vantus-ink-950: var(--vantus-ink-950);
+  --color-vantus-navy-900: var(--vantus-navy-900);
+  --color-vantus-navy-800: var(--vantus-navy-800);
+  --color-vantus-blue-700: var(--vantus-blue-700);
+  --color-vantus-blue-600: var(--vantus-blue-600);
+  --color-vantus-sky-500: var(--vantus-sky-500);
+  --color-vantus-steel-400: var(--vantus-steel-400);
+  --color-vantus-cream-050: var(--vantus-cream-050);
+  --color-vantus-slate-200: var(--vantus-slate-200);
+  --color-vantus-slate-500: var(--vantus-slate-500);
+  --color-vantus-slate-700: var(--vantus-slate-700);
+  --color-brand-primary: var(--vantus-brand-primary);
+  --color-brand-secondary: var(--vantus-brand-secondary);
+  --color-brand-accent: var(--vantus-brand-accent);
 
   /* Animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -120,6 +139,22 @@
 
 @layer base {
   :root {
+    /* Vantus Brand Tokens */
+    --vantus-ink-950: #0C131A;
+    --vantus-navy-900: #10283B;
+    --vantus-navy-800: #16334F;
+    --vantus-blue-700: #244A6D;
+    --vantus-blue-600: #2E6B94;
+    --vantus-sky-500: #50A5D0;
+    --vantus-steel-400: #6C92A6;
+    --vantus-cream-050: #F9F8F4;
+    --vantus-slate-200: #D8DEE2;
+    --vantus-slate-500: #4F6170;
+    --vantus-slate-700: #334657;
+    --vantus-brand-primary: var(--vantus-navy-900);
+    --vantus-brand-secondary: var(--vantus-blue-700);
+    --vantus-brand-accent: var(--vantus-sky-500);
+
     /* Premium Light Mode (OKLCH) */
     --background: oklch(1 0 0); /* White */
     --foreground: oklch(0.18 0.01 254); /* Dark Slate */
@@ -180,6 +215,11 @@
   }
 
   .dark {
+    /* Vantus Brand (Dark) */
+    --vantus-brand-primary: var(--vantus-blue-600);
+    --vantus-brand-secondary: var(--vantus-steel-400);
+    --vantus-brand-accent: var(--vantus-sky-500);
+
     /* Premium Dark Mode (OKLCH) */
     --background: oklch(0.13 0.01 261); /* #0c0d12 */
     --foreground: oklch(0.98 0.002 247);
@@ -249,7 +289,7 @@
 
   /* Corporate Typography Defaults */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans tracking-tight font-bold text-foreground;
+    @apply font-heading tracking-tight font-bold text-foreground;
   }
 
   /* Grain Texture using CSS noise */

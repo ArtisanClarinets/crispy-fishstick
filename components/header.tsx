@@ -40,13 +40,10 @@ export function Header() {
     };
   }, [isOpen]);
 
-  const navLinks = [
-    { href: "/work", label: "Work" },
-    { href: "/performance", label: "System" }, // Renamed from Infrastructure
-    { href: "/lab/revenue-leak", label: "Lab" },
-    { href: "/process", label: "Process" },
-    { href: "/trust", label: "Trust" },
-  ];
+  const navLinks = siteConfig.mainNav.map((item) => ({
+    href: item.href,
+    label: item.title,
+  }));
 
   return (
     <header

@@ -21,18 +21,18 @@ export function Footer() {
             <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground/80">Services</h4>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/services" className="text-foreground/80 hover:text-foreground transition-colors">
-                  Design Engineering
+                <Link href="/services/website-rebuild" className="text-foreground/80 hover:text-foreground transition-colors">
+                  Website Rebuild
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-foreground/80 hover:text-foreground transition-colors">
-                  Frontend Architecture
+                <Link href="/services/website-plus-cms" className="text-foreground/80 hover:text-foreground transition-colors">
+                  Website + CMS
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-foreground/80 hover:text-foreground transition-colors">
-                  Commerce Systems
+                <Link href="/services/website-plus-portal" className="text-foreground/80 hover:text-foreground transition-colors">
+                  Website + Business Portal
                 </Link>
               </li>
             </ul>
@@ -80,8 +80,8 @@ export function Footer() {
             &copy; {currentYear} {siteConfig.company}. All rights reserved.
           </p>
           <div className="flex gap-6 text-xs text-muted-foreground">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+            <Link href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+            <Link href="/legal/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
              <span className="w-2 h-2 rounded-full bg-signal-success animate-pulse" />

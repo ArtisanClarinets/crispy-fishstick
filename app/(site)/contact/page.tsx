@@ -37,7 +37,7 @@ export default function ContactPage() {
     <div className="container py-12 md:py-24 grid md:grid-cols-2 gap-16 max-w-6xl mx-auto">
       <div className="space-y-8">
           <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Let&apos;s Talk</h1>
+              <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-tight">Let&apos;s Talk</h1>
               <p className="text-xl text-muted-foreground">
                   Ready to build something rigorous? Send us a message or book a time.
               </p>
@@ -56,8 +56,8 @@ export default function ContactPage() {
                   <div>
                       <h3 className="font-semibold">Service Area</h3>
                       <p className="text-muted-foreground">
-                          Based in US/EU. Remote-first.
-                          <br/>We work with clients specifically in UTC-5 to UTC+1 timezones.
+                          Gulf Coast, Texas — working remotely across North America.
+                          <br/>Available in UTC−8 to UTC+1 timezones.
                       </p>
                   </div>
               </div>
@@ -108,7 +108,7 @@ export default function ContactPage() {
                     {errors.message && <p className="text-destructive text-xs">{errors.message[0]}</p>}
                 </div>
 
-                <Button type="submit" className="w-full btn-precision" disabled={isSubmitting}>
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...

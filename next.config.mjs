@@ -23,6 +23,28 @@ const nextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
+  async redirects() {
+    return [
+      // Legacy route aliases → canonical routes
+      { source: '/audit', destination: '/start-audit', permanent: true },
+      { source: '/how-it-works', destination: '/services', permanent: true },
+      { source: '/trust', destination: '/proof', permanent: true },
+      { source: '/resources', destination: '/learn', permanent: true },
+      { source: '/work', destination: '/proof', permanent: true },
+      { source: '/work/:slug', destination: '/proof/case-studies/:slug', permanent: true },
+      { source: '/platform', destination: '/services', permanent: true },
+      { source: '/process', destination: '/services', permanent: true },
+      { source: '/academy', destination: '/learn', permanent: true },
+      { source: '/faq', destination: '/pricing', permanent: true },
+      // Legal shorthand
+      { source: '/privacy', destination: '/legal/privacy', permanent: true },
+      { source: '/terms', destination: '/legal/terms', permanent: true },
+      { source: '/cookies', destination: '/legal/cookies', permanent: true },
+      // Insights → learn
+      { source: '/insights', destination: '/learn', permanent: true },
+      { source: '/insights/:slug', destination: '/learn/design/:slug', permanent: false },
+    ];
+  },
 };
 
 const withMDX = createMDX({

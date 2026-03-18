@@ -5,8 +5,8 @@ export default function AboutPage() {
   return (
     <div className="container py-12 md:py-24 max-w-3xl mx-auto space-y-12">
       <div className="space-y-6">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Math, Not Marketing.</h1>
-        <p className="text-xl text-muted-foreground leading-relaxed">
+        <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-tight">Math, Not Marketing.</h1>
+        <p className="font-body text-xl text-muted-foreground leading-relaxed">
            Vantus Systems was founded on a simple frustration: Small businesses are constantly being sold &quot;magic&quot; marketing solutions that are technically broken.
         </p>
       </div>
@@ -16,22 +16,22 @@ export default function AboutPage() {
               We are not a marketing agency. We don&apos;t sell &quot;vibes&quot;. We are an engineering studio.
               We believe that a website is a software product, and it should be built with the same rigor as a banking app or a flight control system.
           </p>
-          <h3>Our Principles</h3>
+          <h3 className="font-heading">Our Principles</h3>
           <ul>
               <li><strong>Transparency:</strong> If we don&apos;t know, we say so. If it costs more, we explain why.</li>
               <li><strong>Ownership:</strong> You should never feel trapped by your vendor. We build systems you own.</li>
               <li><strong>Performance:</strong> We obsess over milliseconds because speed equals trust.</li>
           </ul>
-          <h3>Why &quot;Vantus&quot;?</h3>
+          <h3 className="font-heading">Why &quot;Vantus&quot;?</h3>
           <p>
-              Derived from &quot;Advantage&quot;. We give small businesses the unfair advantage of enterprise-grade engineering, without the enterprise-grade bureaucracy.
+              Derived from &quot;Advantage&quot;. We give small businesses the advantage of engineering-grade web development — without the enterprise bureaucracy or offshore compromises. Based on the Gulf Coast, working remotely across North America.
           </p>
       </div>
 
       <div className="border-t pt-12">
-          <h2 className="text-2xl font-bold mb-6">Ready to work with engineers?</h2>
-          <Button asChild size="lg" className="btn-precision rounded-full px-8">
-              <Link href="/audit">Get Your Free Audit</Link>
+          <h2 className="font-heading text-2xl font-bold mb-6">Ready to work with engineers?</h2>
+          <Button asChild size="lg" className="rounded-full px-8">
+              <Link href="/start-audit">Get Your Free Audit</Link>
           </Button>
       </div>
     </div>

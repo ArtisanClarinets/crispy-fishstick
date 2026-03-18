@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { headers } from "next/headers";
 import { AuthProvider } from "@/components/auth-provider";
@@ -10,11 +9,20 @@ import { VisitedPathProvider } from "@/components/visited-path-provider";
 import { AppMotionConfig } from "@/components/motion-config";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Poppins, Lora } from "next/font/google";
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-inter",
-  display: 'swap',
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
+const lora = Lora({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-lora",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,6 +36,10 @@ export const metadata: Metadata = {
     "Software Engineering",
     "Small Business Website",
     "Systems Architecture",
+    "Website Rebuild",
+    "Business Portal",
+    "Gulf Coast",
+    "Professional Web Development",
     "Next.js",
     "React",
     "TypeScript",
@@ -68,7 +80,8 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className={cn(
-        inter.variable,
+        poppins.variable,
+        lora.variable,
         "font-sans antialiased min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary"
       )}>
         <AuthProvider session={session}>

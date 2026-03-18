@@ -12,8 +12,8 @@ export const siteConfig = {
   },
   cta: {
     primary: {
-      text: "Get a Free Mini-Audit",
-      href: "/audit",
+      text: "Start Your Audit",
+      href: "/start-audit",
     },
     secondary: {
       text: "See Packages",
@@ -30,16 +30,16 @@ export const siteConfig = {
       href: "/pricing",
     },
     {
-      title: "How it Works",
-      href: "/how-it-works",
+      title: "Proof",
+      href: "/proof",
     },
     {
-      title: "Trust",
-      href: "/trust",
+      title: "Standards",
+      href: "/standards",
     },
     {
-      title: "Resources",
-      href: "/resources",
+      title: "Learn",
+      href: "/learn",
     },
   ],
   mobileNav: [
@@ -59,8 +59,8 @@ export const siteConfig = {
       icon: "CreditCard",
     },
     {
-      title: "Audit",
-      href: "/audit",
+      title: "Start Audit",
+      href: "/start-audit",
       icon: "Activity",
     },
     {
@@ -71,21 +71,27 @@ export const siteConfig = {
   ],
   packages: [
     {
-        name: "Starter",
-        price: "$2,500",
-        description: "Perfect for launch or refresh."
+      name: "Website Rebuild",
+      slug: "website-rebuild",
+      price: "From $15,000",
+      range: "$15K – $55K",
+      description: "Modern, complete website rebuild with production-grade engineering.",
     },
     {
-        name: "Growth",
-        price: "$5,000",
-        description: "Systems + Automation."
+      name: "Website + CMS",
+      slug: "website-plus-cms",
+      price: "From $32,000",
+      range: "$32K – $125K",
+      description: "Full website with content management system. Recommended for most businesses.",
     },
     {
-        name: "Scale",
-        price: "$10,000+",
-        description: "Multi-location / Advanced."
-    }
-  ]
+      name: "Website + Business Portal",
+      slug: "website-plus-portal",
+      price: "From $90,000",
+      range: "$90K – $400K",
+      description: "Enterprise-grade website with custom business portal and integrations.",
+    },
+  ],
 };
 
 export type SiteConfig = typeof siteConfig;
