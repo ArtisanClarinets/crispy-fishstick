@@ -46,33 +46,36 @@ export default async function OfferDetailPage({ params }: Props) {
       {/* Hero */}
       <section className="px-4 md:px-6 lg:px-8 max-w-5xl mx-auto w-full grid md:grid-cols-2 gap-12 items-start">
         <div className="space-y-6">
-          <Badge variant="secondary" className="uppercase tracking-wider text-xs font-semibold">
+          <Badge variant="secondary" className="badge-sky uppercase tracking-wider text-xs font-semibold">
             Service Offer
           </Badge>
           <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-tight text-balance">
             {offer.name}
           </h1>
           <p className="font-body text-xl text-muted-foreground leading-relaxed">{offer.tagline}</p>
-          <p className="font-body text-muted-foreground leading-relaxed">{offer.ideal}</p>
-          <Button asChild size="lg" className="rounded-full px-8 font-semibold">
+          <div className="rounded-xl border border-border bg-muted/30 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider mb-1 text-sky">Best fit</p>
+            <p className="font-body text-sm text-muted-foreground leading-relaxed">{offer.ideal}</p>
+          </div>
+          <Button asChild size="lg" className="rounded-full px-8 font-semibold btn-sky-glow">
             <Link href="/start-audit">
-              Start Your Audit <ArrowRight className="h-4 w-4 ml-1" />
+              Start Your Free Audit <ArrowRight className="h-4 w-4 ml-1" />
             </Link>
           </Button>
         </div>
 
         {/* Pricing card */}
-        <div className="rounded-2xl border border-[var(--vantus-sky)] bg-card p-8 space-y-6">
+        <div className="rounded-2xl border bg-card p-8 space-y-6 card-glow border-sky">
           <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">
+            <p className="text-xs font-semibold uppercase tracking-wider mb-1 text-sky">
               Typical Investment
             </p>
-            <p className="font-heading text-4xl font-black text-[var(--vantus-sky)]">
+            <p className="font-heading text-4xl font-black text-gradient-brand">
               {offer.rangeLabel}
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+            <p className="text-xs font-semibold uppercase tracking-wider text-sky">
               Typical Timeline
             </p>
             <p className="font-body text-lg font-semibold">{offer.timeline}</p>
@@ -85,11 +88,15 @@ export default async function OfferDetailPage({ params }: Props) {
 
       {/* Outcomes */}
       <section className="px-4 md:px-6 lg:px-8 max-w-5xl mx-auto w-full space-y-8">
-        <h2 className="font-heading text-2xl md:text-3xl font-bold">What you gain</h2>
+        <div>
+          <span className="accent-bar" />
+          <h2 className="font-heading text-2xl md:text-3xl font-bold">What changes for your business</h2>
+          <p className="font-body text-muted-foreground mt-1">Concrete outcomes delivered at project close.</p>
+        </div>
         <ul className="grid md:grid-cols-2 gap-4">
           {offer.outcomes.map((outcome) => (
-            <li key={outcome} className="flex items-start gap-3 rounded-xl border border-border p-5 bg-card">
-              <CheckCircle2 className="h-5 w-5 text-[var(--vantus-sky)] mt-0.5 shrink-0" />
+            <li key={outcome} className="flex items-start gap-3 rounded-xl border border-border p-5 bg-card card-glow">
+              <CheckCircle2 className="h-5 w-5 mt-0.5 shrink-0 text-sky" />
               <span className="font-body leading-relaxed">{outcome}</span>
             </li>
           ))}
@@ -97,13 +104,17 @@ export default async function OfferDetailPage({ params }: Props) {
       </section>
 
       {/* Deliverables */}
-      <section className="bg-muted/30 border-y border-border py-16 px-4 md:px-6 lg:px-8">
+      <section className="bg-sky-subtle border-y border-border py-16 px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold">What we deliver</h2>
+          <div>
+            <span className="accent-bar" />
+            <h2 className="font-heading text-2xl md:text-3xl font-bold">Technical deliverables</h2>
+            <p className="font-body text-muted-foreground mt-1">Everything handed over at project close. No exceptions, no ongoing dependency on us.</p>
+          </div>
           <ul className="grid md:grid-cols-2 gap-3">
             {offer.deliverables.map((item) => (
               <li key={item} className="flex items-center gap-2 text-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--vantus-sky)] shrink-0" />
+                <span className="h-1.5 w-1.5 rounded-full shrink-0 bg-sky" />
                 <span className="font-body">{item}</span>
               </li>
             ))}
@@ -116,16 +127,16 @@ export default async function OfferDetailPage({ params }: Props) {
         <h2 className="font-heading text-xl font-bold text-muted-foreground">Other offers</h2>
         <div className="grid md:grid-cols-2 gap-6">
           {otherOffers.map((o) => (
-            <Link
+          <Link
               key={o.slug}
               href={`/services/${o.slug}`}
-              className="group rounded-2xl border border-border p-6 hover:border-[var(--vantus-sky)] transition-colors bg-card space-y-2"
+              className="group rounded-2xl border border-border p-6 card-glow bg-card space-y-2"
             >
               <h3 className="font-heading font-bold text-lg group-hover:text-[var(--vantus-sky)] transition-colors">
                 {o.name}
               </h3>
               <p className="font-body text-sm text-muted-foreground">{o.tagline}</p>
-              <p className="text-sm font-semibold text-[var(--vantus-sky)]">{o.rangeLabel}</p>
+              <p className="text-sm font-semibold text-gradient-brand">{o.rangeLabel}</p>
             </Link>
           ))}
         </div>
@@ -137,9 +148,10 @@ export default async function OfferDetailPage({ params }: Props) {
           Ready to scope your project?
         </h2>
         <p className="font-body text-muted-foreground">
-          Start with a free audit. We&apos;ll review your current setup and provide a written proposal—no obligation.
+          Start with a free audit. We review your current setup, identify the right scope,
+          and return a written fixed-price proposal within five business days — no obligation.
         </p>
-        <Button asChild size="lg" className="rounded-full px-10 font-semibold">
+        <Button asChild size="lg" className="rounded-full px-10 font-semibold btn-sky-glow">
           <Link href="/start-audit">Start Your Free Audit</Link>
         </Button>
       </section>

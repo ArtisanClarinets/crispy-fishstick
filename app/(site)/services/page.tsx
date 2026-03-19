@@ -91,21 +91,22 @@ export default function ServicesPage() {
       </section>
 
       {/* Process Strip */}
-      <section className="bg-muted/30 border-y border-border py-16 px-4 md:px-6 lg:px-8">
+      <section className="bg-sky-subtle border-y border-border py-16 px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-10">
           <div className="text-center space-y-2">
-            <h2 className="font-heading text-2xl md:text-3xl font-bold">How we work</h2>
-            <p className="font-body text-muted-foreground">Every engagement follows the same disciplined sequence.</p>
+            <span className="accent-bar mx-auto" />
+            <h2 className="font-heading text-2xl md:text-3xl font-bold">Our engagement model</h2>
+            <p className="font-body text-muted-foreground">Every project follows the same disciplined sequence — no shortcuts, no surprises.</p>
           </div>
           <ol className="grid md:grid-cols-4 gap-6">
             {[
-              { step: "01", title: "Discovery", body: "We interview stakeholders, audit existing systems, and document scope before writing a line of code." },
-              { step: "02", title: "Scope & Proposal", body: "You receive a written, fixed-price proposal with milestones. No vague estimates." },
-              { step: "03", title: "Build", body: "Our team implements in weekly sprints with demo checkpoints. You see progress continuously." },
-              { step: "04", title: "Handoff", body: "We deliver full source code, documentation, and credentials. You own everything." },
+              { step: "01", title: "Discovery", body: "We interview you, audit your current setup, and document what needs to change before writing a line of code." },
+              { step: "02", title: "Fixed Proposal", body: "You receive a written, fixed-price proposal with exact deliverables, milestones, and payment schedule." },
+              { step: "03", title: "Build", body: "Our team implements in focused sprints. You get plain-English updates weekly. No surprises at the finish line." },
+              { step: "04", title: "Handoff", body: "Full source code, all credentials, and a walkthrough session. You own and can operate everything without us." },
             ].map(({ step, title, body }) => (
               <li key={step} className="space-y-2">
-                <span className="font-heading text-4xl font-black text-[var(--vantus-sky)] opacity-60">{step}</span>
+                <span className="font-heading text-4xl font-black text-gradient-brand opacity-80">{step}</span>
                 <h3 className="font-heading font-bold text-lg">{title}</h3>
                 <p className="font-body text-sm text-muted-foreground leading-relaxed">{body}</p>
               </li>
@@ -116,12 +117,13 @@ export default function ServicesPage() {
 
       {/* Bottom CTA */}
       <section className="px-4 md:px-6 lg:px-8 max-w-3xl mx-auto w-full text-center space-y-6">
-        <h2 className="font-heading text-2xl md:text-3xl font-bold">Not sure which offer fits?</h2>
+        <h2 className="font-heading text-2xl md:text-3xl font-bold">Not sure which offer fits your situation?</h2>
         <p className="font-body text-muted-foreground">
-          Start with a free audit. We&apos;ll review your current setup and recommend the right scope—no obligation.
+          The free audit is designed to answer exactly that. We review what you have, what you need,
+          and recommend the right scope — no obligation.
         </p>
-        <Button asChild size="lg" className="rounded-full px-10 font-semibold">
-          <Link href="/start-audit">Start Your Free Audit</Link>
+        <Button asChild size="lg" className="rounded-full px-10 font-semibold btn-sky-glow">
+          <Link href="/start-audit">Get a Free Audit</Link>
         </Button>
       </section>
     </div>

@@ -51,14 +51,15 @@ export function DesktopHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors link-precision"
+              className="text-sm font-medium text-muted-foreground hover:text-[var(--vantus-sky)] transition-colors duration-200 relative group"
             >
               {link.title}
+              <span className="absolute -bottom-0.5 left-0 h-px w-0 rounded-full group-hover:w-full transition-all duration-300" style={{ background: "var(--gradient-brand)" }} />
             </Link>
           ))}
           <div className="w-px h-6 bg-border mx-2" />
           <ThemeToggle />
-          <Button asChild variant="default" className="rounded-full px-6 btn-precision">
+          <Button asChild variant="default" className="rounded-full px-6 btn-sky-glow font-semibold">
             <Link href={siteConfig.cta.primary.href}>
               {siteConfig.cta.primary.text}
             </Link>
@@ -66,10 +67,10 @@ export function DesktopHeader() {
         </nav>
       </div>
 
-      {/* Progress Line */}
+      {/* Progress Line — brand gradient */}
       <motion.div
-        className="absolute bottom-0 left-0 right-0 h-[1px] bg-primary origin-left"
-        style={{ scaleX }}
+        className="absolute bottom-0 left-0 right-0 h-[2px] origin-left"
+        style={{ scaleX, background: "var(--gradient-brand)" }}
       />
     </header>
   );

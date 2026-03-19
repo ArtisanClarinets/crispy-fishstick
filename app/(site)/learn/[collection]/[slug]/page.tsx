@@ -164,9 +164,8 @@ export default async function LearnArticlePage({ params }: Props) {
       {/* CTA */}
       <div className="px-4 md:px-6 lg:px-8 max-w-3xl mx-auto w-full">
         <div
-          className="rounded-2xl p-8 md:p-10 space-y-4 text-center"
-          style={{ background: "var(--vantus-navy)", color: "var(--vantus-cream)" }}
-        >
+          className="rounded-2xl p-8 md:p-10 space-y-4 text-center bg-navy text-cream"
+          >
           <h3 className="font-heading text-2xl font-bold">Ready to apply this to your business?</h3>
           <p className="font-body text-base opacity-80">
             A free audit is the fastest way to understand what your current site needs.
@@ -174,8 +173,7 @@ export default async function LearnArticlePage({ params }: Props) {
           <Button
             asChild
             size="lg"
-            className="rounded-full px-10 font-semibold"
-            style={{ background: "var(--vantus-sky)" }}
+            className="rounded-full px-10 font-semibold bg-sky"
           >
             <Link href="/start-audit">Start Your Free Audit</Link>
           </Button>

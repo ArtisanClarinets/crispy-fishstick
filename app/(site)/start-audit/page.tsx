@@ -51,11 +51,11 @@ export default function StartAuditPage() {
     <div className="flex flex-col gap-16 pb-24">
       {/* Header */}
       <section className="pt-16 md:pt-24 px-4 md:px-6 lg:px-8 max-w-4xl mx-auto w-full space-y-4">
-        <Badge variant="secondary" className="uppercase tracking-wider text-xs font-semibold">
+        <Badge variant="secondary" className="badge-sky uppercase tracking-wider text-xs font-semibold">
           Free — No Obligation
         </Badge>
         <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance">
-          Start Your<br className="hidden md:block" /> Free Audit
+          Start Your{" "}<span className="text-gradient-brand">Free Audit</span>
         </h1>
         <p className="font-body text-xl text-muted-foreground max-w-2xl leading-relaxed">
           Tell us about your current site and top concern. We will review it and return a written
@@ -69,7 +69,7 @@ export default function StartAuditPage() {
             "Specific findings, not generic advice",
           ].map((item) => (
             <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--vantus-sky)" }} />
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-sky" />
               {item}
             </li>
           ))}
@@ -80,10 +80,9 @@ export default function StartAuditPage() {
       <section className="px-4 md:px-6 lg:px-8 max-w-2xl mx-auto w-full">
         {state?.success ? (
           <div
-            className="rounded-2xl p-10 text-center space-y-4"
-            style={{ background: "var(--vantus-navy)", color: "var(--vantus-cream)" }}
+            className="rounded-2xl p-10 text-center space-y-4 bg-navy text-cream"
           >
-            <CheckCircle2 className="h-12 w-12 mx-auto" style={{ color: "var(--vantus-sky)" }} />
+            <CheckCircle2 className="h-12 w-12 mx-auto text-sky" />
             <h2 className="font-heading text-2xl font-bold">Request Received</h2>
             <p className="font-body text-base opacity-80">
               {state.message ?? "We will have your written assessment ready within five business days."}
@@ -93,7 +92,7 @@ export default function StartAuditPage() {
           <form
             ref={formRef}
             action={formAction}
-            className="space-y-6 rounded-2xl border border-border bg-card p-6 md:p-8"
+            className="space-y-6 rounded-2xl border border-border bg-card p-6 md:p-8 card-glow"
           >
             {/* Name */}
             <div className="space-y-1.5">
@@ -195,7 +194,7 @@ export default function StartAuditPage() {
               type="submit"
               size="lg"
               disabled={isPending}
-              className="w-full rounded-full font-semibold"
+              className="w-full rounded-full font-semibold btn-sky-glow"
             >
               {isPending ? (
                 <>

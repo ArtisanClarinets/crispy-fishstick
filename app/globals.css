@@ -212,6 +212,22 @@
     --system-s: 15%;
     --system-l: 10%;
     --system-glow-a: 0.05;
+
+    /* ── Brand shorthand aliases ── */
+    --vantus-sky: var(--vantus-sky-500);
+    --vantus-navy: var(--vantus-navy-900);
+    --vantus-cream: var(--vantus-cream-050);
+
+    /* ── Light mode color pops ── */
+    --highlight-gold: #B45309;
+    --highlight-gold-subtle: rgba(180, 83, 9, 0.08);
+    --highlight-sky-subtle: rgba(80, 165, 208, 0.08);
+    --glow-sky: 0 0 0 1px rgba(80, 165, 208, 0.22), 0 8px 32px rgba(80, 165, 208, 0.15);
+    --glow-gold: 0 0 0 1px rgba(180, 83, 9, 0.25), 0 8px 32px rgba(180, 83, 9, 0.12);
+    --glow-card: 0 4px 24px -4px rgba(80, 165, 208, 0.16);
+    --gradient-brand: linear-gradient(135deg, #50A5D0 0%, #244A6D 100%);
+    --gradient-gold: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+    --gradient-hero: linear-gradient(135deg, #2E6B94 0%, #50A5D0 100%);
   }
 
   .dark {
@@ -275,6 +291,23 @@
     --system-s: 20%;
     --system-l: 6%;
     --system-glow-a: 0.15;
+
+    /* ── Dark mode brand overrides ── */
+    --vantus-sky: #38BDF8;
+    --vantus-sky-500: #38BDF8;
+    --vantus-navy: var(--vantus-navy-900);
+    --vantus-cream: var(--vantus-cream-050);
+
+    /* ── Dark mode color pops ── */
+    --highlight-gold: #FCD34D;
+    --highlight-gold-subtle: rgba(252, 211, 77, 0.1);
+    --highlight-sky-subtle: rgba(56, 189, 248, 0.1);
+    --glow-sky: 0 0 0 1px rgba(56, 189, 248, 0.3), 0 8px 40px rgba(56, 189, 248, 0.24);
+    --glow-gold: 0 0 0 1px rgba(252, 211, 77, 0.24), 0 8px 32px rgba(252, 211, 77, 0.18);
+    --glow-card: 0 4px 32px -4px rgba(56, 189, 248, 0.22);
+    --gradient-brand: linear-gradient(135deg, #38BDF8 0%, #0EA5E9 100%);
+    --gradient-gold: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
+    --gradient-hero: linear-gradient(135deg, #0EA5E9 0%, #818CF8 100%);
   }
 }
 
@@ -453,6 +486,112 @@
     body::before {
         display: none;
     }
+  }
+
+  /* ── Color Pop & Glow Utilities ───────────────────────── */
+
+  .text-gradient-brand {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-image: var(--gradient-brand);
+    display: inline;
+  }
+  .text-gradient-gold {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-image: var(--gradient-gold);
+    display: inline;
+  }
+  .text-gradient-hero {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-image: var(--gradient-hero);
+    display: inline;
+  }
+
+  .glow-sky  { box-shadow: var(--glow-sky);  }
+  .glow-gold { box-shadow: var(--glow-gold); }
+
+  .card-glow {
+    transition: box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform   240ms cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 200ms ease;
+  }
+  .card-glow:hover {
+    box-shadow: var(--glow-card);
+    border-color: color-mix(in oklch, var(--vantus-sky), transparent 40%) !important;
+    transform: translateY(-2px);
+  }
+
+  .btn-sky-glow  { transition: box-shadow 200ms ease, transform 180ms ease; }
+  .btn-sky-glow:hover  { box-shadow: var(--glow-sky);  transform: translateY(-1px); }
+  .btn-gold-glow { transition: box-shadow 200ms ease, transform 180ms ease; }
+  .btn-gold-glow:hover { box-shadow: var(--glow-gold); transform: translateY(-1px); }
+
+  /* Decorative accent bars */
+  .accent-bar {
+    display: block; height: 3px; width: 40px;
+    background: var(--gradient-brand);
+    border-radius: 99px; margin-bottom: 0.875rem;
+  }
+  .accent-bar-gold {
+    display: block; height: 3px; width: 40px;
+    background: var(--gradient-gold);
+    border-radius: 99px; margin-bottom: 0.875rem;
+  }
+
+  /* Inline color helpers */
+  .text-sky  { color: var(--vantus-sky); }
+  .text-gold { color: var(--highlight-gold); }
+  .bg-sky-subtle  { background: var(--highlight-sky-subtle); }
+  .bg-gold-subtle { background: var(--highlight-gold-subtle); }
+  .bg-sky         { background: var(--vantus-sky); }
+  .bg-navy        { background: var(--vantus-navy); }
+  .text-cream     { color: var(--vantus-cream); }
+  .border-sky     { border-color: var(--vantus-sky); }
+  .icon-bg-sky    { background: color-mix(in srgb, var(--vantus-sky) 12%, transparent); }
+  .icon-bg-gold   { background: color-mix(in srgb, var(--highlight-gold) 12%, transparent); }
+
+  /* Colored badge variants */
+  .badge-sky {
+    background: var(--highlight-sky-subtle) !important;
+    color: var(--vantus-sky) !important;
+    border-color: color-mix(in oklch, var(--vantus-sky), transparent 60%) !important;
+  }
+  .badge-gold {
+    background: var(--highlight-gold-subtle) !important;
+    color: var(--highlight-gold) !important;
+    border-color: color-mix(in oklch, var(--highlight-gold), transparent 60%) !important;
+  }
+  .badge-featured {
+    background: var(--vantus-sky) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+  }
+
+  /* Sky interactive link */
+  .link-sky {
+    color: var(--vantus-sky);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 200ms ease;
+  }
+  .link-sky:hover { text-decoration-color: var(--vantus-sky); }
+
+  /* Nav link with animated sky underline */
+  .nav-link-active {
+    color: var(--vantus-sky) !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-glow:hover    { transform: none; }
+    .btn-sky-glow:hover { transform: none; box-shadow: none; }
+    .btn-gold-glow:hover{ transform: none; box-shadow: none; }
+    .accent-bar, .accent-bar-gold { display: none; }
   }
 }
 
